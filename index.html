@@ -2235,7 +2235,7 @@
 
           <div class="form-group">
             <label for="itemTitle">Title</label>
-            <input type="search" id="itemTitle" required name="notafield" autocomplete="nope" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other" oninput="if(typeof handleTitleInput==='function') handleTitleInput();" onkeyup="if(typeof handleTitleInput==='function') handleTitleInput();">
+            <input type="search" id="itemTitle" required name="notafield" autocomplete="nope" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other" oninput="if(typeof handleTitleInput==='function') handleTitleInput();">
             <div id="autocompleteResults" class="autocomplete-results"></div>
             <div class="helper-text">Start typing to search, or just enter the title manually</div>
           </div>
@@ -3423,7 +3423,7 @@
       searchResults = results;
       
       resultsDiv.innerHTML = results.map((result, index) => `
-        <div class="autocomplete-item" ontouchend="event.preventDefault(); selectSearchResult(${index})" onclick="selectSearchResult(${index})">
+        <div class="autocomplete-item" onclick="selectSearchResult(${index})">
           ${result.image 
             ? `<img src="${result.image}" alt="${result.title}" class="autocomplete-image">`
             : `<div class="autocomplete-image placeholder">${typeEmoji}</div>`
@@ -3437,6 +3437,21 @@
           </div>
         </div>
       `).join('');
+
+      // Mobile tap detection — distinguish taps from scrolls
+      let _touchStartY = 0;
+      resultsDiv.querySelectorAll('.autocomplete-item').forEach((item, idx) => {
+        item.addEventListener('touchstart', (e) => {
+          _touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+        item.addEventListener('touchend', (e) => {
+          const dy = Math.abs(e.changedTouches[0].clientY - _touchStartY);
+          if (dy < 10) {
+            e.preventDefault();
+            selectSearchResult(idx);
+          }
+        });
+      });
     }
 
     // Select a search result

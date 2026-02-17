@@ -3160,11 +3160,22 @@
         }
       });
 
-      // Close autocomplete when tapping outside (use mousedown to avoid keyboard conflicts on mobile)
-      document.addEventListener('mousedown', (e) => {
-        if (!e.target.closest('.form-group') && !e.target.closest('.autocomplete-results')) {
+      // Close autocomplete when tapping outside — use focusin on other inputs/buttons
+      document.addEventListener('focusin', (e) => {
+        if (e.target !== titleInput && !e.target.closest('.autocomplete-results')) {
           resultsDiv.classList.remove('active');
         }
+      });
+      // Also close when tapping modal backdrop or other non-form areas
+      document.querySelector('#itemModal')?.addEventListener('click', (e) => {
+        if (e.target.closest('.autocomplete-results') || e.target.closest('.form-group')) return;
+        if (e.target === document.querySelector('#itemModal')) return; // modal backdrop handled separately
+        // Small delay to let ontouchend on autocomplete items fire first
+        setTimeout(() => {
+          if (!document.activeElement || document.activeElement !== titleInput) {
+            resultsDiv.classList.remove('active');
+          }
+        }, 200);
       });
     }
 

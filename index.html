@@ -3115,8 +3115,8 @@
 
 
 
-      titleInput.addEventListener('input', (e) => {
-        const query = e.target.value.trim();
+      function handleTitleInput() {
+        const query = titleInput.value.trim();
         const type = typeSelect.value;
 
         clearTimeout(searchTimeout);
@@ -3132,7 +3132,10 @@
         searchTimeout = setTimeout(() => {
           searchMedia(query, type);
         }, 500);
-      });
+      }
+
+      titleInput.addEventListener('input', handleTitleInput);
+      titleInput.addEventListener('compositionend', handleTitleInput);
 
       typeSelect.addEventListener('change', () => {
         toggleStreamingPlatform();
@@ -3146,8 +3149,9 @@
         }
       });
 
-      document.addEventListener('click', (e) => {
-        if (!e.target.closest('.form-group')) {
+      // Close autocomplete when tapping outside (use mousedown to avoid keyboard conflicts on mobile)
+      document.addEventListener('mousedown', (e) => {
+        if (!e.target.closest('.form-group') && !e.target.closest('.autocomplete-results')) {
           resultsDiv.classList.remove('active');
         }
       });
@@ -3403,7 +3407,7 @@
       searchResults = results;
       
       resultsDiv.innerHTML = results.map((result, index) => `
-        <div class="autocomplete-item" onclick="selectSearchResult(${index})">
+        <div class="autocomplete-item" ontouchend="event.preventDefault(); selectSearchResult(${index})" onclick="selectSearchResult(${index})">
           ${result.image 
             ? `<img src="${result.image}" alt="${result.title}" class="autocomplete-image">`
             : `<div class="autocomplete-image placeholder">${typeEmoji}</div>`

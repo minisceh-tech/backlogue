@@ -2235,7 +2235,7 @@
 
           <div class="form-group">
             <label for="itemTitle">Title</label>
-            <input type="text" id="itemTitle" required autocomplete="off" oninput="if(typeof handleTitleInput==='function') handleTitleInput();" onkeyup="if(typeof handleTitleInput==='function') handleTitleInput();">
+            <input type="text" id="itemTitle" required autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="if(typeof handleTitleInput==='function') handleTitleInput();" onkeyup="if(typeof handleTitleInput==='function') handleTitleInput();">
             <div id="autocompleteResults" class="autocomplete-results"></div>
             <div class="helper-text">Start typing to search, or just enter the title manually</div>
           </div>
@@ -3408,6 +3408,9 @@
     // Display autocomplete results
     function displayAutocompleteResults(results, type) {
       const resultsDiv = document.getElementById('autocompleteResults');
+
+      // Dismiss keyboard on mobile so results are easy to scroll
+      document.getElementById('itemTitle').blur();
 
       if (results.length === 0) {
         resultsDiv.innerHTML = '<div class="loading-indicator">No results found. You can enter the title manually.</div>';

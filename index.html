@@ -2913,15 +2913,22 @@
 
     // Initialize app
     async function init() {
-      // Auto-create default user (no login required)
-      const existingUser = await window.storage.get('currentUser');
-      if (!existingUser) {
+      // Check if there's an active session, if not create a default one
+      const existingSession = await checkSession();
+      if (!existingSession) {
+        const userId = 'user_' + Date.now();
+        const session = {
+          userId: userId,
+          expires: Date.now() + (30 * 24 * 60 * 60 * 1000)
+        };
+        await window.storage.set(CURRENT_SESSION_KEY, JSON.stringify(session));
+
         const defaultUser = {
-          id: 'user_' + Date.now(),
+          id: userId,
           name: 'Me',
           memberOf: []
         };
-        await window.storage.set('currentUser', JSON.stringify(defaultUser));
+        await window.storage.set(`${USER_KEY}-${userId}`, JSON.stringify(defaultUser));
       }
 
       // User is authenticated, load their data

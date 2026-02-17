@@ -3654,6 +3654,10 @@
 
       if (filteredItems.length === 0) {
         grid.style.display = 'none';
+        const emptyIcons = { 'movie': '🎬', 'tv': '📺', 'podcast': '🎙️', 'book': '📚', 'all': '📚' };
+        const emptyLabels = { 'movie': 'No movies yet', 'tv': 'No TV shows yet', 'podcast': 'No podcasts yet', 'book': 'No books yet', 'all': 'Your shelf is empty' };
+        emptyState.querySelector('.empty-state-icon').textContent = emptyIcons[currentMediaFilter] || '📚';
+        emptyState.querySelector('.empty-state-text').textContent = emptyLabels[currentMediaFilter] || 'Your shelf is empty';
         emptyState.style.display = 'block';
         return;
       }

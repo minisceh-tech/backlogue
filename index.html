@@ -3112,6 +3112,7 @@
 
     // Setup autocomplete
     // Global search handler (needs to be accessible from inline oninput)
+    let _lastSearchQuery = '';
     function handleTitleInput() {
       const titleInput = document.getElementById('itemTitle');
       const typeSelect = document.getElementById('itemType');
@@ -3120,6 +3121,12 @@
 
       const query = titleInput.value.trim();
       const type = typeSelect.value;
+
+      // Don't reset results if query hasn't changed (prevents scroll from closing list)
+      if (query === _lastSearchQuery && resultsDiv.classList.contains('active')) {
+        return;
+      }
+      _lastSearchQuery = query;
 
       clearTimeout(searchTimeout);
       resultsDiv.classList.remove('active');
@@ -3406,9 +3413,6 @@
     // Display autocomplete results
     function displayAutocompleteResults(results, type) {
       const resultsDiv = document.getElementById('autocompleteResults');
-
-      // Dismiss keyboard on mobile so results are easy to scroll
-      document.getElementById('itemTitle').blur();
 
       if (results.length === 0) {
         resultsDiv.innerHTML = '<div class="loading-indicator">No results found. You can enter the title manually.</div>';

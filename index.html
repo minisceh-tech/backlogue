@@ -2300,51 +2300,40 @@
           <input type="text" id="itemReferral" placeholder="Friend's name or source">
         </div>
 
-        <!-- More Details toggle -->
-        <button type="button" class="more-details-toggle" id="moreDetailsToggle" onclick="toggleMoreDetails()">
-          <span>More Details...</span>
-          <span class="toggle-arrow">&#9660;</span>
-        </button>
+        <!-- Genre (auto-populated from search, hidden from UI) -->
+        <select id="itemGenre" style="display:none;">
+          <option value="">Select genre...</option>
+          <option value="Action">Action</option>
+          <option value="Adventure">Adventure</option>
+          <option value="Animation">Animation</option>
+          <option value="Comedy">Comedy</option>
+          <option value="Crime">Crime</option>
+          <option value="Documentary">Documentary</option>
+          <option value="Drama">Drama</option>
+          <option value="Fantasy">Fantasy</option>
+          <option value="Horror">Horror</option>
+          <option value="Musical">Musical</option>
+          <option value="Mystery">Mystery</option>
+          <option value="Romance">Romance</option>
+          <option value="Sci-Fi">Sci-Fi</option>
+          <option value="Thriller">Thriller</option>
+          <option value="Western">Western</option>
+          <option value="Other">Other</option>
+        </select>
+        <input type="text" id="itemGenreOther" style="display:none;">
+        <div id="editModeTypeTitle" style="display:none;"></div>
 
-        <!-- Collapsible details section -->
-        <div class="more-details" id="moreDetailsSection">
-          <!-- Genre is auto-populated from search results, hidden from UI -->
-          <select id="itemGenre" style="display:none;">
-            <option value="">Select genre...</option>
-            <option value="Action">Action</option>
-            <option value="Adventure">Adventure</option>
-            <option value="Animation">Animation</option>
-            <option value="Comedy">Comedy</option>
-            <option value="Crime">Crime</option>
-            <option value="Documentary">Documentary</option>
-            <option value="Drama">Drama</option>
-            <option value="Fantasy">Fantasy</option>
-            <option value="Horror">Horror</option>
-            <option value="Musical">Musical</option>
-            <option value="Mystery">Mystery</option>
-            <option value="Romance">Romance</option>
-            <option value="Sci-Fi">Sci-Fi</option>
-            <option value="Thriller">Thriller</option>
-            <option value="Western">Western</option>
-            <option value="Other">Other</option>
+        <div class="form-group">
+          <label for="itemNotes">Notes</label>
+          <textarea id="itemNotes" placeholder="Your thoughts, quotes, or reminders about this..."></textarea>
+          <div class="helper-text">These notes will be visible on the card</div>
+        </div>
+
+        <div class="form-group">
+          <label for="itemGroup">Share with Group (optional)</label>
+          <select id="itemGroup">
+            <option value="">No group</option>
           </select>
-          <input type="text" id="itemGenreOther" style="display:none;">
-
-          <div class="form-group">
-            <label for="itemNotes">Notes</label>
-            <textarea id="itemNotes" placeholder="Your thoughts, quotes, or reminders about this..."></textarea>
-            <div class="helper-text">These notes will be visible on the card</div>
-          </div>
-
-          <div class="form-group">
-            <label for="itemGroup">Share with Group (optional)</label>
-            <select id="itemGroup">
-              <option value="">No group</option>
-            </select>
-          </div>
-
-          <!-- Edit-mode: Type & Title change (rarely needed) -->
-          <div id="editModeTypeTitle" style="display:none;"></div>
         </div>
 
         <div class="modal-actions">
@@ -3656,7 +3645,7 @@
               ${item.rating >= 1 ? '<div class="card-rating">👍</div>' : item.rating === -1 ? '<div class="card-rating">👎</div>' : ''}
               ${item.streamingPlatform ? `<div class="card-streaming">${item.streamingPlatform}</div>` : ''}
               ${item.genre ? `<div class="card-genre">${item.genre}</div>` : ''}
-              ${item.referral ? `<div class="card-referral">Recommended by ${item.referral}</div>` : ''}
+              ${item.referral ? `<div class="card-referral">Rec by ${item.referral}</div>` : ''}
               ${item.notes ? `<div class="card-notes">${item.notes}</div>` : ''}
               ${item.group ? `<div class="card-group">📁 ${getGroupName(item.group)}</div>` : ''}
             </div>
@@ -3787,7 +3776,7 @@
             <div class="card-content">
               ${item.rating >= 1 ? '<div class="card-rating">👍</div>' : item.rating === -1 ? '<div class="card-rating">👎</div>' : ''}
               ${item.streamingPlatform ? `<div class="card-streaming">${item.streamingPlatform}</div>` : ''}
-              ${item.referral ? `<div class="card-referral">Recommended by ${item.referral}</div>` : ''}
+              ${item.referral ? `<div class="card-referral">Rec by ${item.referral}</div>` : ''}
               ${item.notes ? `<div class="card-notes">${item.notes}</div>` : ''}
               <div class="card-referral" style="font-size:0.7rem; opacity:0.7;">Added by ${userName}${showGroup && groupName ? ` to ${groupName}` : ''}</div>
             </div>
@@ -3975,7 +3964,6 @@
       document.getElementById('modalItemPreview').classList.remove('visible');
       document.getElementById('editModeTypeTitle').style.display = 'none';
       document.querySelector('.modal-content').classList.remove('quick-edit-mode');
-      collapseMoreDetails();
       selectStatus('want');
 
       // Add mode: show Save + Cancel
@@ -4089,8 +4077,7 @@
         toggleStreamingPlatform();
 
         // Collapse more details by default
-        collapseMoreDetails();
-
+  
         // Edit mode: hide Save, show Done (auto-saves on close)
         document.getElementById('modalSaveBtn').style.display = 'none';
         document.getElementById('modalCloseBtn').textContent = 'Done';
@@ -4103,25 +4090,6 @@
     }
 
     // Toggle more details section
-    function toggleMoreDetails() {
-      const section = document.getElementById('moreDetailsSection');
-      const toggle = document.getElementById('moreDetailsToggle');
-      if (section.classList.contains('visible')) {
-        collapseMoreDetails();
-      } else {
-        section.classList.add('visible');
-        toggle.classList.add('expanded');
-        toggle.querySelector('span:first-child').textContent = 'Less Details';
-      }
-    }
-
-    function collapseMoreDetails() {
-      const section = document.getElementById('moreDetailsSection');
-      const toggle = document.getElementById('moreDetailsToggle');
-      section.classList.remove('visible');
-      toggle.classList.remove('expanded');
-      toggle.querySelector('span:first-child').textContent = 'More Details...';
-    }
 
     // Select status via pill buttons (syncs with hidden select)
     function selectStatus(status) {

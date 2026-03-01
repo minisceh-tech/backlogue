@@ -3804,10 +3804,18 @@
         document.getElementById('itemPremiereDate').value = result.premiereDate || '';
         document.getElementById('autocompleteResults').classList.remove('active');
 
+        // Reset premiere label
+        const premiereLabel = document.querySelector('label[for="itemPremiereDate"]');
+        if (premiereLabel) premiereLabel.textContent = 'Premieres / Airs On';
+
         // Auto-populate genre
         if (result.type === 'movie' || result.type === 'tv') {
           if (result.genre_ids && result.genre_ids.length > 0) {
             fetchTMDBGenre(result.genre_ids[0], result.type);
+          }
+          // For TV shows, fetch latest/upcoming season premiere date
+          if (result.type === 'tv' && result.tmdbId) {
+            fetchTVSeasonDate(result.tmdbId);
           }
         } else if (result.genre) {
           // Books/Podcasts: genre already in result
@@ -3815,6 +3823,54 @@
         }
       } catch (error) {
         console.error('Error selecting search result:', error);
+      }
+    }
+
+    // Fetch TV show details to get latest/next season premiere date
+    async function fetchTVSeasonDate(tmdbId) {
+      try {
+        const url = `https://api.themoviedb.org/3/tv/${tmdbId}?api_key=${TMDB_API_KEY}`;
+        const response = await fetch(url);
+        const data = await response.json();
+
+        if (!data.seasons || data.seasons.length === 0) return;
+
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // Filter out specials (season 0) and seasons without air dates
+        const realSeasons = data.seasons.filter(s => s.season_number > 0 && s.air_date);
+        if (realSeasons.length === 0) return;
+
+        // Find next upcoming season (air date in the future)
+        const upcoming = realSeasons
+          .filter(s => new Date(s.air_date + 'T00:00:00') >= today)
+          .sort((a, b) => a.air_date.localeCompare(b.air_date));
+
+        let bestDate, seasonLabel;
+
+        if (upcoming.length > 0) {
+          bestDate = upcoming[0].air_date;
+          seasonLabel = `S${upcoming[0].season_number}`;
+        } else {
+          // No upcoming — use most recent season
+          const sorted = realSeasons.sort((a, b) => b.air_date.localeCompare(a.air_date));
+          bestDate = sorted[0].air_date;
+          seasonLabel = `S${sorted[0].season_number}`;
+        }
+
+        document.getElementById('itemPremiereDate').value = bestDate;
+
+        // Update label to show which season
+        const label = document.querySelector('label[for="itemPremiereDate"]');
+        if (label) {
+          const isFuture = new Date(bestDate + 'T00:00:00') >= today;
+          label.textContent = isFuture
+            ? `${seasonLabel} Premieres`
+            : `${seasonLabel} Aired`;
+        }
+      } catch (error) {
+        console.error('Error fetching TV season data:', error);
       }
     }
 
@@ -4651,6 +4707,8 @@
 
       setStarRating(null); // Reset stars
       document.getElementById('itemPremiereDate').value = '';
+      const premiereLabel = document.querySelector('label[for="itemPremiereDate"]');
+      if (premiereLabel) premiereLabel.textContent = 'Premieres / Airs On';
       document.getElementById('itemDateLogged').value = '';
       currentTags = [];
       renderTagChips();

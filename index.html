@@ -3808,10 +3808,14 @@
         const premiereLabel = document.querySelector('label[for="itemPremiereDate"]');
         if (premiereLabel) premiereLabel.textContent = 'Premieres / Airs On';
 
-        // Auto-populate genre
+        // Auto-populate genre + streaming + season dates
         if (result.type === 'movie' || result.type === 'tv') {
           if (result.genre_ids && result.genre_ids.length > 0) {
             fetchTMDBGenre(result.genre_ids[0], result.type);
+          }
+          // Fetch where to stream
+          if (result.tmdbId) {
+            fetchStreamingProvider(result.tmdbId, result.type);
           }
           // For TV shows, fetch latest/upcoming season premiere date
           if (result.type === 'tv' && result.tmdbId) {
@@ -3871,6 +3875,71 @@
         }
       } catch (error) {
         console.error('Error fetching TV season data:', error);
+      }
+    }
+
+    // Fetch streaming provider from TMDB Watch Providers API
+    async function fetchStreamingProvider(tmdbId, type) {
+      try {
+        const mediaType = type === 'movie' ? 'movie' : 'tv';
+        const url = `https://api.themoviedb.org/3/${mediaType}/${tmdbId}/watch/providers?api_key=${TMDB_API_KEY}`;
+        const response = await fetch(url);
+        const data = await response.json();
+
+        // Use US region
+        const us = data.results?.US;
+        if (!us) return;
+
+        // Map TMDB provider names to our dropdown values
+        const providerMap = {
+          'Netflix': 'Netflix',
+          'Amazon Prime Video': 'Amazon Prime Video',
+          'Disney Plus': 'Disney+',
+          'Hulu': 'Hulu',
+          'Max': 'Max',
+          'HBO Max': 'Max',
+          'Apple TV Plus': 'Apple TV+',
+          'Apple TV+': 'Apple TV+',
+          'Peacock': 'Peacock',
+          'Peacock Premium': 'Peacock',
+          'Paramount Plus': 'Paramount+',
+          'Paramount+': 'Paramount+',
+          'Showtime': 'Showtime',
+          'Starz': 'Starz',
+          'ESPN Plus': 'ESPN+',
+          'YouTube Premium': 'YouTube Premium',
+          'Crunchyroll': 'Crunchyroll',
+          'Tubi TV': 'Tubi',
+          'Pluto TV': 'Pluto TV',
+          'Amazon Prime Video with Ads': 'Freevee',
+          'The Roku Channel': 'Roku Channel',
+        };
+
+        // Check flatrate (subscription) first, then free, then ads
+        const providers = [...(us.flatrate || []), ...(us.free || []), ...(us.ads || [])];
+
+        for (const provider of providers) {
+          const mapped = providerMap[provider.provider_name];
+          if (mapped) {
+            const select = document.getElementById('itemStreamingPlatform');
+            // Verify option exists in dropdown
+            const optionExists = Array.from(select.options).some(opt => opt.value === mapped);
+            if (optionExists) {
+              select.value = mapped;
+              return;
+            }
+          }
+        }
+
+        // Check if in theaters (movies only)
+        if (type === 'movie') {
+          // If no streaming but has buy/rent, set to Rental
+          if ((us.buy || us.rent) && !us.flatrate && !us.free) {
+            document.getElementById('itemStreamingPlatform').value = 'Rental';
+          }
+        }
+      } catch (error) {
+        console.error('Error fetching streaming provider:', error);
       }
     }
 

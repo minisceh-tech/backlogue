@@ -21,6 +21,7 @@
     */
 
     :root {
+      color-scheme: dark;
       --bg-primary: #121212;
       --bg-secondary: #1e1e1e;
       --bg-accent: #282828;
@@ -160,6 +161,11 @@
       outline: none;
       border-color: var(--accent-primary);
       box-shadow: 0 0 0 3px rgba(44, 79, 124, 0.1);
+    }
+
+    .filter-dropdown option {
+      background: var(--bg-secondary);
+      color: var(--text-primary);
     }
 
     /* Subtle pill-style dropdowns */
@@ -2459,10 +2465,258 @@
       user-select: none;
     }
 
+    /* ===== Share Card Styles ===== */
+    .share-card-types {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .share-type-btn {
+      flex: 1;
+      padding: 0.5rem;
+      border: 1.5px solid var(--border-light);
+      border-radius: 8px;
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .share-type-btn.active {
+      background: var(--accent-primary);
+      color: white;
+      border-color: var(--accent-primary);
+    }
+
+    .share-card-preview {
+      display: flex;
+      justify-content: center;
+      margin-bottom: 1rem;
+      overflow: hidden;
+      border-radius: 12px;
+    }
+
+    .share-card-render {
+      width: 400px;
+      min-height: 480px;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      border-radius: 16px;
+      padding: 2rem;
+      font-family: 'Inter', sans-serif;
+      color: #e1e1e1;
+      position: relative;
+      overflow: hidden;
+      transform: scale(0.85);
+      transform-origin: top center;
+    }
+
+    .share-card-render::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #5B9BD5, #7CB8E8, #f59e0b);
+    }
+
+    .share-card-branding {
+      text-align: center;
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .share-card-branding .brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 0.85rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .share-card-item-poster {
+      width: 140px;
+      height: 210px;
+      border-radius: 10px;
+      object-fit: cover;
+      margin: 0 auto 1rem;
+      display: block;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+
+    .share-card-item-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
+    }
+
+    .share-card-item-meta {
+      text-align: center;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 0.75rem;
+    }
+
+    .share-card-rating {
+      text-align: center;
+      font-size: 1.5rem;
+      color: #f59e0b;
+      margin-bottom: 0.5rem;
+      letter-spacing: 2px;
+    }
+
+    .share-card-review {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.75);
+      text-align: center;
+      font-style: italic;
+      line-height: 1.5;
+      max-height: 4.5em;
+      overflow: hidden;
+    }
+
+    .share-card-status-badge {
+      display: inline-block;
+      padding: 0.3rem 0.8rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .share-card-stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+    }
+
+    .share-card-stat {
+      background: rgba(255,255,255,0.08);
+      border-radius: 10px;
+      padding: 0.75rem;
+      text-align: center;
+    }
+
+    .share-card-stat-value {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #5B9BD5;
+    }
+
+    .share-card-stat-label {
+      font-size: 0.65rem;
+      color: rgba(255,255,255,0.5);
+      margin-top: 0.15rem;
+    }
+
+    .share-card-actions {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+      margin-top: 0.5rem;
+    }
+
+    .share-card-actions .btn {
+      flex: 1;
+      max-width: 180px;
+    }
+
+    /* ===== Toggle Row (for Profile Settings) ===== */
+    .toggle-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+    }
+
+    .toggle-row input[type="checkbox"] {
+      width: 40px;
+      height: 22px;
+      appearance: none;
+      -webkit-appearance: none;
+      background: var(--bg-accent);
+      border-radius: 11px;
+      position: relative;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      border: 1px solid var(--border-medium);
+      flex-shrink: 0;
+    }
+
+    .toggle-row input[type="checkbox"]:checked {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+    }
+
+    .toggle-row input[type="checkbox"]::after {
+      content: '';
+      position: absolute;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: white;
+      top: 1px;
+      left: 1px;
+      transition: transform 0.2s ease;
+    }
+
+    .toggle-row input[type="checkbox"]:checked::after {
+      transform: translateX(18px);
+    }
+
+    /* ===== Public Profile View ===== */
+    .public-profile-header {
+      text-align: center;
+      padding: 2rem 1rem 1rem;
+    }
+
+    .public-profile-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .public-profile-subtitle {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-top: 0.25rem;
+    }
+
+    .public-profile-stats {
+      max-width: 600px;
+      margin: 0 auto 1.5rem;
+      padding: 0 1rem;
+    }
+
+    .public-profile-section {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0 1rem 3rem;
+    }
+
+    .public-profile-footer {
+      text-align: center;
+      padding: 2rem;
+      border-top: 1px solid var(--border-light);
+      margin-top: 2rem;
+    }
+
   </style>
   <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore-compat.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 <body>
   <div class="header">
@@ -2522,11 +2776,11 @@
     <!-- Group Feeds Tab -->
     <div id="groupFeeds" class="tab-content">
       <div class="feed-filters">
-        <select id="feedGroupFilter" onchange="filterFeeds()" class="filter-dropdown">
+        <select id="feedGroupFilter" onchange="filterFeeds()" class="filter-dropdown filter-dropdown-blue" style="border-radius: 20px; padding: 0.3rem 0.6rem; font-size: 0.7rem; min-width: 0;">
           <option value="all">All Groups</option>
         </select>
 
-        <select id="feedMediaFilter" onchange="filterFeeds()" class="filter-dropdown">
+        <select id="feedMediaFilter" onchange="filterFeeds()" class="filter-dropdown filter-dropdown-blue" style="border-radius: 20px; padding: 0.3rem 0.6rem; font-size: 0.7rem; min-width: 0;">
           <option value="all">All Media Types</option>
           <option value="movie">🎬 Movies</option>
           <option value="tv">📺 TV Shows</option>
@@ -2534,7 +2788,7 @@
           <option value="book">📚 Books</option>
         </select>
 
-        <select id="feedReferralFilter" onchange="filterFeeds()" class="filter-dropdown">
+        <select id="feedReferralFilter" onchange="filterFeeds()" class="filter-dropdown filter-dropdown-blue" style="border-radius: 20px; padding: 0.3rem 0.6rem; font-size: 0.7rem; min-width: 0;">
           <option value="all">All Recommendations</option>
         </select>
       </div>
@@ -2906,6 +3160,92 @@
       <button class="modal-close" onclick="closeModal('statsModal')" aria-label="Close">&times;</button>
       <h2 class="modal-header">Your Stats</h2>
       <div class="stats-modal-body" id="statsBody"></div>
+      <button class="btn btn-secondary" onclick="openShareCardForStats()" style="margin-top: 1rem; width: 100%; font-size: 0.8rem;">📤 Create Share Card</button>
+    </div>
+  </div>
+
+  <!-- Share Card Modal -->
+  <div id="shareCardModal" class="modal">
+    <div class="modal-content" style="max-width: 440px;">
+      <button class="modal-close" onclick="closeModal('shareCardModal')" aria-label="Close">&times;</button>
+      <h2 class="modal-header">Share Card</h2>
+      <div class="share-card-types" id="shareCardTypes">
+        <button class="share-type-btn active" onclick="switchShareCardType('item')">Item Card</button>
+        <button class="share-type-btn" onclick="switchShareCardType('stats')">Stats Card</button>
+      </div>
+      <div class="share-card-preview">
+        <div id="shareCardRender" class="share-card-render"></div>
+      </div>
+      <div class="share-card-actions">
+        <button class="btn" onclick="downloadShareCard()">📥 Download</button>
+        <button class="btn btn-secondary" onclick="copyShareCardToClipboard()">📋 Copy</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Settings Modal -->
+  <div id="profileSettingsModal" class="modal">
+    <div class="modal-content">
+      <button class="modal-close" onclick="closeModal('profileSettingsModal')" aria-label="Close">&times;</button>
+      <h2 class="modal-header">Public Profile</h2>
+      <div class="form-group">
+        <label class="toggle-row">
+          <span>Enable Public Profile</span>
+          <input type="checkbox" id="profileEnabled" onchange="togglePublicProfile()">
+        </label>
+        <div style="font-size: 0.7rem; color: var(--text-tertiary); margin-top: 0.3rem;">When enabled, anyone with your link can see your shelf</div>
+      </div>
+      <div id="profileOptions" style="display: none;">
+        <div class="form-group">
+          <label for="profileDisplayName">Display Name</label>
+          <input type="text" id="profileDisplayName" class="form-control" placeholder="Your public name">
+        </div>
+        <div class="form-group">
+          <label class="toggle-row">
+            <span>Show Ratings</span>
+            <input type="checkbox" id="profileShowRatings" checked>
+          </label>
+        </div>
+        <div class="form-group">
+          <label class="toggle-row">
+            <span>Show Reviews</span>
+            <input type="checkbox" id="profileShowReviews">
+          </label>
+        </div>
+        <div class="form-group">
+          <label class="toggle-row">
+            <span>Show Stats</span>
+            <input type="checkbox" id="profileShowStats" checked>
+          </label>
+        </div>
+        <div class="form-group">
+          <label>Your Profile Link</label>
+          <div class="invite-code" style="word-break: break-all;">
+            <span id="profileLinkDisplay" style="font-size: 0.7rem;"></span>
+            <button class="copy-btn" onclick="copyProfileLink()">Copy</button>
+          </div>
+        </div>
+        <div class="modal-actions" style="justify-content: center;">
+          <button class="btn" onclick="savePublicProfile()">Save & Publish</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Public Profile View (shown for ?profile= visitors) -->
+  <div id="publicProfileView" style="display: none;">
+    <div class="public-profile-header">
+      <div style="font-family: 'Playfair Display', serif; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 0.5rem;">BACKLOGUE</div>
+      <div class="public-profile-name" id="publicProfileName"></div>
+      <div class="public-profile-subtitle">Media Collection</div>
+    </div>
+    <div id="publicProfileStats" class="public-profile-stats"></div>
+    <div class="public-profile-section">
+      <div id="publicProfilePills" class="status-pills" style="justify-content: center; margin-bottom: 1rem;"></div>
+      <div id="publicProfileGrid" class="grid"></div>
+    </div>
+    <div class="public-profile-footer">
+      <a class="btn" onclick="window.location.href=window.location.origin+window.location.pathname">Create Your Own Backlogue</a>
     </div>
   </div>
 
@@ -4467,6 +4807,7 @@
               ${item.group ? `<div class="card-group">📁 ${getGroupName(item.group)}</div>` : ''}
             </div>
             <div class="card-actions">
+              <button class="card-action-btn" onclick="event.stopPropagation(); openShareCardForItem('${item.id}')" title="Share">📤</button>
               <button class="card-action-btn" onclick="event.stopPropagation(); editItem('${item.id}')" title="Edit">✏️</button>
               <button class="card-action-btn delete-btn" onclick="event.stopPropagation(); deleteItem('${item.id}')" title="Delete">🗑️</button>
             </div>
@@ -5370,15 +5711,15 @@
         contentDiv.className = 'tab-content';
         contentDiv.innerHTML = `
           <div class="feed-filters">
-            <select id="groupMediaFilter-${group.id}" onchange="filterGroupFeed('${group.id}')" class="filter-dropdown">
+            <select id="groupMediaFilter-${group.id}" onchange="filterGroupFeed('${group.id}')" class="filter-dropdown filter-dropdown-blue" style="border-radius: 20px; padding: 0.3rem 0.6rem; font-size: 0.7rem; min-width: 0;">
               <option value="all">All Media Types</option>
               <option value="movie">🎬 Movies</option>
               <option value="tv">📺 TV Shows</option>
               <option value="podcast">🎙️ Podcasts</option>
               <option value="book">📚 Books</option>
             </select>
-            
-            <select id="groupReferralFilter-${group.id}" onchange="filterGroupFeed('${group.id}')" class="filter-dropdown">
+
+            <select id="groupReferralFilter-${group.id}" onchange="filterGroupFeed('${group.id}')" class="filter-dropdown filter-dropdown-blue" style="border-radius: 20px; padding: 0.3rem 0.6rem; font-size: 0.7rem; min-width: 0;">
               <option value="all">All Recommendations</option>
             </select>
           </div>
@@ -5920,8 +6261,411 @@
       }
     }
 
+    // ========== SHARE CARDS ==========
+    let currentShareItem = null;
+
+    function openShareCardForItem(itemId) {
+      const item = items.find(i => i.id === itemId);
+      if (!item) return;
+      currentShareItem = item;
+      renderItemShareCard(item);
+      document.getElementById('shareCardTypes').style.display = 'flex';
+      document.querySelectorAll('.share-type-btn').forEach((btn, i) => {
+        btn.classList.toggle('active', i === 0);
+      });
+      document.getElementById('shareCardModal').classList.add('active');
+    }
+
+    function openShareCardForStats() {
+      currentShareItem = null;
+      renderStatsShareCard();
+      document.getElementById('shareCardTypes').style.display = 'none';
+      document.getElementById('shareCardModal').classList.add('active');
+    }
+
+    function switchShareCardType(type) {
+      document.querySelectorAll('.share-type-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent.toLowerCase().includes(type));
+      });
+      if (type === 'item' && currentShareItem) {
+        renderItemShareCard(currentShareItem);
+      } else {
+        renderStatsShareCard();
+      }
+    }
+
+    function renderItemShareCard(item) {
+      const stars = legacyToStars(item.rating);
+      let starHtml = '';
+      if (stars !== null) {
+        const full = Math.floor(stars);
+        const half = (stars % 1) >= 0.5;
+        starHtml = '<div class="share-card-rating">' + '\u2605'.repeat(full) + (half ? '\u00BD' : '') + '</div>';
+      }
+
+      const statusColors = {
+        'done': { bg: 'rgba(91,155,213,0.2)', color: '#5B9BD5', label: 'Completed' },
+        'current': { bg: 'rgba(99,102,241,0.2)', color: '#6366f1', label: 'Currently Enjoying' },
+        'want': { bg: 'rgba(245,158,11,0.2)', color: '#f59e0b', label: 'Up Next' }
+      };
+      const sc = statusColors[item.status] || statusColors['done'];
+
+      const container = document.getElementById('shareCardRender');
+      container.innerHTML = `
+        <div style="text-align: center; margin-bottom: 0.5rem;">
+          <span class="share-card-status-badge" style="background: ${sc.bg}; color: ${sc.color};">${sc.label}</span>
+        </div>
+        ${item.image
+          ? `<img class="share-card-item-poster" src="${item.image}" crossorigin="anonymous" onerror="this.style.display='none'">`
+          : `<div style="width:140px;height:210px;margin:0 auto 1rem;border-radius:10px;background:linear-gradient(135deg,#282828,#333);display:flex;align-items:center;justify-content:center;font-size:3rem;">${getTypeEmoji(item.type)}</div>`
+        }
+        <div class="share-card-item-title">${item.title}</div>
+        <div class="share-card-item-meta">
+          ${getTypeEmoji(item.type)} ${item.type.charAt(0).toUpperCase() + item.type.slice(1)}
+          ${item.genre ? ' &middot; ' + item.genre : ''}
+          ${item.dateLogged ? ' &middot; ' + formatDateForCard(item.dateLogged) : ''}
+        </div>
+        ${starHtml}
+        ${item.notes ? `<div class="share-card-review">"${item.notes.substring(0, 150)}${item.notes.length > 150 ? '...' : ''}"</div>` : ''}
+        <div class="share-card-branding"><div class="brand">BACKLOGUE</div></div>
+      `;
+    }
+
+    function renderStatsShareCard() {
+      const total = items.length;
+      const done = items.filter(i => i.status === 'done').length;
+      const current = items.filter(i => i.status === 'current').length;
+      const rated = items.filter(i => legacyToStars(i.rating) !== null);
+      const avgRating = rated.length > 0
+        ? (rated.reduce((s, i) => s + legacyToStars(i.rating), 0) / rated.length).toFixed(1)
+        : '--';
+
+      const genreCounts = {};
+      items.forEach(i => { if (i.genre) genreCounts[i.genre] = (genreCounts[i.genre] || 0) + 1; });
+      const topGenre = Object.entries(genreCounts).sort((a, b) => b[1] - a[1])[0];
+
+      const typeCounts = {};
+      items.forEach(i => { typeCounts[i.type] = (typeCounts[i.type] || 0) + 1; });
+
+      const typeEmojis = { movie: '\uD83C\uDFAC', tv: '\uD83D\uDCFA', podcast: '\uD83C\uDF99\uFE0F', book: '\uD83D\uDCDA' };
+      let typeHtml = '';
+      ['movie', 'tv', 'podcast', 'book'].forEach(t => {
+        const c = typeCounts[t] || 0;
+        if (c > 0) {
+          typeHtml += `<div style="display:flex;justify-content:space-between;padding:0.3rem 0;font-size:0.8rem;color:rgba(255,255,255,0.7);">
+            <span>${typeEmojis[t]} ${t.charAt(0).toUpperCase() + t.slice(1)}</span>
+            <span style="color:#5B9BD5;font-weight:600;">${c}</span>
+          </div>`;
+        }
+      });
+
+      const container = document.getElementById('shareCardRender');
+      container.innerHTML = `
+        <div style="text-align:center;margin-bottom:1.5rem;">
+          <div style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;margin-bottom:0.25rem;">My Media Journey</div>
+          <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);">${currentUser ? currentUser.name : 'A Backloguer'}</div>
+        </div>
+        <div class="share-card-stats-grid">
+          <div class="share-card-stat"><div class="share-card-stat-value">${total}</div><div class="share-card-stat-label">Total Items</div></div>
+          <div class="share-card-stat"><div class="share-card-stat-value">${done}</div><div class="share-card-stat-label">Completed</div></div>
+          <div class="share-card-stat"><div class="share-card-stat-value">${avgRating}</div><div class="share-card-stat-label">Avg Rating</div></div>
+          <div class="share-card-stat"><div class="share-card-stat-value">${current}</div><div class="share-card-stat-label">In Progress</div></div>
+        </div>
+        ${topGenre ? `<div style="text-align:center;font-size:0.8rem;color:rgba(255,255,255,0.6);margin-bottom:1rem;">Top Genre: <span style="color:#f59e0b;font-weight:600;">${topGenre[0]}</span></div>` : ''}
+        <div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:0.75rem;">
+          ${typeHtml}
+        </div>
+        <div class="share-card-branding"><div class="brand">BACKLOGUE</div></div>
+      `;
+    }
+
+    async function downloadShareCard() {
+      const element = document.getElementById('shareCardRender');
+      try {
+        const canvas = await html2canvas(element, {
+          backgroundColor: null,
+          scale: 2,
+          useCORS: true,
+          allowTaint: false,
+          logging: false
+        });
+        const link = document.createElement('a');
+        link.download = 'backlogue-card.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      } catch (err) {
+        console.error('Share card generation error:', err);
+        alert('Failed to generate image. Try again.');
+      }
+    }
+
+    async function copyShareCardToClipboard() {
+      const element = document.getElementById('shareCardRender');
+      try {
+        const canvas = await html2canvas(element, {
+          backgroundColor: null,
+          scale: 2,
+          useCORS: true,
+          allowTaint: false,
+          logging: false
+        });
+        canvas.toBlob(async (blob) => {
+          try {
+            await navigator.clipboard.write([
+              new ClipboardItem({ 'image/png': blob })
+            ]);
+            alert('Card copied to clipboard!');
+          } catch (e) {
+            console.warn('Clipboard API not supported, falling back to download');
+            downloadShareCard();
+          }
+        }, 'image/png');
+      } catch (err) {
+        console.error('Copy to clipboard error:', err);
+        alert('Could not copy to clipboard. Try downloading instead.');
+      }
+    }
+
+    // ========== PUBLIC PROFILE ==========
+
+    function checkProfileParam() {
+      const params = new URLSearchParams(window.location.search);
+      const profileId = params.get('profile');
+      if (profileId) {
+        loadPublicProfile(profileId);
+        return true;
+      }
+      return false;
+    }
+
+    async function loadPublicProfile(userId) {
+      try {
+        const doc = await db.collection('publicProfiles').doc(userId).get();
+        if (!doc.exists || !doc.data().enabled) {
+          document.getElementById('publicProfileView').style.display = 'block';
+          document.getElementById('publicProfileView').innerHTML = `
+            <div style="text-align:center;padding:4rem 2rem;color:var(--text-secondary);font-family:Inter,sans-serif;">
+              <h2 style="color:var(--text-primary);">Profile Not Found</h2>
+              <p>This profile doesn't exist or is set to private.</p>
+              <a href="${window.location.origin + window.location.pathname}" style="color:var(--accent-primary);margin-top:1rem;display:inline-block;">Go to Backlogue</a>
+            </div>`;
+          return;
+        }
+        renderPublicProfile(doc.data());
+      } catch (err) {
+        console.error('Error loading public profile:', err);
+      }
+    }
+
+    function renderPublicProfile(data) {
+      // Hide app UI
+      const header = document.querySelector('.header');
+      const container = document.querySelector('.container');
+      const bottomNav = document.querySelector('.bottom-nav');
+      const fab = document.querySelector('.fab');
+      if (header) header.style.display = 'none';
+      if (container) container.style.display = 'none';
+      if (bottomNav) bottomNav.style.display = 'none';
+      if (fab) fab.style.display = 'none';
+
+      // Hide login/signup modals
+      const loginModal = document.getElementById('loginModal');
+      const signupModal = document.getElementById('signupModal');
+      if (loginModal) loginModal.style.display = 'none';
+      if (signupModal) signupModal.style.display = 'none';
+
+      const view = document.getElementById('publicProfileView');
+      view.style.display = 'block';
+
+      document.getElementById('publicProfileName').textContent = data.displayName || 'A Backloguer';
+
+      // Stats
+      if (data.showStats && data.stats) {
+        const s = data.stats;
+        document.getElementById('publicProfileStats').innerHTML = `
+          <div class="stats-grid">
+            <div class="stat-card"><div class="stat-value">${s.total || 0}</div><div class="stat-label">Total</div></div>
+            <div class="stat-card"><div class="stat-value">${s.completed || 0}</div><div class="stat-label">Completed</div></div>
+            <div class="stat-card"><div class="stat-value">${s.avgRating || '--'}</div><div class="stat-label">Avg Rating</div></div>
+            ${s.topGenre ? `<div class="stat-card"><div class="stat-value" style="font-size:1rem;">${s.topGenre}</div><div class="stat-label">Top Genre</div></div>` : ''}
+          </div>`;
+      }
+
+      // Items
+      if (data.items && data.items.length > 0) {
+        const pills = document.getElementById('publicProfilePills');
+        pills.innerHTML = `
+          <button class="status-pill active" onclick="filterPublicProfile('all', this)">All</button>
+          <button class="status-pill" onclick="filterPublicProfile('current', this)">Consuming</button>
+          <button class="status-pill" onclick="filterPublicProfile('want', this)">Up Next</button>
+          <button class="status-pill" onclick="filterPublicProfile('done', this)">Caught Up</button>
+        `;
+        window._publicItems = data.items;
+        window._publicShowRatings = data.showRatings;
+        window._publicShowReviews = data.showReviews;
+        renderPublicProfileGrid(data.items, data.showRatings, data.showReviews);
+      }
+    }
+
+    function filterPublicProfile(status, btn) {
+      document.querySelectorAll('#publicProfilePills .status-pill').forEach(p => p.classList.remove('active'));
+      btn.classList.add('active');
+      let filtered = window._publicItems;
+      if (status !== 'all') {
+        filtered = filtered.filter(i => i.status === status);
+      }
+      renderPublicProfileGrid(filtered, window._publicShowRatings, window._publicShowReviews);
+    }
+
+    function renderPublicProfileGrid(profileItems, showRatings, showReviews) {
+      const grid = document.getElementById('publicProfileGrid');
+      const typeEmojis = { movie: '\uD83C\uDFAC', tv: '\uD83D\uDCFA', podcast: '\uD83C\uDF99\uFE0F', book: '\uD83D\uDCDA' };
+      grid.innerHTML = profileItems.map(item => `
+        <div class="card" style="cursor: default;">
+          <div class="card-image">
+            ${item.image ? `<img src="${item.image}" alt="${item.title}">` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:2rem;background:var(--bg-accent);">${typeEmojis[item.type] || ''}</div>`}
+          </div>
+          <div class="card-content">
+            <div class="card-type-badge">${typeEmojis[item.type] || ''}</div>
+            ${showRatings && item.rating ? renderStarDisplayPublic(item.rating) : ''}
+            ${item.genre ? `<div class="card-genre">${item.genre}</div>` : ''}
+            ${showReviews && item.notes ? `<div class="card-notes-label">Review:</div><div class="card-notes">${item.notes}</div>` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderStarDisplayPublic(rating) {
+      if (rating === null || rating === undefined) return '';
+      const full = Math.floor(rating);
+      const half = (rating % 1) >= 0.5;
+      let html = '<div class="star-rating-display">';
+      for (let i = 0; i < full; i++) html += '\u2605';
+      if (half) html += '\u00BD';
+      html += '</div>';
+      return html;
+    }
+
+    function openProfileSettings() {
+      loadProfileSettings();
+      document.getElementById('profileSettingsModal').classList.add('active');
+    }
+
+    async function loadProfileSettings() {
+      try {
+        const doc = await db.collection('publicProfiles').doc(currentUser.id).get();
+        if (doc.exists) {
+          const data = doc.data();
+          document.getElementById('profileEnabled').checked = data.enabled || false;
+          document.getElementById('profileDisplayName').value = data.displayName || currentUser.name;
+          document.getElementById('profileShowRatings').checked = data.showRatings !== false;
+          document.getElementById('profileShowReviews').checked = data.showReviews || false;
+          document.getElementById('profileShowStats').checked = data.showStats !== false;
+        } else {
+          document.getElementById('profileEnabled').checked = false;
+          document.getElementById('profileDisplayName').value = currentUser.name;
+          document.getElementById('profileShowRatings').checked = true;
+          document.getElementById('profileShowReviews').checked = false;
+          document.getElementById('profileShowStats').checked = true;
+        }
+        togglePublicProfile();
+      } catch (err) {
+        console.error('Error loading profile settings:', err);
+      }
+    }
+
+    function togglePublicProfile() {
+      const enabled = document.getElementById('profileEnabled').checked;
+      document.getElementById('profileOptions').style.display = enabled ? 'block' : 'none';
+      if (enabled) {
+        const link = window.location.origin + window.location.pathname + '?profile=' + currentUser.id;
+        document.getElementById('profileLinkDisplay').textContent = link;
+      }
+    }
+
+    function copyProfileLink() {
+      const link = document.getElementById('profileLinkDisplay').textContent;
+      navigator.clipboard.writeText(link).then(() => {
+        alert('Profile link copied!');
+      }).catch(() => {
+        const temp = document.createElement('input');
+        document.body.appendChild(temp);
+        temp.value = link;
+        temp.select();
+        document.execCommand('copy');
+        document.body.removeChild(temp);
+        alert('Profile link copied!');
+      });
+    }
+
+    async function savePublicProfile() {
+      try {
+        const enabled = document.getElementById('profileEnabled').checked;
+        const displayName = document.getElementById('profileDisplayName').value.trim() || currentUser.name;
+        const showRatings = document.getElementById('profileShowRatings').checked;
+        const showReviews = document.getElementById('profileShowReviews').checked;
+        const showStats = document.getElementById('profileShowStats').checked;
+
+        // Compute stats
+        const total = items.length;
+        const completed = items.filter(i => i.status === 'done').length;
+        const current = items.filter(i => i.status === 'current').length;
+        const rated = items.filter(i => legacyToStars(i.rating) !== null);
+        const avgRating = rated.length > 0
+          ? (rated.reduce((s, i) => s + legacyToStars(i.rating), 0) / rated.length).toFixed(1)
+          : null;
+        const genreCounts = {};
+        items.forEach(i => { if (i.genre) genreCounts[i.genre] = (genreCounts[i.genre] || 0) + 1; });
+        const topGenreEntry = Object.entries(genreCounts).sort((a, b) => b[1] - a[1])[0];
+
+        // Denormalize items for public access
+        const publicItems = items.map(item => ({
+          title: item.title,
+          type: item.type,
+          status: item.status,
+          rating: showRatings ? legacyToStars(item.rating) : null,
+          image: item.image || '',
+          genre: item.genre || '',
+          notes: showReviews ? (item.notes || '') : '',
+          dateLogged: item.dateLogged || ''
+        }));
+
+        const profileData = {
+          enabled,
+          displayName,
+          showRatings,
+          showReviews,
+          showStats,
+          lastUpdated: Date.now(),
+          stats: {
+            total,
+            completed,
+            current,
+            avgRating,
+            topGenre: topGenreEntry ? topGenreEntry[0] : null,
+            typeCounts: (() => {
+              const tc = {};
+              items.forEach(i => { tc[i.type] = (tc[i.type] || 0) + 1; });
+              return tc;
+            })()
+          },
+          items: publicItems
+        };
+
+        await db.collection('publicProfiles').doc(currentUser.id).set(profileData);
+        alert(enabled ? 'Public profile published!' : 'Public profile disabled.');
+        closeModal('profileSettingsModal');
+      } catch (err) {
+        console.error('Error saving public profile:', err);
+        alert('Failed to save profile. Please try again.');
+      }
+    }
+
     // Firebase Auth state listener - main entry point
     auth.onAuthStateChanged(async (firebaseUser) => {
+      // Check if viewing a public profile — skip login
+      if (checkProfileParam()) return;
+
       if (firebaseUser) {
         // User is signed in - initialize app
         try {
@@ -5977,6 +6721,10 @@
     <button class="bottom-nav-btn" onclick="openStatsModal()">
       <span class="bottom-nav-icon">📊</span>
       <span class="bottom-nav-label">Stats</span>
+    </button>
+    <button class="bottom-nav-btn" onclick="openProfileSettings()">
+      <span class="bottom-nav-icon">👤</span>
+      <span class="bottom-nav-label">Profile</span>
     </button>
   </nav>
 </body>

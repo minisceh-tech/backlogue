@@ -1121,6 +1121,10 @@
       overflow: hidden;
     }
 
+    .card[data-type="podcast"] .card-image {
+      aspect-ratio: 1 / 1;
+    }
+
     .card-image img {
       position: absolute;
       top: 0;
@@ -4787,7 +4791,7 @@
         
         // Add the card
         html += `
-          <div class="card" style="animation-delay: ${index * 0.05}s">
+          <div class="card" data-type="${item.type}" style="animation-delay: ${index * 0.05}s">
             <div class="card-priority-toggle" onclick="event.stopPropagation(); togglePriority('${item.id}')" title="Toggle priority">
               ${item.watchSoon ? '⭐' : '☆'}
             </div>
@@ -4928,7 +4932,7 @@
         }));
 
         html += `
-          <div class="card" style="animation-delay: ${index * 0.05}s">
+          <div class="card" data-type="${item.type}" style="animation-delay: ${index * 0.05}s">
             ${item.watchSoon ? '<div class="card-priority-toggle" style="pointer-events:none;">⭐</div>' : ''}
             <div class="card-image">
               ${item.image ? `<img src="${item.image}" alt="${item.title}">` : ''}

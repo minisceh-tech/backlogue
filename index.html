@@ -795,6 +795,14 @@
       border-color: rgba(91, 155, 213, 0.3);
     }
 
+    .card.priority-glow {
+      border-left: 3px solid var(--accent-gold);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), -2px 0 8px rgba(245, 158, 11, 0.15);
+    }
+    .card.priority-glow:hover {
+      box-shadow: 0 6px 16px rgba(44, 79, 124, 0.1), -2px 0 12px rgba(245, 158, 11, 0.2);
+    }
+
 
     @keyframes cardAppear {
       from {
@@ -807,26 +815,6 @@
       }
     }
 
-    .card-priority-toggle {
-      position: absolute;
-      top: 5px;
-      left: 5px;
-      width: 26px;
-      height: 26px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1.1rem;
-      z-index: 10;
-      cursor: pointer;
-      filter: drop-shadow(0 1px 3px rgba(0,0,0,0.4));
-      transition: transform 0.2s ease;
-      color: rgba(200, 200, 200, 0.8);
-    }
-
-    .card-priority-toggle:hover {
-      transform: scale(1.2);
-    }
 
     .card-rating {
       margin-top: 0.25rem;
@@ -2486,8 +2474,7 @@
     .btn,
     .card-action-btn,
     .bottom-nav-btn,
-    .fab,
-    .card-priority-toggle {
+    .fab {
       -webkit-user-select: none;
       user-select: none;
     }
@@ -2739,6 +2726,189 @@
       margin-top: 2rem;
     }
 
+    /* === EMPTY STATE IMPROVEMENTS === */
+    .empty-state .btn {
+      margin-top: 1rem;
+      display: inline-block;
+      padding: 0.5rem 1.2rem;
+      background: var(--accent-primary);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .empty-state .btn:hover {
+      background: var(--accent-secondary);
+    }
+
+    /* === FEATURED CARD === */
+    .card.featured-card {
+      grid-column: span 2;
+    }
+    .card.featured-card .card-image img {
+      max-height: 260px;
+    }
+    .card.featured-card .card-content {
+      font-size: 0.85rem;
+    }
+    @media (max-width: 400px) {
+      .card.featured-card {
+        grid-column: span 1;
+      }
+      .card.featured-card .card-image img {
+        max-height: 220px;
+      }
+    }
+
+    /* === QUICK ACTION MENU (Long-Press) === */
+    .quick-action-menu {
+      display: none;
+      position: fixed;
+      z-index: 2000;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-medium);
+      border-radius: 12px;
+      box-shadow: var(--shadow-xl);
+      padding: 0.4rem 0;
+      min-width: 180px;
+      animation: quickMenuIn 0.15s ease-out;
+    }
+    .quick-action-menu.visible {
+      display: block;
+    }
+    @keyframes quickMenuIn {
+      from { opacity: 0; transform: scale(0.92); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .quick-action-section {
+      padding: 0.3rem 0.8rem;
+      font-size: 0.65rem;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    .quick-action-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      padding: 0.55rem 0.9rem;
+      cursor: pointer;
+      font-size: 0.8rem;
+      color: var(--text-primary);
+      transition: background 0.15s;
+      border: none;
+      background: none;
+      width: 100%;
+      text-align: left;
+    }
+    .quick-action-item:hover {
+      background: var(--bg-accent);
+    }
+    .quick-action-item.danger {
+      color: var(--accent-rose);
+    }
+    .quick-action-divider {
+      height: 1px;
+      background: var(--border-light);
+      margin: 0.25rem 0;
+    }
+    .quick-action-stars {
+      display: flex;
+      gap: 2px;
+      padding: 0.4rem 0.9rem;
+    }
+    .quick-action-stars span {
+      cursor: pointer;
+      font-size: 1.1rem;
+      transition: transform 0.1s;
+    }
+    .quick-action-stars span:hover {
+      transform: scale(1.3);
+    }
+
+    /* === QUICK-ADD FROM SEARCH === */
+    .quick-add-buttons {
+      display: flex;
+      gap: 0.3rem;
+      padding: 0.3rem 0.5rem 0.4rem;
+      flex-wrap: wrap;
+    }
+    .quick-add-btn {
+      font-size: 0.65rem;
+      padding: 0.2rem 0.5rem;
+      border-radius: 12px;
+      border: 1px solid var(--border-light);
+      background: var(--bg-accent);
+      color: var(--text-secondary);
+      cursor: pointer;
+      transition: all 0.15s;
+      white-space: nowrap;
+    }
+    .quick-add-btn:hover {
+      background: var(--accent-primary);
+      color: #fff;
+      border-color: var(--accent-primary);
+    }
+
+    /* === PULL TO REFRESH === */
+    .pull-refresh-indicator {
+      position: absolute;
+      top: -50px;
+      left: 0;
+      right: 0;
+      height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      transition: transform 0.2s;
+      pointer-events: none;
+      z-index: 50;
+    }
+    .pull-refresh-indicator .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid var(--border-light);
+      border-top-color: var(--accent-primary);
+      border-radius: 50%;
+      animation: spin 0.6s linear infinite;
+      margin-right: 0.5rem;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* === TOAST NOTIFICATION === */
+    .toast {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      box-shadow: var(--shadow-lg);
+      border: 1px solid var(--border-light);
+      z-index: 3000;
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.3s;
+      pointer-events: none;
+    }
+    .toast.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    /* === SWIPE TAB TRANSITION === */
+    .grid {
+      transition: opacity 0.15s ease;
+    }
+
   </style>
   <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
@@ -2765,7 +2935,10 @@
     </div>
   </div>
 
-  <div class="container">
+  <div class="container" style="position:relative;">
+    <div id="pullToRefresh" class="pull-refresh-indicator">
+      <div class="spinner"></div> Refreshing...
+    </div>
     <div class="status-pills">
       <button class="status-pill active" data-status="all" onclick="statusPillFilter('all')">All</button>
       <button class="status-pill" data-status="current" onclick="statusPillFilter('current')">Consuming</button>
@@ -4126,7 +4299,7 @@
       
       resultsDiv.innerHTML = results.map((result, index) => `
         <div class="autocomplete-item" onclick="selectSearchResult(${index})">
-          ${result.image 
+          ${result.image
             ? `<img src="${result.image}" alt="${result.title}" class="autocomplete-image">`
             : `<div class="autocomplete-image placeholder">${typeEmoji}</div>`
           }
@@ -4137,6 +4310,11 @@
               ${result.author ? ` • ${result.author}` : ''}
             </div>
           </div>
+        </div>
+        <div class="quick-add-buttons">
+          <button class="quick-add-btn" onclick="event.stopPropagation(); quickAddItem(${index}, 'want')">📌 Up Next</button>
+          <button class="quick-add-btn" onclick="event.stopPropagation(); quickAddItem(${index}, 'current')">🔥 Consuming</button>
+          <button class="quick-add-btn" onclick="event.stopPropagation(); quickAddItem(${index}, 'done')">✅ Done</button>
         </div>
       `).join('');
 
@@ -4342,13 +4520,14 @@
       }
     }
 
-    // Toggle priority star on card
+    // Toggle priority on card (tap image to toggle)
     async function togglePriority(id) {
       const item = items.find(i => i.id === id);
       if (!item) return;
       item.watchSoon = !item.watchSoon;
       await saveItemToFirestore(item);
       renderItems();
+      showToast(item.watchSoon ? 'Marked as priority' : 'Priority removed');
     }
 
     // Set rating (thumbs: -1, 0, 1, or null for unset)
@@ -4772,8 +4951,26 @@
         grid.style.display = 'none';
         const emptyIcons = { 'movie': '🎬', 'tv': '📺', 'podcast': '🎙️', 'book': '📚', 'all': '📚' };
         const emptyLabels = { 'movie': 'No movies yet', 'tv': 'No TV shows yet', 'podcast': 'No podcasts yet', 'book': 'No books yet', 'all': 'Your shelf is empty' };
+        const statusMessages = {
+          'current': 'Nothing in progress — start something new!',
+          'want': 'Your queue is empty — add something to watch next!',
+          'done': 'Nothing completed yet — keep going!'
+        };
         emptyState.querySelector('.empty-state-icon').textContent = emptyIcons[currentMediaFilter] || '📚';
-        emptyState.querySelector('.empty-state-text').textContent = emptyLabels[currentMediaFilter] || 'Your shelf is empty';
+        if (currentStatusFilter !== 'all' && statusMessages[currentStatusFilter]) {
+          emptyState.querySelector('.empty-state-text').textContent = statusMessages[currentStatusFilter];
+        } else {
+          emptyState.querySelector('.empty-state-text').textContent = emptyLabels[currentMediaFilter] || 'Your shelf is empty';
+        }
+        // Show Add button in empty state
+        const existingBtn = emptyState.querySelector('.btn');
+        if (!existingBtn) {
+          const addBtn = document.createElement('button');
+          addBtn.className = 'btn';
+          addBtn.textContent = '+ Add Item';
+          addBtn.onclick = openAddModal;
+          emptyState.appendChild(addBtn);
+        }
         emptyState.style.display = 'block';
         return;
       }
@@ -4848,13 +5045,12 @@
       });
 
       function renderCardHtml(item, index) {
+        const isFeatured = item.status === 'current' && item.watchSoon;
+        const isPriority = item.watchSoon;
         return `
-          <div class="card" data-type="${item.type}" style="animation-delay: ${index * 0.05}s">
-            <div class="card-priority-toggle" onclick="event.stopPropagation(); togglePriority('${item.id}')" title="Toggle priority">
-              ${item.watchSoon ? '⭐' : '☆'}
-            </div>
-            <div class="card-image">
-              ${item.image ? `<img src="${item.image}" alt="${item.title}">` : ''}
+          <div class="card${isFeatured ? ' featured-card' : ''}${isPriority ? ' priority-glow' : ''}" data-id="${item.id}" data-type="${item.type}" style="animation-delay: ${index * 0.05}s">
+            <div class="card-image" onclick="event.stopPropagation(); togglePriority('${item.id}')" title="Tap to toggle priority" style="cursor:pointer;">
+              ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : ''}
             </div>
             <div class="card-content">
               <div class="card-type-badge">${getTypeEmoji(item.type)}</div>
@@ -4990,10 +5186,9 @@
         }));
 
         html += `
-          <div class="card" data-type="${item.type}" style="animation-delay: ${index * 0.05}s">
-            ${item.watchSoon ? '<div class="card-priority-toggle" style="pointer-events:none;">⭐</div>' : ''}
+          <div class="card${item.watchSoon ? ' priority-glow' : ''}" data-type="${item.type}" style="animation-delay: ${index * 0.05}s">
             <div class="card-image">
-              ${item.image ? `<img src="${item.image}" alt="${item.title}">` : ''}
+              ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : ''}
             </div>
             <div class="card-content">
               <div class="card-type-badge">${getTypeEmoji(item.type)}</div>
@@ -6585,7 +6780,7 @@
       grid.innerHTML = profileItems.map(item => `
         <div class="card" style="cursor: default;">
           <div class="card-image">
-            ${item.image ? `<img src="${item.image}" alt="${item.title}">` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:2rem;background:var(--bg-accent);">${typeEmojis[item.type] || ''}</div>`}
+            ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:2rem;background:var(--bg-accent);">${typeEmojis[item.type] || ''}</div>`}
           </div>
           <div class="card-content">
             <div class="card-type-badge">${typeEmojis[item.type] || ''}</div>
@@ -6723,6 +6918,262 @@
       }
     }
 
+    // ========== UX ENHANCEMENTS ==========
+
+    // === TOAST NOTIFICATION ===
+    function showToast(message, duration = 2000) {
+      const toast = document.getElementById('toast');
+      toast.textContent = message;
+      toast.classList.add('visible');
+      setTimeout(() => toast.classList.remove('visible'), duration);
+    }
+
+    // === SWIPE BETWEEN STATUS TABS (Feature 3) ===
+    (function initSwipeTabs() {
+      const statusCycle = ['all', 'current', 'want', 'done'];
+      let swipeStartX = 0, swipeStartY = 0;
+      const shelf = document.getElementById('myShelf');
+      if (!shelf) return;
+
+      shelf.addEventListener('touchstart', (e) => {
+        swipeStartX = e.touches[0].clientX;
+        swipeStartY = e.touches[0].clientY;
+      }, { passive: true });
+
+      shelf.addEventListener('touchend', (e) => {
+        const deltaX = e.changedTouches[0].clientX - swipeStartX;
+        const deltaY = e.changedTouches[0].clientY - swipeStartY;
+        if (Math.abs(deltaX) > 50 && Math.abs(deltaY) < 100) {
+          const currentIdx = statusCycle.indexOf(currentStatusFilter);
+          let newIdx;
+          if (deltaX < 0) {
+            // Swipe left → next
+            newIdx = (currentIdx + 1) % statusCycle.length;
+          } else {
+            // Swipe right → previous
+            newIdx = (currentIdx - 1 + statusCycle.length) % statusCycle.length;
+          }
+          const grid = document.getElementById('itemsGrid');
+          grid.style.opacity = '0';
+          setTimeout(() => {
+            statusPillFilter(statusCycle[newIdx]);
+            grid.style.opacity = '1';
+          }, 100);
+        }
+      }, { passive: true });
+    })();
+
+    // === LONG-PRESS QUICK-EDIT MENU (Feature 5) ===
+    let longPressTimer = null;
+    let quickActionItemId = null;
+
+    function initLongPress() {
+      const grid = document.getElementById('itemsGrid');
+      if (!grid) return;
+
+      grid.addEventListener('touchstart', (e) => {
+        const card = e.target.closest('.card[data-id]');
+        if (!card) return;
+        const touch = e.touches[0];
+        longPressTimer = setTimeout(() => {
+          e.preventDefault();
+          quickActionItemId = card.dataset.id;
+          showQuickActionMenu(touch.clientX, touch.clientY);
+        }, 500);
+      }, { passive: false });
+
+      grid.addEventListener('touchmove', () => {
+        if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+      }, { passive: true });
+
+      grid.addEventListener('touchend', () => {
+        if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+      }, { passive: true });
+
+      // Prevent context menu on cards
+      grid.addEventListener('contextmenu', (e) => {
+        if (e.target.closest('.card[data-id]')) e.preventDefault();
+      });
+    }
+
+    function showQuickActionMenu(x, y) {
+      const menu = document.getElementById('quickActionMenu');
+      // Build star picker
+      const starsDiv = document.getElementById('quickActionStars');
+      let starsHtml = '';
+      for (let i = 1; i <= 5; i++) {
+        starsHtml += `<span onclick="quickRate(${i})">${'★'}</span>`;
+      }
+      starsHtml += `<span onclick="quickRate(0)" style="font-size:0.75rem;margin-left:4px;">Clear</span>`;
+      starsDiv.innerHTML = starsHtml;
+
+      // Position menu, keeping it in viewport
+      const menuW = 190, menuH = 280;
+      let left = Math.min(x, window.innerWidth - menuW - 10);
+      let top = Math.min(y, window.innerHeight - menuH - 10);
+      left = Math.max(10, left);
+      top = Math.max(10, top);
+      menu.style.left = left + 'px';
+      menu.style.top = top + 'px';
+      menu.classList.add('visible');
+
+      // Close on outside tap
+      setTimeout(() => {
+        document.addEventListener('touchstart', closeQuickMenuOutside, { once: true });
+        document.addEventListener('click', closeQuickMenuOutside, { once: true });
+      }, 10);
+    }
+
+    function closeQuickMenuOutside(e) {
+      const menu = document.getElementById('quickActionMenu');
+      if (!menu.contains(e.target)) {
+        menu.classList.remove('visible');
+        quickActionItemId = null;
+      }
+    }
+
+    function closeQuickActionMenu() {
+      document.getElementById('quickActionMenu').classList.remove('visible');
+      quickActionItemId = null;
+    }
+
+    async function quickChangeStatus(status) {
+      if (!quickActionItemId) return;
+      const item = items.find(i => i.id === quickActionItemId);
+      if (!item) return;
+      item.status = status;
+      await saveItemToFirestore(item);
+      renderItems();
+      closeQuickActionMenu();
+      const labels = { want: 'Up Next', current: 'Consuming', done: 'Caught Up' };
+      showToast(`Moved to ${labels[status] || status}`);
+    }
+
+    async function quickRate(rating) {
+      if (!quickActionItemId) return;
+      const item = items.find(i => i.id === quickActionItemId);
+      if (!item) return;
+      item.rating = rating === 0 ? null : rating;
+      await saveItemToFirestore(item);
+      renderItems();
+      closeQuickActionMenu();
+      showToast(rating === 0 ? 'Rating cleared' : `Rated ${rating} star${rating > 1 ? 's' : ''}`);
+    }
+
+    async function quickDeleteItem() {
+      if (!quickActionItemId) return;
+      closeQuickActionMenu();
+      await deleteItem(quickActionItemId);
+      showToast('Item deleted');
+    }
+
+    // Initialize long-press after DOM ready
+    initLongPress();
+
+    // === QUICK-ADD FROM SEARCH (Feature 6) ===
+    async function quickAddItem(index, status) {
+      if (!searchResults || !searchResults[index]) return;
+      const result = searchResults[index];
+
+      // Check if already in list
+      if (items.some(i => i.title === result.title && i.type === result.type)) {
+        showToast('Already in your list!');
+        return;
+      }
+
+      const type = document.getElementById('itemType').value || 'movie';
+      const newItem = {
+        id: Date.now().toString(),
+        title: result.title,
+        type: type,
+        status: status,
+        watchSoon: false,
+        rating: null,
+        image: result.image || '',
+        streamingPlatform: '',
+        genre: result.genre || '',
+        referral: '',
+        notes: '',
+        premiereDate: result.premiereDate || '',
+        dateLogged: '',
+        tags: [],
+        group: '',
+        userId: currentUser.id
+      };
+
+      items.push(newItem);
+      await saveItemToFirestore(newItem);
+
+      // Close autocomplete and clear input
+      document.getElementById('autocompleteResults').classList.remove('active');
+      document.getElementById('itemTitle').value = '';
+
+      renderItems();
+      const labels = { want: 'Up Next', current: 'Consuming', done: 'Caught Up' };
+      showToast(`Added "${result.title}" as ${labels[status] || status}`);
+    }
+
+    // === PULL-TO-REFRESH (Feature 7) ===
+    (function initPullToRefresh() {
+      const container = document.querySelector('.container');
+      const indicator = document.getElementById('pullToRefresh');
+      if (!container || !indicator) return;
+
+      let ptrStartY = 0;
+      let ptrActive = false;
+      let ptrPulling = false;
+      const threshold = 60;
+
+      container.addEventListener('touchstart', (e) => {
+        // Only activate when scrolled to top and on the shelf tab
+        if (container.scrollTop > 0) return;
+        const shelf = document.getElementById('myShelf');
+        if (!shelf || !shelf.classList.contains('active')) return;
+        ptrStartY = e.touches[0].clientY;
+        ptrActive = true;
+        ptrPulling = false;
+      }, { passive: true });
+
+      container.addEventListener('touchmove', (e) => {
+        if (!ptrActive) return;
+        const deltaY = e.touches[0].clientY - ptrStartY;
+        const deltaX = Math.abs(e.touches[0].clientX - (e.touches[0].clientX)); // no horizontal needed
+        if (deltaY > 0 && container.scrollTop <= 0) {
+          ptrPulling = true;
+          const pull = Math.min(deltaY, threshold + 30);
+          container.style.transform = `translateY(${pull}px)`;
+          container.style.transition = 'none';
+        }
+      }, { passive: true });
+
+      container.addEventListener('touchend', async () => {
+        if (!ptrActive || !ptrPulling) {
+          ptrActive = false;
+          return;
+        }
+
+        const currentTransform = container.style.transform;
+        const match = currentTransform.match(/translateY\(([0-9.]+)px\)/);
+        const pullDistance = match ? parseFloat(match[1]) : 0;
+
+        container.style.transition = 'transform 0.3s ease';
+        container.style.transform = '';
+        ptrActive = false;
+        ptrPulling = false;
+
+        if (pullDistance >= threshold && auth.currentUser) {
+          showToast('Refreshing...');
+          try {
+            await init(auth.currentUser);
+            showToast('Refreshed!');
+          } catch (err) {
+            console.error('Pull-to-refresh error:', err);
+            showToast('Refresh failed');
+          }
+        }
+      }, { passive: true });
+    })();
+
     // Firebase Auth state listener - main entry point
     auth.onAuthStateChanged(async (firebaseUser) => {
       // Check if viewing a public profile — skip login
@@ -6789,5 +7240,21 @@
       <span class="bottom-nav-label">Profile</span>
     </button>
   </nav>
+  <!-- Quick Action Menu (Long-Press) -->
+  <div id="quickActionMenu" class="quick-action-menu">
+    <div class="quick-action-section">Change Status</div>
+    <button class="quick-action-item" onclick="quickChangeStatus('want')">📌 Up Next</button>
+    <button class="quick-action-item" onclick="quickChangeStatus('current')">🔥 Consuming</button>
+    <button class="quick-action-item" onclick="quickChangeStatus('done')">✅ Caught Up</button>
+    <div class="quick-action-divider"></div>
+    <div class="quick-action-section">Rate</div>
+    <div class="quick-action-stars" id="quickActionStars"></div>
+    <div class="quick-action-divider"></div>
+    <button class="quick-action-item danger" onclick="quickDeleteItem()">🗑️ Delete</button>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="toast"></div>
+
 </body>
 </html>

@@ -798,6 +798,7 @@
     .card.priority-glow {
       border-left: 3px solid var(--accent-gold);
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), -2px 0 8px rgba(245, 158, 11, 0.15);
+      margin-left: -2px;
     }
     .card.priority-glow:hover {
       box-shadow: 0 6px 16px rgba(44, 79, 124, 0.1), -2px 0 12px rgba(245, 158, 11, 0.2);
@@ -2743,24 +2744,6 @@
       background: var(--accent-secondary);
     }
 
-    /* === FEATURED CARD === */
-    .card.featured-card {
-      grid-column: span 2;
-    }
-    .card.featured-card .card-image img {
-      max-height: 260px;
-    }
-    .card.featured-card .card-content {
-      font-size: 0.85rem;
-    }
-    @media (max-width: 400px) {
-      .card.featured-card {
-        grid-column: span 1;
-      }
-      .card.featured-card .card-image img {
-        max-height: 220px;
-      }
-    }
 
     /* === QUICK ACTION MENU (Long-Press) === */
     .quick-action-menu {
@@ -5045,10 +5028,9 @@
       });
 
       function renderCardHtml(item, index) {
-        const isFeatured = item.status === 'current' && item.watchSoon;
         const isPriority = item.watchSoon;
         return `
-          <div class="card${isFeatured ? ' featured-card' : ''}${isPriority ? ' priority-glow' : ''}" data-id="${item.id}" data-type="${item.type}" style="animation-delay: ${index * 0.05}s">
+          <div class="card${isPriority ? ' priority-glow' : ''}" data-id="${item.id}" data-type="${item.type}" style="animation-delay: ${index * 0.05}s">
             <div class="card-image" onclick="event.stopPropagation(); togglePriority('${item.id}')" title="Tap to toggle priority" style="cursor:pointer;">
               ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : ''}
             </div>

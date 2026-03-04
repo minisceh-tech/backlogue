@@ -731,6 +731,29 @@
       background: linear-gradient(90deg, var(--border-medium), transparent);
     }
 
+    .type-sub-header {
+      grid-column: 1 / -1;
+      margin-top: 0.75rem;
+      margin-bottom: 0.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .type-sub-header-label {
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      white-space: nowrap;
+    }
+
+    .type-sub-header-line {
+      flex: 1;
+      height: 1px;
+      background: linear-gradient(90deg, var(--border-light), transparent);
+    }
+
     .status-section-count {
       font-family: 'Inter', sans-serif;
       font-size: 0.7rem;
@@ -4758,39 +4781,74 @@
       grid.style.display = 'grid';
       emptyState.style.display = 'none';
 
-      // Build HTML with status section headers
+      // Build HTML with status section headers and type sub-headers
       let html = '';
-      let lastStatus = null;
-      
+
       // Pre-count items per status for the badges
       const statusCounts = {};
       filteredItems.forEach(item => {
         statusCounts[item.status] = (statusCounts[item.status] || 0) + 1;
       });
 
-      filteredItems.forEach((item, index) => {
-        // Add section header when status changes
-        if (item.status !== lastStatus) {
-          const statusConfig = {
-            'current': { label: 'Consuming', icon: '🔥', css: 'status-current' },
-            'want':    { label: 'Up Next', icon: '✨', css: 'status-want' },
-            'done':    { label: 'Caught Up', icon: '🏆', css: 'status-done' }
-          };
-          const cfg = statusConfig[item.status] || { label: item.status, icon: '📌', css: 'status-want' };
-          const count = statusCounts[item.status] || 0;
+      // Group items by status, then by type within each status
+      const statusList = ['current', 'want', 'done'];
+      const typeOrder = ['movie', 'tv', 'podcast', 'book'];
+      const typeLabels = { movie: '🎬 Movies', tv: '📺 TV Shows', podcast: '🎙️ Podcasts', book: '📚 Books' };
+      const statusConfig = {
+        'current': { label: 'Consuming' },
+        'want':    { label: 'Up Next' },
+        'done':    { label: 'Caught Up' }
+      };
 
-          html += `
-            <div class="status-section-header">
-              <h2 class="status-section-title">${cfg.label}</h2>
-              <div class="status-section-line"></div>
-              <span class="status-section-count">${count}</span>
-            </div>
-          `;
-          lastStatus = item.status;
-        }
-        
-        // Add the card
+      let cardIndex = 0;
+      const activeStatuses = statusList.filter(s => filteredItems.some(i => i.status === s));
+
+      activeStatuses.forEach(status => {
+        const statusItems = filteredItems.filter(i => i.status === status);
+        if (statusItems.length === 0) return;
+
+        const cfg = statusConfig[status] || { label: status };
+        const count = statusCounts[status] || 0;
+
         html += `
+          <div class="status-section-header">
+            <h2 class="status-section-title">${cfg.label}</h2>
+            <div class="status-section-line"></div>
+            <span class="status-section-count">${count}</span>
+          </div>
+        `;
+
+        // Check how many distinct types are in this status
+        const typesInStatus = [...new Set(statusItems.map(i => i.type))];
+        const showTypeHeaders = typesInStatus.length >= 2;
+
+        if (showTypeHeaders) {
+          // Render grouped by type
+          typeOrder.forEach(type => {
+            const typeItems = statusItems.filter(i => i.type === type);
+            if (typeItems.length === 0) return;
+
+            html += `
+              <div class="type-sub-header">
+                <span class="type-sub-header-label">${typeLabels[type] || type}</span>
+                <div class="type-sub-header-line"></div>
+              </div>
+            `;
+
+            typeItems.forEach(item => {
+              html += renderCardHtml(item, cardIndex++);
+            });
+          });
+        } else {
+          // Single type, no sub-headers needed
+          statusItems.forEach(item => {
+            html += renderCardHtml(item, cardIndex++);
+          });
+        }
+      });
+
+      function renderCardHtml(item, index) {
+        return `
           <div class="card" data-type="${item.type}" style="animation-delay: ${index * 0.05}s">
             <div class="card-priority-toggle" onclick="event.stopPropagation(); togglePriority('${item.id}')" title="Toggle priority">
               ${item.watchSoon ? '⭐' : '☆'}
@@ -4817,7 +4875,7 @@
             </div>
           </div>
         `;
-      });
+      }
       
       grid.innerHTML = html;
 

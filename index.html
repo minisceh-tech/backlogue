@@ -5031,7 +5031,7 @@
         const isPriority = item.watchSoon;
         return `
           <div class="card${isPriority ? ' priority-glow' : ''}" data-id="${item.id}" data-type="${item.type}" style="animation-delay: ${index * 0.05}s">
-            <div class="card-image" onclick="event.stopPropagation(); togglePriority('${item.id}')" title="Tap to toggle priority" style="cursor:pointer;">
+            <div class="card-image" data-priority-toggle="${item.id}" style="cursor:pointer;">
               ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : ''}
             </div>
             <div class="card-content">
@@ -6945,36 +6945,66 @@
       }, { passive: true });
     })();
 
-    // === LONG-PRESS QUICK-EDIT MENU (Feature 5) ===
+    // === LONG-PRESS QUICK-EDIT MENU (Feature 5) + PRIORITY TAP ===
     let longPressTimer = null;
     let quickActionItemId = null;
+    let longPressFired = false;
 
     function initLongPress() {
       const grid = document.getElementById('itemsGrid');
       if (!grid) return;
 
+      let touchStartX = 0, touchStartY = 0;
+
       grid.addEventListener('touchstart', (e) => {
         const card = e.target.closest('.card[data-id]');
         if (!card) return;
         const touch = e.touches[0];
+        touchStartX = touch.clientX;
+        touchStartY = touch.clientY;
+        longPressFired = false;
         longPressTimer = setTimeout(() => {
-          e.preventDefault();
+          longPressFired = true;
           quickActionItemId = card.dataset.id;
           showQuickActionMenu(touch.clientX, touch.clientY);
         }, 500);
-      }, { passive: false });
-
-      grid.addEventListener('touchmove', () => {
-        if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
       }, { passive: true });
 
-      grid.addEventListener('touchend', () => {
-        if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+      grid.addEventListener('touchmove', (e) => {
+        if (longPressTimer) {
+          const dx = Math.abs(e.touches[0].clientX - touchStartX);
+          const dy = Math.abs(e.touches[0].clientY - touchStartY);
+          if (dx > 10 || dy > 10) {
+            clearTimeout(longPressTimer);
+            longPressTimer = null;
+          }
+        }
       }, { passive: true });
+
+      grid.addEventListener('touchend', (e) => {
+        if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+        if (longPressFired) { longPressFired = false; return; }
+
+        // Check if tap was on card image for priority toggle
+        const priorityEl = e.target.closest('[data-priority-toggle]');
+        if (priorityEl) {
+          e.preventDefault();
+          togglePriority(priorityEl.dataset.priorityToggle);
+        }
+      });
 
       // Prevent context menu on cards
       grid.addEventListener('contextmenu', (e) => {
         if (e.target.closest('.card[data-id]')) e.preventDefault();
+      });
+
+      // Desktop: click on card image toggles priority
+      grid.addEventListener('click', (e) => {
+        const priorityEl = e.target.closest('[data-priority-toggle]');
+        if (priorityEl) {
+          e.stopPropagation();
+          togglePriority(priorityEl.dataset.priorityToggle);
+        }
       });
     }
 

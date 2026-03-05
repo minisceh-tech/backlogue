@@ -891,15 +891,6 @@
       border-color: rgba(91, 155, 213, 0.3);
     }
 
-    .card.priority-glow {
-      border-left: 3px solid var(--accent-gold);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), -2px 0 8px rgba(245, 158, 11, 0.15);
-      margin-left: -2px;
-    }
-    .card.priority-glow:hover {
-      box-shadow: 0 6px 16px rgba(44, 79, 124, 0.1), -2px 0 12px rgba(245, 158, 11, 0.2);
-    }
-
 
     @keyframes cardAppear {
       from {
@@ -4055,7 +4046,7 @@
       <div class="tutorial-slide" data-slide="2">
         <div class="tutorial-slide-icon">&#11088;</div>
         <div class="tutorial-slide-title">Organize Your Way</div>
-        <div class="tutorial-slide-text">Sort by status &mdash; Consuming, Up Next, and Caught Up. Double-tap any card to mark it as a priority.</div>
+        <div class="tutorial-slide-text">Sort by status &mdash; Consuming, Up Next, and Caught Up. Tap any card to see details and edit.</div>
       </div>
       <div class="tutorial-slide" data-slide="3">
         <div class="tutorial-slide-icon">&#128101;</div>
@@ -5208,16 +5199,6 @@
       }
     }
 
-    // Toggle priority on card (tap image to toggle)
-    async function togglePriority(id) {
-      const item = items.find(i => i.id === id);
-      if (!item) return;
-      item.watchSoon = !item.watchSoon;
-      await saveItemToFirestore(item);
-      renderItems();
-      showToast(item.watchSoon ? 'Marked as priority' : 'Priority removed');
-    }
-
     // Set rating (thumbs: -1, 0, 1, or null for unset)
     function setRating(rating) {
       const ratingInput = document.getElementById('itemRating');
@@ -5580,11 +5561,9 @@
         if (currentSortOption === 'dateAdded') {
           return (parseInt(b.id) || 0) - (parseInt(a.id) || 0);
         }
-        // Default: status → priority → rating
+        // Default: status → rating
         const statusDiff = (statusOrder[a.status] || 999) - (statusOrder[b.status] || 999);
         if (statusDiff !== 0) return statusDiff;
-        if (a.watchSoon && !b.watchSoon) return -1;
-        if (!a.watchSoon && b.watchSoon) return 1;
         const ratingA = legacyToStars(a.rating) || 0;
         const ratingB = legacyToStars(b.rating) || 0;
         return ratingB - ratingA;
@@ -5707,9 +5686,8 @@
       });
 
       function renderCardHtml(item, index) {
-        const isPriority = item.watchSoon;
         return `
-          <div class="card${isPriority ? ' priority-glow' : ''}" data-id="${item.id}" data-type="${item.type}" style="animation-delay: ${Math.min(index * 0.05, 0.5)}s">
+          <div class="card" data-id="${item.id}" data-type="${item.type}" style="animation-delay: ${Math.min(index * 0.05, 0.5)}s">
             <div class="card-image">
               ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : `<div class="card-placeholder">${getTypeEmoji(item.type)}<div class="card-placeholder-title">${item.title}</div></div>`}
             </div>
@@ -5778,10 +5756,8 @@
       const typeOrderArr = ['movie', 'tv', 'podcast', 'book'];
       const typeLabels = { movie: '🎬 Movies', tv: '📺 TV Shows', podcast: '🎙️ Podcasts', book: '📚 Books' };
 
-      // Sort by priority then timestamp within each type
+      // Sort by timestamp within each type
       filteredItems.sort((a, b) => {
-        if (a.watchSoon && !b.watchSoon) return -1;
-        if (!a.watchSoon && b.watchSoon) return 1;
         return b.timestamp - a.timestamp;
       });
 
@@ -6991,9 +6967,8 @@
       } else {
         emptyState.style.display = 'none';
         container.innerHTML = results.map((item, i) => {
-          const isPriority = item.watchSoon;
           return `
-            <div class="card${isPriority ? ' priority-glow' : ''}" data-id="${item.id}" data-type="${item.type}" style="animation-delay: ${Math.min(i * 0.05, 0.5)}s">
+            <div class="card" data-id="${item.id}" data-type="${item.type}" style="animation-delay: ${Math.min(i * 0.05, 0.5)}s">
               <div class="card-image">
                 ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : `<div class="card-placeholder">${getTypeEmoji(item.type)}<div class="card-placeholder-title">${item.title}</div></div>`}
               </div>
@@ -7083,9 +7058,8 @@
       } else {
         emptyState.style.display = 'none';
         container.innerHTML = results.map((item, i) => {
-          const isPriority = item.watchSoon;
           return `
-            <div class="card${isPriority ? ' priority-glow' : ''}" data-id="${item.id}" data-type="${item.type}" style="animation-delay: ${Math.min(i * 0.05, 0.5)}s">
+            <div class="card" data-id="${item.id}" data-type="${item.type}" style="animation-delay: ${Math.min(i * 0.05, 0.5)}s">
               <div class="card-image">
                 ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : `<div class="card-placeholder">${getTypeEmoji(item.type)}<div class="card-placeholder-title">${item.title}</div></div>`}
               </div>
@@ -7970,11 +7944,8 @@
           if (e.target.closest('.card[data-id]')) e.preventDefault();
         });
 
-        // Touch: double-tap toggles priority, single-tap opens detail card
+        // Touch: single-tap opens detail card
         let touchMoved = false;
-        let lastTapTime = 0;
-        let lastTapCard = null;
-        let singleTapTimer = null;
 
         grid.addEventListener('touchstart', () => {
           touchMoved = false;
@@ -7988,46 +7959,15 @@
           if (touchMoved || longPressFired) return;
           const card = e.target.closest('.card[data-id]');
           if (!card) return;
-          const cardId = card.dataset.id;
-          const now = Date.now();
-
-          if (lastTapCard === cardId && now - lastTapTime < 350) {
-            // Double-tap: toggle priority
-            e.preventDefault();
-            if (singleTapTimer) { clearTimeout(singleTapTimer); singleTapTimer = null; }
-            togglePriority(cardId);
-            lastTapTime = 0;
-            lastTapCard = null;
-          } else {
-            // Potential single tap — wait to see if double-tap follows
-            lastTapTime = now;
-            lastTapCard = cardId;
-            if (singleTapTimer) clearTimeout(singleTapTimer);
-            singleTapTimer = setTimeout(() => {
-              singleTapTimer = null;
-              openDetailCard(cardId);
-              lastTapTime = 0;
-              lastTapCard = null;
-            }, 300);
-          }
+          openDetailCard(card.dataset.id);
         });
 
         // Desktop: single click opens detail card
         grid.addEventListener('click', (e) => {
           const card = e.target.closest('.card[data-id]');
           if (!card) return;
-          // Don't open if a button inside was clicked
           if (e.target.closest('button')) return;
           openDetailCard(card.dataset.id);
-        });
-
-        // Desktop: double-click on card toggles priority
-        grid.addEventListener('dblclick', (e) => {
-          const card = e.target.closest('.card[data-id]');
-          if (card) {
-            e.stopPropagation();
-            togglePriority(card.dataset.id);
-          }
         });
       });
     }

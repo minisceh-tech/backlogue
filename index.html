@@ -3867,6 +3867,10 @@
           <input type="password" id="loginPassword" required placeholder="Enter your password">
         </div>
 
+        <p style="text-align: right; margin: -0.5rem 0 0.5rem;">
+          <a href="#" onclick="handleForgotPassword(); return false;" style="color: var(--accent-primary); font-size: 0.85rem; font-weight: 500;">Forgot password?</a>
+        </p>
+
         <div class="modal-actions">
           <button type="submit" class="btn">Log In</button>
         </div>
@@ -4363,6 +4367,27 @@
         }
         btn.disabled = false;
         btn.textContent = 'Log In';
+      }
+    }
+
+    // Handle forgot password
+    async function handleForgotPassword() {
+      const email = document.getElementById('loginEmail').value.toLowerCase().trim();
+      if (!email) {
+        alert('Please enter your email address first, then tap "Forgot password?"');
+        document.getElementById('loginEmail').focus();
+        return;
+      }
+      try {
+        await auth.sendPasswordResetEmail(email);
+        alert('Password reset email sent! Check your inbox.');
+      } catch (error) {
+        console.error('Password reset error:', error);
+        if (error.code === 'auth/user-not-found') {
+          alert('No account found with that email.');
+        } else {
+          alert('Failed to send reset email: ' + error.message);
+        }
       }
     }
 

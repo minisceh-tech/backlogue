@@ -475,16 +475,67 @@
       animation: fadeIn 0.4s ease;
     }
 
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-      gap: 0.35rem;
+    .shelf-sections {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
       animation: fadeIn 0.4s ease;
     }
 
+    .status-section {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .scroll-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+    }
+
+    .scroll-row.hidden-by-filter {
+      display: none;
+    }
+
+    .scroll-row-label {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      padding-left: 0.25rem;
+      font-weight: 500;
+    }
+
+    .scroll-row-track {
+      overflow-x: auto;
+      overflow-y: hidden;
+      white-space: nowrap;
+      -webkit-overflow-scrolling: touch;
+      padding: 0.25rem 0;
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+      border: 2px solid red;
+    }
+
+    .scroll-row-track::-webkit-scrollbar {
+      display: none;
+    }
+
+    .scroll-row-track > .card {
+      /* moved after .card rule below for cascade order */
+    }
+
+    .scroll-row-empty {
+      font-style: italic;
+      color: var(--text-secondary);
+      font-size: 0.85rem;
+      padding: 0.5rem 0.25rem;
+    }
+
     @media (max-width: 480px) {
-      .grid {
-        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+      .scroll-row-track > .card {
+        width: 140px !important;
+        min-width: 140px !important;
+        max-width: 140px !important;
       }
 
       .container {
@@ -681,8 +732,7 @@
 
     /* Status section headers */
     .status-section-header {
-      grid-column: 1 / -1;
-      margin-top: 2rem;
+      margin-top: 0.5rem;
       margin-bottom: 0.75rem;
       display: flex;
       align-items: center;
@@ -732,7 +782,6 @@
     }
 
     .type-sub-header {
-      grid-column: 1 / -1;
       margin-top: 0.75rem;
       margin-bottom: 0.25rem;
       display: flex;
@@ -788,6 +837,17 @@
       border: 1px solid var(--border-light);
       display: flex;
       flex-direction: column;
+    }
+
+    .scroll-row-track > .card {
+      display: inline-block !important;
+      vertical-align: top;
+      white-space: normal;
+      width: 130px !important;
+      min-width: 130px !important;
+      max-width: 130px !important;
+      margin-right: 0.5rem;
+      box-sizing: border-box;
     }
 
     .card:hover {
@@ -2137,10 +2197,7 @@
       gap: 0.4rem;
       margin-bottom: 0.75rem;
       align-items: center;
-      flex-wrap: nowrap;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
+      flex-wrap: wrap;
       padding-bottom: 2px;
     }
 
@@ -2888,7 +2945,7 @@
     }
 
     /* === SWIPE TAB TRANSITION === */
-    .grid {
+    .shelf-sections {
       transition: opacity 0.15s ease;
     }
 
@@ -2923,10 +2980,10 @@
       <div class="spinner"></div> Refreshing...
     </div>
     <div class="status-pills">
-      <button class="status-pill active" data-status="all" onclick="statusPillFilter('all')">All</button>
-      <button class="status-pill" data-status="current" onclick="statusPillFilter('current')">Consuming</button>
-      <button class="status-pill" data-status="want" onclick="statusPillFilter('want')">Up Next</button>
-      <button class="status-pill" data-status="done" onclick="statusPillFilter('done')">Caught Up</button>
+      <button class="status-pill active" data-status="all" onclick="statusPillScroll('all')">All</button>
+      <button class="status-pill" data-status="current" onclick="statusPillScroll('current')">Consuming</button>
+      <button class="status-pill" data-status="want" onclick="statusPillScroll('want')">Up Next</button>
+      <button class="status-pill" data-status="done" onclick="statusPillScroll('done')">Caught Up</button>
       <select id="shelfReferralFilter" onchange="referralFilter(this.value)" class="filter-dropdown filter-dropdown-blue" style="border-radius: 20px; padding: 0.3rem 0.6rem; font-size: 0.7rem; min-width: 0; flex-shrink: 0;">
         <option value="all">Recommenders</option>
       </select>
@@ -2948,7 +3005,7 @@
     <div id="groupTabsContainer" style="display: none;"></div>
     <!-- My Shelf Tab -->
     <div id="myShelf" class="tab-content active">
-      <div id="itemsGrid" class="grid"></div>
+      <div id="itemsGrid" class="shelf-sections"></div>
       <div id="emptyState" class="empty-state" style="display: none;">
         <div class="empty-state-icon">📚</div>
         <div class="empty-state-text">Your shelf is empty</div>
@@ -4861,12 +4918,6 @@
           matchesMedia = item.type === currentMediaFilter;
         }
 
-        // Apply status filter
-        let matchesStatus = true;
-        if (currentStatusFilter !== 'all') {
-          matchesStatus = item.status === currentStatusFilter;
-        }
-
         // Apply referral filter
         let matchesReferral = true;
         if (currentReferralFilter !== 'all') {
@@ -4886,7 +4937,7 @@
         }
 
         // Item must match ALL filters
-        return matchesMedia && matchesStatus && matchesReferral && matchesGenre && matchesTag;
+        return matchesMedia && matchesReferral && matchesGenre && matchesTag;
       });
 
       // Sort based on currentSortOption
@@ -4934,17 +4985,8 @@
         grid.style.display = 'none';
         const emptyIcons = { 'movie': '🎬', 'tv': '📺', 'podcast': '🎙️', 'book': '📚', 'all': '📚' };
         const emptyLabels = { 'movie': 'No movies yet', 'tv': 'No TV shows yet', 'podcast': 'No podcasts yet', 'book': 'No books yet', 'all': 'Your shelf is empty' };
-        const statusMessages = {
-          'current': 'Nothing in progress — start something new!',
-          'want': 'Your queue is empty — add something to watch next!',
-          'done': 'Nothing completed yet — keep going!'
-        };
         emptyState.querySelector('.empty-state-icon').textContent = emptyIcons[currentMediaFilter] || '📚';
-        if (currentStatusFilter !== 'all' && statusMessages[currentStatusFilter]) {
-          emptyState.querySelector('.empty-state-text').textContent = statusMessages[currentStatusFilter];
-        } else {
-          emptyState.querySelector('.empty-state-text').textContent = emptyLabels[currentMediaFilter] || 'Your shelf is empty';
-        }
+        emptyState.querySelector('.empty-state-text').textContent = emptyLabels[currentMediaFilter] || 'Your shelf is empty';
         // Show Add button in empty state
         const existingBtn = emptyState.querySelector('.btn');
         if (!existingBtn) {
@@ -4958,19 +5000,12 @@
         return;
       }
 
-      grid.style.display = 'grid';
+      grid.style.display = '';
       emptyState.style.display = 'none';
 
-      // Build HTML with status section headers and type sub-headers
+      // Build HTML with horizontal scroll rows per status/type
       let html = '';
 
-      // Pre-count items per status for the badges
-      const statusCounts = {};
-      filteredItems.forEach(item => {
-        statusCounts[item.status] = (statusCounts[item.status] || 0) + 1;
-      });
-
-      // Group items by status, then by type within each status
       const statusList = ['current', 'want', 'done'];
       const typeOrder = ['movie', 'tv', 'podcast', 'book'];
       const typeLabels = { movie: '🎬 Movies', tv: '📺 TV Shows', podcast: '🎙️ Podcasts', book: '📚 Books' };
@@ -4981,15 +5016,13 @@
       };
 
       let cardIndex = 0;
-      const activeStatuses = statusList.filter(s => filteredItems.some(i => i.status === s));
 
-      activeStatuses.forEach(status => {
+      statusList.forEach(status => {
         const statusItems = filteredItems.filter(i => i.status === status);
-        if (statusItems.length === 0) return;
-
         const cfg = statusConfig[status] || { label: status };
-        const count = statusCounts[status] || 0;
+        const count = statusItems.length;
 
+        html += `<section class="status-section" id="status-${status}">`;
         html += `
           <div class="status-section-header">
             <h2 class="status-section-title">${cfg.label}</h2>
@@ -4998,40 +5031,35 @@
           </div>
         `;
 
-        // Check how many distinct types are in this status
-        const typesInStatus = [...new Set(statusItems.map(i => i.type))];
-        const showTypeHeaders = typesInStatus.length >= 2;
-
-        if (showTypeHeaders) {
-          // Render grouped by type
+        if (statusItems.length === 0) {
+          html += `<div class="scroll-row-empty">Nothing here yet</div>`;
+        } else {
           typeOrder.forEach(type => {
             const typeItems = statusItems.filter(i => i.type === type);
             if (typeItems.length === 0) return;
 
-            html += `
-              <div class="type-sub-header">
-                <span class="type-sub-header-label">${typeLabels[type] || type}</span>
-                <div class="type-sub-header-line"></div>
-              </div>
-            `;
+            const hiddenClass = (currentMediaFilter !== 'all' && type !== currentMediaFilter) ? ' hidden-by-filter' : '';
+
+            html += `<div class="scroll-row${hiddenClass}" data-type="${type}">`;
+            html += `<div class="scroll-row-header"><span class="scroll-row-label">${typeLabels[type] || type}</span></div>`;
+            html += `<div class="scroll-row-track">`;
 
             typeItems.forEach(item => {
               html += renderCardHtml(item, cardIndex++);
             });
-          });
-        } else {
-          // Single type, no sub-headers needed
-          statusItems.forEach(item => {
-            html += renderCardHtml(item, cardIndex++);
+
+            html += `</div></div>`;
           });
         }
+
+        html += `</section>`;
       });
 
       function renderCardHtml(item, index) {
         const isPriority = item.watchSoon;
         return `
-          <div class="card${isPriority ? ' priority-glow' : ''}" data-id="${item.id}" data-type="${item.type}" style="animation-delay: ${index * 0.05}s">
-            <div class="card-image" data-priority-toggle="${item.id}" style="cursor:pointer;">
+          <div class="card${isPriority ? ' priority-glow' : ''}" data-id="${item.id}" data-type="${item.type}" style="animation-delay: ${Math.min(index * 0.05, 0.5)}s">
+            <div class="card-image">
               ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : ''}
             </div>
             <div class="card-content">
@@ -6107,17 +6135,11 @@
       renderItems();
     }
 
-    // Status pill filter
-    function statusPillFilter(status) {
-      currentStatusFilter = status === 'all' ? 'all' : status;
-
+    // Status pill scroll anchor
+    function statusPillScroll(status) {
       document.querySelectorAll('.status-pill').forEach(pill => {
         pill.classList.toggle('active', pill.dataset.status === status);
       });
-
-      // Sync hidden dropdown
-      const statusDropdown = document.getElementById('statusFilter');
-      if (statusDropdown) statusDropdown.value = status === 'all' ? 'all' : status;
 
       // Switch to My Shelf if needed
       if (!document.getElementById('myShelf').classList.contains('active')) {
@@ -6125,7 +6147,17 @@
         document.getElementById('myShelf').classList.add('active');
       }
 
-      renderItems();
+      // Scroll to section — only when a specific pill is tapped
+      if (status !== 'all') {
+        const target = document.getElementById(`status-${status}`);
+        if (target) {
+          const headerOffset = 100; // account for sticky header/pills
+          const y = target.getBoundingClientRect().top + window.pageYOffset - headerOffset;
+          window.scrollTo({ top: y, behavior: 'smooth' });
+        }
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
     }
 
     // === FAB MODE SWITCHING ===
@@ -6910,41 +6942,6 @@
       setTimeout(() => toast.classList.remove('visible'), duration);
     }
 
-    // === SWIPE BETWEEN STATUS TABS (Feature 3) ===
-    (function initSwipeTabs() {
-      const statusCycle = ['all', 'current', 'want', 'done'];
-      let swipeStartX = 0, swipeStartY = 0;
-      const shelf = document.getElementById('myShelf');
-      if (!shelf) return;
-
-      shelf.addEventListener('touchstart', (e) => {
-        swipeStartX = e.touches[0].clientX;
-        swipeStartY = e.touches[0].clientY;
-      }, { passive: true });
-
-      shelf.addEventListener('touchend', (e) => {
-        const deltaX = e.changedTouches[0].clientX - swipeStartX;
-        const deltaY = e.changedTouches[0].clientY - swipeStartY;
-        if (Math.abs(deltaX) > 50 && Math.abs(deltaY) < 100) {
-          const currentIdx = statusCycle.indexOf(currentStatusFilter);
-          let newIdx;
-          if (deltaX < 0) {
-            // Swipe left → next
-            newIdx = (currentIdx + 1) % statusCycle.length;
-          } else {
-            // Swipe right → previous
-            newIdx = (currentIdx - 1 + statusCycle.length) % statusCycle.length;
-          }
-          const grid = document.getElementById('itemsGrid');
-          grid.style.opacity = '0';
-          setTimeout(() => {
-            statusPillFilter(statusCycle[newIdx]);
-            grid.style.opacity = '1';
-          }, 100);
-        }
-      }, { passive: true });
-    })();
-
     // === LONG-PRESS QUICK-EDIT MENU (Feature 5) + PRIORITY TAP ===
     let longPressTimer = null;
     let quickActionItemId = null;
@@ -6984,13 +6981,6 @@
       grid.addEventListener('touchend', (e) => {
         if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
         if (longPressFired) { longPressFired = false; return; }
-
-        // Check if tap was on card image for priority toggle
-        const priorityEl = e.target.closest('[data-priority-toggle]');
-        if (priorityEl) {
-          e.preventDefault();
-          togglePriority(priorityEl.dataset.priorityToggle);
-        }
       });
 
       // Prevent context menu on cards
@@ -6998,12 +6988,42 @@
         if (e.target.closest('.card[data-id]')) e.preventDefault();
       });
 
-      // Desktop: click on card image toggles priority
-      grid.addEventListener('click', (e) => {
-        const priorityEl = e.target.closest('[data-priority-toggle]');
-        if (priorityEl) {
+      // Double-tap on card to toggle priority (touch)
+      // Track whether finger moved during this touch (scroll vs tap)
+      let touchMoved = false;
+      let lastTapTime = 0;
+      let lastTapCard = null;
+
+      grid.addEventListener('touchstart', () => {
+        touchMoved = false;
+      }, { passive: true });
+
+      grid.addEventListener('touchmove', () => {
+        touchMoved = true;
+      }, { passive: true });
+
+      grid.addEventListener('touchend', (e) => {
+        if (touchMoved || longPressFired) return; // was a scroll, not a tap
+        const card = e.target.closest('.card[data-id]');
+        if (!card) return;
+        const now = Date.now();
+        if (lastTapCard === card.dataset.id && now - lastTapTime < 350) {
+          e.preventDefault();
+          togglePriority(card.dataset.id);
+          lastTapTime = 0;
+          lastTapCard = null;
+        } else {
+          lastTapTime = now;
+          lastTapCard = card.dataset.id;
+        }
+      });
+
+      // Desktop: double-click on card toggles priority
+      grid.addEventListener('dblclick', (e) => {
+        const card = e.target.closest('.card[data-id]');
+        if (card) {
           e.stopPropagation();
-          togglePriority(priorityEl.dataset.priorityToggle);
+          togglePriority(card.dataset.id);
         }
       });
     }

@@ -306,11 +306,7 @@
     }
 
     .logo-container {
-      line-height: 0;
-      position: absolute;
-      left: 0.25rem;
-      top: 50%;
-      transform: translateY(-50%);
+      display: none;
     }
 
     .logo-image {
@@ -337,13 +333,49 @@
     }
 
     .header-subtitle {
-      font-size: 0.5rem;
-      color: var(--text-tertiary);
-      font-weight: 400;
-      letter-spacing: 0.08em;
+      display: none;
+    }
+
+    /* Splash Screen */
+    .splash-screen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 9999;
+      background: var(--bg-primary);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 1.25rem;
+      transition: opacity 0.4s ease;
+    }
+
+    .splash-screen.fade-out {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .splash-logo {
+      height: 200px;
+      width: auto;
+      animation: splashPulse 1.5s ease-in-out infinite;
+    }
+
+    .splash-brand {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      font-weight: 700;
+      color: #e1e1e1;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
-      margin-top: 1px;
-      margin-bottom: 0;
+    }
+
+    @keyframes splashPulse {
+      0%, 100% { opacity: 0.7; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.03); }
     }
 
     .header-signout {
@@ -621,15 +653,15 @@
 
       /* Bottom nav */
       .bottom-nav-btn {
-        padding: 0.3rem 0.35rem;
+        padding: 0.3rem 1.25rem;
       }
 
       .bottom-nav-icon {
-        font-size: 1.15rem;
+        font-size: 1.4rem;
       }
 
       .bottom-nav-label {
-        font-size: 0.55rem;
+        font-size: 0.65rem;
       }
 
       /* FAB */
@@ -837,6 +869,7 @@
       border: 1px solid var(--border-light);
       display: flex;
       flex-direction: column;
+      cursor: pointer;
     }
 
     .scroll-row-track > .card {
@@ -847,7 +880,7 @@
       width: 130px !important;
       min-width: 130px !important;
       max-width: 130px !important;
-      height: 240px;
+      height: 195px;
       margin-right: 0.5rem;
       box-sizing: border-box;
       overflow: hidden;
@@ -879,6 +912,200 @@
       }
     }
 
+    /* Card placeholder for items without images */
+    .card-placeholder {
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      font-size: 2.5rem;
+      gap: 0.5rem;
+      padding: 0.5rem;
+      box-sizing: border-box;
+    }
+
+    .card-placeholder-title {
+      font-size: 0.7rem;
+      color: rgba(255,255,255,0.7);
+      text-align: center;
+      line-height: 1.2;
+      max-height: 3.6em;
+      overflow: hidden;
+      word-break: break-word;
+    }
+
+    /* Detail Card Overlay */
+    .detail-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1500;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(4px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .detail-overlay.visible {
+      display: flex;
+    }
+
+    .detail-card {
+      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      border-radius: 16px;
+      max-width: 360px;
+      width: 100%;
+      padding: 1.5rem;
+      position: relative;
+      overflow: hidden;
+      color: #e1e1e1;
+      font-family: 'Inter', sans-serif;
+      max-height: 90vh;
+      overflow-y: auto;
+      animation: detailCardIn 0.25s ease;
+    }
+
+    @keyframes detailCardIn {
+      from { opacity: 0; transform: scale(0.92) translateY(20px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .detail-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, #5B9BD5, #7CB8E8, #f59e0b);
+    }
+
+    .detail-card-close {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: #e1e1e1;
+      font-size: 1.2rem;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+    }
+
+    .detail-card-close:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    .detail-card-poster {
+      width: 140px;
+      height: 210px;
+      border-radius: 10px;
+      object-fit: cover;
+      margin: 0 auto 1rem;
+      display: block;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+    }
+
+    .detail-card-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.4rem;
+      font-weight: 700;
+      text-align: center;
+      margin-bottom: 0.5rem;
+      line-height: 1.2;
+    }
+
+    .detail-card-meta {
+      text-align: center;
+      font-size: 0.85rem;
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 0.75rem;
+    }
+
+    .detail-card-rating {
+      text-align: center;
+      font-size: 1.5rem;
+      color: #f59e0b;
+      margin-bottom: 0.5rem;
+      letter-spacing: 2px;
+    }
+
+    .detail-card-field {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.75);
+      margin-bottom: 0.4rem;
+      line-height: 1.4;
+    }
+
+    .detail-card-field strong {
+      color: rgba(255,255,255,0.9);
+    }
+
+    .detail-card-notes {
+      font-size: 0.8rem;
+      color: rgba(255,255,255,0.75);
+      font-style: italic;
+      line-height: 1.5;
+      margin-bottom: 0.5rem;
+    }
+
+    .detail-card-tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.3rem;
+      justify-content: center;
+      margin-bottom: 0.5rem;
+    }
+
+    .detail-card-tag {
+      background: rgba(91,155,213,0.2);
+      color: #7CB8E8;
+      padding: 0.2rem 0.5rem;
+      border-radius: 10px;
+      font-size: 0.7rem;
+    }
+
+    .detail-card-actions {
+      display: flex;
+      justify-content: center;
+      gap: 0.75rem;
+      margin-top: 1rem;
+      padding-top: 0.75rem;
+      border-top: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .detail-card-action-btn {
+      background: rgba(255,255,255,0.1);
+      border: none;
+      color: #e1e1e1;
+      font-size: 1.1rem;
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+    }
+
+    .detail-card-action-btn:hover {
+      background: rgba(255,255,255,0.2);
+    }
+
+    .detail-card-action-btn.delete-action:hover {
+      background: rgba(239,68,68,0.3);
+    }
 
     .card-rating {
       margin-top: 0.25rem;
@@ -2168,7 +2395,7 @@
 
     .fab-menu {
       position: fixed;
-      bottom: 145px;
+      bottom: 200px;
       right: 20px;
       z-index: 102;
       display: none;
@@ -2208,6 +2435,57 @@
 
     .fab-menu-item .fab-menu-icon {
       font-size: 1.1rem;
+    }
+
+    /* Filter FAB */
+    .filter-fab {
+      position: fixed;
+      bottom: 145px;
+      right: 20px;
+      z-index: 101;
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-light);
+      cursor: pointer;
+      box-shadow: var(--shadow-md);
+      transition: all 0.25s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      line-height: 1;
+    }
+
+    .filter-fab:hover {
+      border-color: var(--accent-primary);
+      box-shadow: var(--shadow-lg);
+    }
+
+    .filter-fab.active {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 2px rgba(91, 155, 213, 0.25);
+    }
+
+    /* Filter Popup */
+    .filter-popup {
+      display: none;
+      position: fixed;
+      bottom: 200px;
+      right: 20px;
+      z-index: 2000;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-medium);
+      border-radius: 12px;
+      box-shadow: var(--shadow-xl);
+      padding: 0.4rem 0;
+      min-width: 180px;
+      animation: quickMenuIn 0.15s ease-out;
+    }
+
+    .filter-popup.visible {
+      display: block;
     }
 
     /* Group Search Results */
@@ -2435,6 +2713,58 @@
       font-weight: 600;
       text-transform: uppercase;
       letter-spacing: 0.03em;
+    }
+
+    /* Search Page */
+    .search-input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      border-radius: 12px;
+      border: 1px solid var(--border-light);
+      background: var(--bg-secondary);
+      color: var(--text-primary);
+      font-size: 1rem;
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      box-sizing: border-box;
+    }
+    .search-input:focus {
+      border-color: var(--accent-primary);
+      box-shadow: 0 0 0 2px rgba(44, 79, 124, 0.15);
+    }
+    .search-input::placeholder {
+      color: var(--text-tertiary);
+    }
+    .search-filters-row {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .search-filters-row select {
+      flex: 1;
+      min-width: 0;
+    }
+    .search-results-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+      gap: 0.75rem;
+      margin-top: 1rem;
+    }
+    .search-empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: var(--text-tertiary);
+      display: none;
+    }
+    .search-empty-state .empty-icon {
+      font-size: 2.5rem;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Feed card */
+    .feed-card {
+      cursor: pointer;
     }
 
     /* Top Navigation Bar */
@@ -3108,6 +3438,24 @@
   <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
 </head>
 <body>
+  <div class="splash-screen" id="splashScreen">
+    <svg class="splash-logo" id="splashLogo" xmlns="http://www.w3.org/2000/svg" viewBox="-15 -15 660 480" preserveAspectRatio="xMidYMid meet"></svg>
+  </div>
+  <script>
+    // Copy the logo SVG content into splash screen once DOM has the logo
+    document.addEventListener('DOMContentLoaded', function() {
+      const source = document.querySelector('.logo-container .logo-image');
+      const target = document.getElementById('splashLogo');
+      if (source && target) {
+        // Copy inner SVG content (paths, groups, etc.) excluding metadata
+        Array.from(source.children).forEach(child => {
+          if (child.tagName.toLowerCase() !== 'metadata') {
+            target.appendChild(child.cloneNode(true));
+          }
+        });
+      }
+    });
+  </script>
   <div class="header">
     <div class="header-main">
       <div class="logo-section">
@@ -3116,7 +3464,6 @@
         </div>
         <div style="text-align: center;">
           <div class="brand-name">BACKLOGUE</div>
-          <p class="header-subtitle">A curated inventory of your digital intentions</p>
         </div>
         <button class="header-help" onclick="showTutorial()">?</button>
         <button class="header-signout" onclick="logout()">Sign Out</button>
@@ -3137,23 +3484,6 @@
       <button class="status-pill" data-status="current" onclick="statusPillScroll('current')">Consuming</button>
       <button class="status-pill" data-status="want" onclick="statusPillScroll('want')">Up Next</button>
       <button class="status-pill" data-status="done" onclick="statusPillScroll('done')">Caught Up</button>
-      <select id="shelfReferralFilter" onchange="referralFilter(this.value)" class="filter-dropdown filter-dropdown-blue" style="border-radius: 20px; padding: 0.3rem 0.6rem; font-size: 0.7rem; min-width: 0; flex-shrink: 0;">
-        <option value="all">Recommenders</option>
-      </select>
-      <select id="shelfGenreFilter" onchange="genreFilter(this.value)" class="filter-dropdown filter-dropdown-blue" style="border-radius: 20px; padding: 0.3rem 0.6rem; font-size: 0.7rem; min-width: 0; flex-shrink: 0;">
-        <option value="all">Genres</option>
-      </select>
-      <select id="shelfTagFilter" onchange="tagFilter(this.value)" class="filter-dropdown filter-dropdown-blue" style="border-radius: 20px; padding: 0.3rem 0.6rem; font-size: 0.7rem; min-width: 0; flex-shrink: 0; display: none;">
-        <option value="all">Tags</option>
-      </select>
-      <select id="shelfSortFilter" onchange="sortFilter(this.value)" class="filter-dropdown filter-dropdown-blue" style="border-radius: 20px; padding: 0.3rem 0.6rem; font-size: 0.7rem; min-width: 0; flex-shrink: 0;">
-        <option value="default">Default</option>
-        <option value="rating">Rating</option>
-        <option value="title">A-Z</option>
-        <option value="dateLogged">Date Logged</option>
-        <option value="premiereDate">Premiere Date</option>
-        <option value="dateAdded">Date Added</option>
-      </select>
     </div>
     <div id="groupTabsContainer" style="display: none;"></div>
     <!-- My Shelf Tab -->
@@ -3184,6 +3514,9 @@
         <select id="feedReferralFilter" onchange="filterFeeds()" class="filter-dropdown filter-dropdown-blue" style="border-radius: 20px; padding: 0.3rem 0.6rem; font-size: 0.7rem; min-width: 0;">
           <option value="all">All Recommendations</option>
         </select>
+        <select id="feedAddedByFilter" onchange="filterFeeds()" class="filter-dropdown filter-dropdown-blue" style="border-radius: 20px; padding: 0.3rem 0.6rem; font-size: 0.7rem; min-width: 0;">
+          <option value="all">Added By</option>
+        </select>
       </div>
       
       <div id="feedsContainer"></div>
@@ -3191,6 +3524,66 @@
         <div class="empty-state-icon">👥</div>
         <div class="empty-state-text">No group activity yet</div>
         <p>Join or create a group to see what others are adding</p>
+      </div>
+    </div>
+
+    <!-- Search Page Tab -->
+    <div id="searchPage" class="tab-content">
+      <input type="text" id="searchInput" class="search-input" placeholder="Search your shelf..." oninput="runSearch()">
+      <div class="search-filters-row">
+        <select id="searchTypeFilter" onchange="runSearch()" class="filter-dropdown filter-dropdown-blue" style="border-radius: 20px; padding: 0.3rem 0.6rem; font-size: 0.7rem;">
+          <option value="all">All Types</option>
+          <option value="movie">Movie</option>
+          <option value="tv">TV</option>
+          <option value="podcast">Podcast</option>
+          <option value="book">Book</option>
+        </select>
+        <select id="searchGenreFilter" onchange="runSearch()" class="filter-dropdown filter-dropdown-blue" style="border-radius: 20px; padding: 0.3rem 0.6rem; font-size: 0.7rem;">
+          <option value="all">All Genres</option>
+        </select>
+        <select id="searchStatusFilter" onchange="runSearch()" class="filter-dropdown filter-dropdown-blue" style="border-radius: 20px; padding: 0.3rem 0.6rem; font-size: 0.7rem;">
+          <option value="all">All Statuses</option>
+          <option value="current">Consuming</option>
+          <option value="want">Up Next</option>
+          <option value="done">Caught Up</option>
+        </select>
+        <select id="searchReferralFilter" onchange="runSearch()" class="filter-dropdown filter-dropdown-blue" style="border-radius: 20px; padding: 0.3rem 0.6rem; font-size: 0.7rem;">
+          <option value="all">Recommended By</option>
+        </select>
+      </div>
+      <div id="searchResults" class="search-results-grid"></div>
+      <div id="searchEmptyState" class="search-empty-state">
+        <div class="empty-icon">🔍</div>
+        <div>No results found</div>
+      </div>
+    </div>
+
+    <!-- Library Tab -->
+    <div id="libraryPage" class="tab-content">
+      <input type="text" id="librarySearchInput" class="search-input"
+             placeholder="Search your library..." oninput="renderLibrary()">
+      <div class="search-filters-row">
+        <select id="libraryTypeFilter" onchange="renderLibrary()" class="filter-dropdown filter-dropdown-blue" style="border-radius: 20px; padding: 0.3rem 0.6rem; font-size: 0.7rem;">
+          <option value="all">All Types</option>
+          <option value="movie">Movie</option>
+          <option value="tv">TV</option>
+          <option value="podcast">Podcast</option>
+          <option value="book">Book</option>
+        </select>
+        <select id="libraryGenreFilter" onchange="renderLibrary()" class="filter-dropdown filter-dropdown-blue" style="border-radius: 20px; padding: 0.3rem 0.6rem; font-size: 0.7rem;">
+          <option value="all">All Genres</option>
+        </select>
+        <select id="librarySortFilter" onchange="renderLibrary()" class="filter-dropdown filter-dropdown-blue" style="border-radius: 20px; padding: 0.3rem 0.6rem; font-size: 0.7rem;">
+          <option value="dateLogged">Date Logged</option>
+          <option value="rating">Rating</option>
+          <option value="az">A-Z</option>
+          <option value="dateAdded">Date Added</option>
+        </select>
+      </div>
+      <div id="libraryResults" class="search-results-grid"></div>
+      <div id="libraryEmptyState" class="search-empty-state" style="display:none;">
+        <div class="empty-icon">📖</div>
+        <div>No completed items found</div>
       </div>
     </div>
 
@@ -3720,6 +4113,8 @@
     let currentFeedMediaFilter = 'all'; // Feed media type filter
     let currentFeedReferralFilter = 'all'; // Feed referral filter
     let currentFeedGroupFilter = 'all'; // Feed group filter
+    let currentFeedAddedByFilter = 'all'; // Feed added-by filter
+    let feedItemsCache = []; // Cache feed items for read-only detail view
     let currentReferralFilter = 'all'; // My Shelf referral filter
     let currentGenreFilter = 'all'; // My Shelf genre filter
     let currentTagFilter = 'all'; // My Shelf tag filter
@@ -3907,8 +4302,18 @@
 
     // ========== AUTHENTICATION FUNCTIONS ==========
 
+    // Dismiss splash screen
+    function dismissSplash() {
+      const splash = document.getElementById('splashScreen');
+      if (splash) {
+        splash.classList.add('fade-out');
+        setTimeout(() => splash.remove(), 500);
+      }
+    }
+
     // Show login modal
     function showLogin() {
+      dismissSplash();
       document.getElementById('loginModal').classList.add('active');
       document.getElementById('signupModal').classList.remove('active');
       // Hide main app content
@@ -4070,6 +4475,9 @@
       if (!localStorage.getItem('backlogue-tutorial-seen')) {
         showTutorial();
       }
+
+      // Dismiss splash screen
+      dismissSplash();
     }
 
     // Save item function (called by Save button)
@@ -4086,11 +4494,18 @@
 
         const ratingVal = document.getElementById('itemRating').value;
         const existingItem = isEditing ? items.find(i => i.id === id) : null;
+        const type = document.getElementById('itemType').value;
+
+        // Prevent duplicates when adding (not editing)
+        if (!isEditing && items.some(i => i.title.toLowerCase() === title.toLowerCase() && i.type === type)) {
+          showToast('This item is already in your list!');
+          return;
+        }
 
         const newItem = {
           id,
           title: title,
-          type: document.getElementById('itemType').value,
+          type: type,
           status: document.getElementById('itemStatus').value,
           watchSoon: isEditing ? (existingItem?.watchSoon || false) : false,
           rating: ratingVal === '' ? null : parseFloat(ratingVal),
@@ -4161,11 +4576,19 @@
           const isEditingForm = !!document.getElementById('editId').value;
           const existingItemForm = isEditingForm ? items.find(i => i.id === id) : null;
           const ratingValForm = document.getElementById('itemRating').value;
+          const formTitle = document.getElementById('itemTitle').value;
+          const formType = document.getElementById('itemType').value;
+
+          // Prevent duplicates when adding (not editing)
+          if (!isEditingForm && items.some(i => i.title.toLowerCase() === formTitle.toLowerCase() && i.type === formType)) {
+            showToast('This item is already in your list!');
+            return;
+          }
 
           const newItem = {
             id,
-            title: document.getElementById('itemTitle').value,
-            type: document.getElementById('itemType').value,
+            title: formTitle,
+            type: formType,
             status: document.getElementById('itemStatus').value,
             watchSoon: isEditingForm ? (existingItemForm?.watchSoon || false) : false,
             rating: ratingValForm === '' ? null : parseFloat(ratingValForm),
@@ -5072,45 +5495,6 @@
       const grid = document.getElementById('itemsGrid');
       const emptyState = document.getElementById('emptyState');
 
-      // Populate shelf referral filter dropdown with unique referrals
-      const shelfReferralDropdown = document.getElementById('shelfReferralFilter');
-      if (shelfReferralDropdown) {
-        const uniqueReferrals = [...new Set(items
-          .filter(item => item.referral)
-          .map(item => item.referral))].sort();
-
-        const prev = shelfReferralDropdown.value;
-        shelfReferralDropdown.innerHTML = '<option value="all">Recommenders</option>' +
-          uniqueReferrals.map(ref => `<option value="${ref}">${ref}</option>`).join('');
-        shelfReferralDropdown.value = prev;
-        shelfReferralDropdown.style.display = uniqueReferrals.length > 0 ? '' : 'none';
-      }
-
-      // Populate shelf genre filter dropdown with unique genres
-      const shelfGenreDropdown = document.getElementById('shelfGenreFilter');
-      if (shelfGenreDropdown) {
-        const uniqueGenres = [...new Set(items
-          .filter(item => item.genre)
-          .map(item => item.genre))].sort();
-
-        const prevGenre = shelfGenreDropdown.value;
-        shelfGenreDropdown.innerHTML = '<option value="all">Genres</option>' +
-          uniqueGenres.map(g => `<option value="${g}">${g}</option>`).join('');
-        shelfGenreDropdown.value = prevGenre;
-        shelfGenreDropdown.style.display = uniqueGenres.length > 0 ? '' : 'none';
-      }
-
-      // Populate shelf tag filter dropdown
-      const shelfTagDropdown = document.getElementById('shelfTagFilter');
-      if (shelfTagDropdown) {
-        const allTags = getAllUserTags();
-        const prevTag = shelfTagDropdown.value;
-        shelfTagDropdown.innerHTML = '<option value="all">Tags</option>' +
-          allTags.map(t => `<option value="${t}">${t}</option>`).join('');
-        shelfTagDropdown.value = prevTag;
-        shelfTagDropdown.style.display = allTags.length > 0 ? '' : 'none';
-      }
-
       let filteredItems = items.filter(item => {
         // Apply media type filter
         let matchesMedia = true;
@@ -5206,7 +5590,8 @@
       // Build HTML with horizontal scroll rows per status/type
       let html = '';
 
-      const statusList = ['current', 'want', 'done'];
+      const allStatuses = ['current', 'want', 'done'];
+      const statusList = currentStatusFilter === 'all' ? allStatuses : allStatuses.filter(s => s === currentStatusFilter);
       const typeOrder = ['movie', 'tv', 'podcast', 'book'];
       const typeLabels = { movie: '🎬 Movies', tv: '📺 TV Shows', podcast: '🎙️ Podcasts', book: '📚 Books' };
       const statusConfig = {
@@ -5232,11 +5617,40 @@
         `;
 
         if (statusItems.length === 0) {
-          html += `<div class="scroll-row-empty">Nothing here yet</div>`;
+          const typeIcons = { movie: '🎬', tv: '📺', podcast: '🎙️', book: '📚' };
+          const emptyByType = {
+            movie:   { current: 'What are you watching?',   want: 'What\'s next to watch?',     done: 'What have you seen?' },
+            tv:      { current: 'What are you binging?',    want: 'What\'s next to binge?',     done: 'What have you binged?' },
+            podcast: { current: 'What are you listening to?', want: 'What\'s next to listen to?', done: 'What have you heard?' },
+            book:    { current: 'What are you reading?',    want: 'What\'s next to read?',      done: 'What have you read?' }
+          };
+          const activeType = currentMediaFilter !== 'all' ? currentMediaFilter : null;
+          if (activeType && emptyByType[activeType]) {
+            html += `<div class="scroll-row-empty" style="text-align:center; padding:2rem 1rem;">
+              <div style="font-size:2.5rem; margin-bottom:0.5rem;">${typeIcons[activeType]}</div>
+              <div>${emptyByType[activeType][status]}</div>
+            </div>`;
+          } else {
+            html += `<div class="scroll-row-empty" style="text-align:center; padding:2rem 1rem;">
+              <div style="font-size:2.5rem; margin-bottom:0.5rem;">📚</div>
+              <div>Nothing here yet</div>
+            </div>`;
+          }
         } else {
           typeOrder.forEach(type => {
             const typeItems = statusItems.filter(i => i.type === type);
             if (typeItems.length === 0) return;
+
+            // For Caught Up, sort by most recent and cap at 15
+            if (status === 'done') {
+              typeItems.sort((a, b) => {
+                const dateA = a.dateLogged || '';
+                const dateB = b.dateLogged || '';
+                if (dateB !== dateA) return dateB.localeCompare(dateA);
+                return Number(b.id) - Number(a.id);
+              });
+            }
+            const displayItems = (status === 'done') ? typeItems.slice(0, 15) : typeItems;
 
             const hiddenClass = (currentMediaFilter !== 'all' && type !== currentMediaFilter) ? ' hidden-by-filter' : '';
 
@@ -5244,11 +5658,23 @@
             html += `<div class="scroll-row-header"><span class="scroll-row-label">${typeLabels[type] || type}</span></div>`;
             html += `<div class="scroll-row-track">`;
 
-            typeItems.forEach(item => {
+            displayItems.forEach(item => {
               html += renderCardHtml(item, cardIndex++);
             });
 
-            html += `</div></div>`;
+            html += `</div>`;
+
+            // Show "View all in Library" link if more than 15 completed items
+            if (status === 'done' && typeItems.length > 15) {
+              const typeLabel = typeLabels[type] || type;
+              html += `<div style="text-align:center; padding:0.5rem;">
+                <a onclick="openLibrary(null, '${type}')" style="color:var(--accent); cursor:pointer; font-size:0.85rem; text-decoration:none;">
+                  View all ${typeItems.length} ${typeLabel.toLowerCase()} in Library &rarr;
+                </a>
+              </div>`;
+            }
+
+            html += `</div>`;
           });
         }
 
@@ -5260,24 +5686,7 @@
         return `
           <div class="card${isPriority ? ' priority-glow' : ''}" data-id="${item.id}" data-type="${item.type}" style="animation-delay: ${Math.min(index * 0.05, 0.5)}s">
             <div class="card-image">
-              ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : ''}
-            </div>
-            <div class="card-content">
-              <div class="card-type-badge">${getTypeEmoji(item.type)}</div>
-              ${renderPremiereDate(item.premiereDate)}
-              ${renderStarDisplay(item.rating)}
-              ${item.dateLogged ? `<div class="card-date">📅 ${formatDateForCard(item.dateLogged)}</div>` : ''}
-              ${item.streamingPlatform ? `<div class="card-streaming">${item.streamingPlatform}</div>` : ''}
-              ${item.genre ? `<div class="card-genre">${item.genre}</div>` : ''}
-              ${item.referral ? `<div class="card-referral">Rec by ${item.referral}</div>` : ''}
-              ${item.notes ? `<div class="card-notes-label">Review:</div><div class="card-notes">${item.notes}</div>` : ''}
-              ${item.tags && item.tags.length > 0 ? `<div class="card-tags">${item.tags.slice(0, 3).map(t => `<span class="card-tag">${t}</span>`).join('')}</div>` : ''}
-              ${item.group ? `<div class="card-group">📁 ${getGroupName(item.group)}</div>` : ''}
-            </div>
-            <div class="card-actions">
-              <button class="card-action-btn" onclick="event.stopPropagation(); openShareCardForItem('${item.id}')" title="Share">📤</button>
-              <button class="card-action-btn" onclick="event.stopPropagation(); editItem('${item.id}')" title="Edit">✏️</button>
-              <button class="card-action-btn delete-btn" onclick="event.stopPropagation(); deleteItem('${item.id}')" title="Delete">🗑️</button>
+              ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : `<div class="card-placeholder">${getTypeEmoji(item.type)}<div class="card-placeholder-title">${item.title}</div></div>`}
             </div>
           </div>
         `;
@@ -5341,84 +5750,50 @@
 
     // Render shared items as a card grid grouped by media type
     function renderFeedGrid(containerEl, filteredItems, showGroup) {
-      const typeOrder = { 'movie': 1, 'tv': 2, 'podcast': 3, 'book': 4 };
-      const typeConfig = {
-        'movie':   { label: 'Movies',   icon: '🎬' },
-        'tv':      { label: 'TV Shows', icon: '📺' },
-        'podcast': { label: 'Podcasts', icon: '🎙️' },
-        'book':    { label: 'Books',    icon: '📚' }
-      };
+      const typeOrderArr = ['movie', 'tv', 'podcast', 'book'];
+      const typeLabels = { movie: '🎬 Movies', tv: '📺 TV Shows', podcast: '🎙️ Podcasts', book: '📚 Books' };
 
-      // Sort by type group, then by priority, then by timestamp
+      // Sort by priority then timestamp within each type
       filteredItems.sort((a, b) => {
-        const typeDiff = (typeOrder[a.type] || 99) - (typeOrder[b.type] || 99);
-        if (typeDiff !== 0) return typeDiff;
         if (a.watchSoon && !b.watchSoon) return -1;
         if (!a.watchSoon && b.watchSoon) return 1;
         return b.timestamp - a.timestamp;
       });
 
-      // Count per type
-      const typeCounts = {};
-      filteredItems.forEach(item => {
-        typeCounts[item.type] = (typeCounts[item.type] || 0) + 1;
-      });
-
+      feedItemsCache = [];
       let html = '';
-      let lastType = null;
+      let cardIndex = 0;
 
-      filteredItems.forEach((item, index) => {
-        if (item.type !== lastType) {
-          const cfg = typeConfig[item.type] || { label: item.type, icon: '📌' };
-          const count = typeCounts[item.type] || 0;
-          html += `
-            <div class="status-section-header">
-              <h2 class="status-section-title">${cfg.icon} ${cfg.label}</h2>
-              <div class="status-section-line"></div>
-              <span class="status-section-count">${count}</span>
-            </div>
-          `;
-          lastType = item.type;
-        }
+      typeOrderArr.forEach(type => {
+        const typeItems = filteredItems.filter(i => i.type === type);
+        if (typeItems.length === 0) return;
 
-        const group = groups.find(g => g.id === item.groupId);
-        const groupName = group ? group.name : '';
-        const userName = item.userName || 'Unknown';
-        const myItem = items.find(i => i.title === item.title && i.type === item.type);
-        const alreadyAdded = !!myItem;
-        const escapedItem = encodeURIComponent(JSON.stringify({
-          title: item.title,
-          type: item.type,
-          image: item.image || '',
-          streamingPlatform: item.streamingPlatform || '',
-          genre: item.genre || '',
-          referral: item.referral || ''
-        }));
-
+        html += `<section class="status-section">`;
         html += `
-          <div class="card${item.watchSoon ? ' priority-glow' : ''}" data-type="${item.type}" style="animation-delay: ${index * 0.05}s">
-            <div class="card-image">
-              ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : ''}
-            </div>
-            <div class="card-content">
-              <div class="card-type-badge">${getTypeEmoji(item.type)}</div>
-              ${renderPremiereDate(item.premiereDate)}
-              ${renderStarDisplay(item.rating)}
-              ${item.dateLogged ? `<div class="card-date">📅 ${formatDateForCard(item.dateLogged)}</div>` : ''}
-              ${item.streamingPlatform ? `<div class="card-streaming">${item.streamingPlatform}</div>` : ''}
-              ${item.referral ? `<div class="card-referral">Rec by ${item.referral}</div>` : ''}
-              ${item.notes ? `<div class="card-notes-label">Review:</div><div class="card-notes-feed">${item.notes}</div>` : ''}
-              ${item.tags && item.tags.length > 0 ? `<div class="card-tags">${item.tags.slice(0, 3).map(t => `<span class="card-tag">${t}</span>`).join('')}</div>` : ''}
-              <div class="card-referral" style="font-size:0.7rem; opacity:0.7;">Added by ${userName}${showGroup && groupName ? ` to ${groupName}` : ''}</div>
-            </div>
-            <div class="card-actions" style="opacity:1;">
-              ${alreadyAdded
-                ? `<button class="card-action-btn" disabled style="opacity:0.5; cursor:default; width:100%; text-align:center;">✓ ${getStatusText(myItem.status, myItem.type)}</button>`
-                : `<button class="card-action-btn" onclick="event.stopPropagation(); addFromFeed('${escapedItem}')" style="width:100%; text-align:center;" title="Add to my list">+ Add to My List</button>`
-              }
-            </div>
+          <div class="status-section-header">
+            <h2 class="status-section-title">${typeLabels[type] || type}</h2>
+            <div class="status-section-line"></div>
+            <span class="status-section-count">${typeItems.length}</span>
           </div>
         `;
+        html += `<div class="scroll-row" data-type="${type}">`;
+        html += `<div class="scroll-row-track">`;
+
+        typeItems.forEach(item => {
+          const feedIdx = feedItemsCache.length;
+          feedItemsCache.push(item);
+
+          html += `
+            <div class="card feed-card" data-feed-idx="${feedIdx}" data-type="${item.type}" style="animation-delay: ${Math.min(cardIndex * 0.05, 0.5)}s">
+              <div class="card-image">
+                ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : `<div class="card-placeholder">${getTypeEmoji(item.type)}<div class="card-placeholder-title">${item.title}</div></div>`}
+              </div>
+            </div>
+          `;
+          cardIndex++;
+        });
+
+        html += `</div></div></section>`;
       });
 
       containerEl.innerHTML = html;
@@ -5452,12 +5827,25 @@
           uniqueReferrals.map(ref => `<option value="${ref}">${ref}</option>`).join('');
       }
 
+      // Populate added-by filter dropdown with unique user names
+      const addedByFilter = document.getElementById('feedAddedByFilter');
+      if (addedByFilter) {
+        const uniqueUsers = [...new Set(sharedItems
+          .filter(item => item.userName)
+          .map(item => item.userName))].sort();
+        const prevUser = addedByFilter.value;
+        addedByFilter.innerHTML = '<option value="all">Added By</option>' +
+          uniqueUsers.map(u => `<option value="${u}">${u}</option>`).join('');
+        addedByFilter.value = prevUser;
+      }
+
       // Apply filters
       let filteredItems = sharedItems.filter(item => {
         let matchesGroup = currentFeedGroupFilter === 'all' || item.groupId === currentFeedGroupFilter;
         let matchesMedia = currentFeedMediaFilter === 'all' || item.type === currentFeedMediaFilter;
         let matchesReferral = currentFeedReferralFilter === 'all' || item.referral === currentFeedReferralFilter;
-        return matchesGroup && matchesMedia && matchesReferral;
+        let matchesAddedBy = currentFeedAddedByFilter === 'all' || item.userName === currentFeedAddedByFilter;
+        return matchesGroup && matchesMedia && matchesReferral && matchesAddedBy;
       });
 
       if (filteredItems.length === 0) {
@@ -5466,9 +5854,7 @@
         return;
       }
 
-      container.style.display = 'grid';
-      container.style.gridTemplateColumns = 'repeat(auto-fill, minmax(120px, 1fr))';
-      container.style.gap = '0.4rem';
+      container.style.display = '';
       emptyState.style.display = 'none';
 
       renderFeedGrid(container, filteredItems, true);
@@ -5479,6 +5865,7 @@
       const groupFilter = document.getElementById('feedGroupFilter');
       const mediaFilter = document.getElementById('feedMediaFilter');
       const referralFilter = document.getElementById('feedReferralFilter');
+      const addedByFilter = document.getElementById('feedAddedByFilter');
 
       if (groupFilter) {
         currentFeedGroupFilter = groupFilter.value;
@@ -5488,6 +5875,9 @@
       }
       if (referralFilter) {
         currentFeedReferralFilter = referralFilter.value;
+      }
+      if (addedByFilter) {
+        currentFeedAddedByFilter = addedByFilter.value;
       }
 
       renderFeeds();
@@ -6338,9 +6728,7 @@
         return;
       }
 
-      container.style.display = 'grid';
-      container.style.gridTemplateColumns = 'repeat(auto-fill, minmax(120px, 1fr))';
-      container.style.gap = '0.4rem';
+      container.style.display = '';
       if (emptyState) emptyState.style.display = 'none';
 
       renderFeedGrid(container, groupItems, false);
@@ -6354,15 +6742,62 @@
 
     // Bottom nav filter
     function bottomNavFilter(type) {
-      currentMediaFilter = type === 'all' ? 'all' : type;
+      document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
+      document.querySelector('.bottom-nav-btn[data-type="all"]').classList.add('active');
+      document.querySelector('.status-pills').style.display = '';
+
+      currentMediaFilter = 'all';
+      currentStatusFilter = 'all';
       currentReferralFilter = 'all';
       currentGenreFilter = 'all';
       currentTagFilter = 'all';
 
-      // Update active state on both top and bottom nav
-      document.querySelectorAll('.bottom-nav-btn, .top-nav-btn').forEach(btn => {
-        btn.classList.toggle('active', btn.dataset.type === type);
+      // Reset status pills to All
+      document.querySelectorAll('.status-pill').forEach(pill => {
+        pill.classList.toggle('active', pill.dataset.status === 'all');
       });
+
+      // Sync header dropdown
+      const typeDropdown = document.getElementById('typeFilter');
+      if (typeDropdown) typeDropdown.value = 'all';
+
+      // Switch to My Shelf tab if not already there
+      if (!document.getElementById('myShelf').classList.contains('active')) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.getElementById('myShelf').classList.add('active');
+      }
+
+      // Reset filter fab icon
+      updateFilterFabIcon('all');
+
+      // Reset FAB to add mode when switching to shelf/media tabs
+      setFabMode('add');
+      closeFabMenu();
+
+      renderItems();
+    }
+
+    // Filter popup toggle
+    function toggleFilterPopup() {
+      const popup = document.getElementById('filterPopup');
+      popup.classList.toggle('visible');
+    }
+
+    // Close filter popup when clicking outside
+    document.addEventListener('click', function(e) {
+      const fab = document.getElementById('filterFab');
+      const popup = document.getElementById('filterPopup');
+      if (popup && fab && !fab.contains(e.target) && !popup.contains(e.target)) {
+        popup.classList.remove('visible');
+      }
+    });
+
+    // Apply media filter from popup
+    function applyMediaFilter(type) {
+      currentMediaFilter = type === 'all' ? 'all' : type;
+      currentReferralFilter = 'all';
+      currentGenreFilter = 'all';
+      currentTagFilter = 'all';
 
       // Sync header dropdown
       const typeDropdown = document.getElementById('typeFilter');
@@ -6374,11 +6809,26 @@
         document.getElementById('myShelf').classList.add('active');
       }
 
-      // Reset FAB to add mode when switching to shelf/media tabs
+      // Update filter fab icon and state
+      updateFilterFabIcon(type);
+
+      // Close popup
+      document.getElementById('filterPopup').classList.remove('visible');
+
+      // Reset FAB to add mode
       setFabMode('add');
       closeFabMenu();
 
       renderItems();
+    }
+
+    // Update filter fab icon based on active filter
+    function updateFilterFabIcon(type) {
+      const iconEl = document.getElementById('filterFabIcon');
+      const fabEl = document.getElementById('filterFab');
+      const icons = { all: '🎯', movie: '🎬', tv: '📺', book: '📚', podcast: '🎙️' };
+      iconEl.textContent = icons[type] || '🎯';
+      fabEl.classList.toggle('active', type !== 'all');
     }
 
     // Shelf referral filter
@@ -6405,17 +6855,9 @@
         document.getElementById('myShelf').classList.add('active');
       }
 
-      // Scroll to section — only when a specific pill is tapped
-      if (status !== 'all') {
-        const target = document.getElementById(`status-${status}`);
-        if (target) {
-          const headerOffset = 100; // account for sticky header/pills
-          const y = target.getBoundingClientRect().top + window.pageYOffset - headerOffset;
-          window.scrollTo({ top: y, behavior: 'smooth' });
-        }
-      } else {
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-      }
+      currentStatusFilter = status;
+      renderItems();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     // === FAB MODE SWITCHING ===
@@ -6466,7 +6908,166 @@
       switchTab('groupFeeds', { target: btn });
       document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
       btn.classList.add('active');
+      document.querySelector('.status-pills').style.display = 'none';
       setFabMode('group');
+    }
+
+    function openSearchPage(btn) {
+      document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.getElementById('searchPage').classList.add('active');
+      document.querySelector('.status-pills').style.display = 'none';
+      setFabMode('add');
+      closeFabMenu();
+
+      // Populate genre dropdown
+      const genreSelect = document.getElementById('searchGenreFilter');
+      const uniqueGenres = [...new Set(items.filter(i => i.genre).map(i => i.genre))].sort();
+      const prevGenre = genreSelect.value;
+      genreSelect.innerHTML = '<option value="all">All Genres</option>' +
+        uniqueGenres.map(g => `<option value="${g}">${g}</option>`).join('');
+      genreSelect.value = prevGenre;
+
+      // Populate recommended-by dropdown
+      const refSelect = document.getElementById('searchReferralFilter');
+      const uniqueRefs = [...new Set(items.filter(i => i.referral).map(i => i.referral))].sort();
+      const prevRef = refSelect.value;
+      refSelect.innerHTML = '<option value="all">Recommended By</option>' +
+        uniqueRefs.map(r => `<option value="${r}">${r}</option>`).join('');
+      refSelect.value = prevRef;
+
+      document.getElementById('searchInput').focus();
+      runSearch();
+    }
+
+    function runSearch() {
+      const query = (document.getElementById('searchInput').value || '').toLowerCase().trim();
+      const typeFilter = document.getElementById('searchTypeFilter').value;
+      const genreFilter = document.getElementById('searchGenreFilter').value;
+      const statusFilter = document.getElementById('searchStatusFilter').value;
+      const referralFilter = document.getElementById('searchReferralFilter').value;
+
+      const results = items.filter(item => {
+        if (query && !item.title.toLowerCase().includes(query)) return false;
+        if (typeFilter !== 'all' && item.type !== typeFilter) return false;
+        if (genreFilter !== 'all' && item.genre !== genreFilter) return false;
+        if (statusFilter !== 'all' && item.status !== statusFilter) return false;
+        if (referralFilter !== 'all' && item.referral !== referralFilter) return false;
+        return true;
+      });
+
+      const container = document.getElementById('searchResults');
+      const emptyState = document.getElementById('searchEmptyState');
+
+      if (results.length === 0) {
+        container.innerHTML = '';
+        emptyState.style.display = 'block';
+      } else {
+        emptyState.style.display = 'none';
+        container.innerHTML = results.map((item, i) => {
+          const isPriority = item.watchSoon;
+          return `
+            <div class="card${isPriority ? ' priority-glow' : ''}" data-id="${item.id}" data-type="${item.type}" style="animation-delay: ${Math.min(i * 0.05, 0.5)}s">
+              <div class="card-image">
+                ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : `<div class="card-placeholder">${getTypeEmoji(item.type)}<div class="card-placeholder-title">${item.title}</div></div>`}
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+    }
+
+    // ========== LIBRARY TAB ==========
+    function openLibrary(btn, presetType) {
+      document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
+      // If btn is an element, activate it; otherwise find the Library nav button
+      if (btn && btn.classList) {
+        btn.classList.add('active');
+      } else {
+        document.querySelectorAll('.bottom-nav-btn').forEach(b => {
+          if (b.textContent.trim().includes('Library')) b.classList.add('active');
+        });
+      }
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.getElementById('libraryPage').classList.add('active');
+      document.querySelector('.status-pills').style.display = 'none';
+      setFabMode('add');
+      closeFabMenu();
+
+      // Populate genre dropdown from completed items only
+      const genreSelect = document.getElementById('libraryGenreFilter');
+      const completedItems = items.filter(i => i.status === 'done');
+      const uniqueGenres = [...new Set(completedItems.filter(i => i.genre).map(i => i.genre))].sort();
+      const prevGenre = genreSelect.value;
+      genreSelect.innerHTML = '<option value="all">All Genres</option>' +
+        uniqueGenres.map(g => `<option value="${g}">${g}</option>`).join('');
+      genreSelect.value = prevGenre;
+
+      // If presetType passed, set the type dropdown
+      if (presetType) {
+        document.getElementById('libraryTypeFilter').value = presetType;
+      }
+
+      document.getElementById('librarySearchInput').focus();
+      renderLibrary();
+    }
+
+    function renderLibrary() {
+      const query = (document.getElementById('librarySearchInput').value || '').toLowerCase().trim();
+      const typeFilter = document.getElementById('libraryTypeFilter').value;
+      const genreFilter = document.getElementById('libraryGenreFilter').value;
+      const sortOption = document.getElementById('librarySortFilter').value;
+
+      let results = items.filter(item => {
+        if (item.status !== 'done') return false;
+        if (query && !item.title.toLowerCase().includes(query)) return false;
+        if (typeFilter !== 'all' && item.type !== typeFilter) return false;
+        if (genreFilter !== 'all' && item.genre !== genreFilter) return false;
+        return true;
+      });
+
+      // Sort
+      switch (sortOption) {
+        case 'rating':
+          results.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+          break;
+        case 'az':
+          results.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+          break;
+        case 'dateAdded':
+          results.sort((a, b) => Number(b.id) - Number(a.id));
+          break;
+        case 'dateLogged':
+        default:
+          results.sort((a, b) => {
+            const dateA = a.dateLogged || '';
+            const dateB = b.dateLogged || '';
+            if (dateB !== dateA) return dateB.localeCompare(dateA);
+            return Number(b.id) - Number(a.id);
+          });
+          break;
+      }
+
+      const container = document.getElementById('libraryResults');
+      const emptyState = document.getElementById('libraryEmptyState');
+
+      if (results.length === 0) {
+        container.innerHTML = '';
+        emptyState.style.display = 'block';
+      } else {
+        emptyState.style.display = 'none';
+        container.innerHTML = results.map((item, i) => {
+          const isPriority = item.watchSoon;
+          return `
+            <div class="card${isPriority ? ' priority-glow' : ''}" data-id="${item.id}" data-type="${item.type}" style="animation-delay: ${Math.min(i * 0.05, 0.5)}s">
+              <div class="card-image">
+                ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : `<div class="card-placeholder">${getTypeEmoji(item.type)}<div class="card-placeholder-title">${item.title}</div></div>`}
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
     }
 
     // Open invite modal for an existing group (pick from user's groups)
@@ -6823,6 +7424,70 @@
       }
     }
 
+    // Detail Card Overlay
+    function openDetailCard(itemId) {
+      const item = items.find(i => i.id === itemId);
+      if (!item) return;
+
+      const stars = legacyToStars(item.rating);
+      let starHtml = '';
+      if (stars !== null) {
+        const full = Math.floor(stars);
+        const half = (stars % 1) >= 0.5;
+        starHtml = '<div class="detail-card-rating">' + '\u2605'.repeat(full) + (half ? '\u00BD' : '') + '</div>';
+      }
+
+      const statusColors = {
+        'done': { bg: 'rgba(91,155,213,0.2)', color: '#5B9BD5', label: 'Caught Up' },
+        'current': { bg: 'rgba(99,102,241,0.2)', color: '#6366f1', label: 'Consuming' },
+        'want': { bg: 'rgba(245,158,11,0.2)', color: '#f59e0b', label: 'Up Next' }
+      };
+      const sc = statusColors[item.status] || statusColors['done'];
+
+      let fieldsHtml = '';
+      if (item.streamingPlatform) fieldsHtml += `<div class="detail-card-field"><strong>Platform:</strong> ${item.streamingPlatform}</div>`;
+      if (item.referral) fieldsHtml += `<div class="detail-card-field"><strong>Rec by:</strong> ${item.referral}</div>`;
+      if (item.premiereDate) fieldsHtml += `<div class="detail-card-field"><strong>Premiere:</strong> ${item.premiereDate}</div>`;
+      if (item.group) fieldsHtml += `<div class="detail-card-field"><strong>Group:</strong> 📁 ${getGroupName(item.group)}</div>`;
+      if (item.notes) fieldsHtml += `<div class="detail-card-notes">"${item.notes.substring(0, 250)}${item.notes.length > 250 ? '...' : ''}"</div>`;
+      if (item.tags && item.tags.length > 0) {
+        fieldsHtml += `<div class="detail-card-tags">${item.tags.map(t => `<span class="detail-card-tag">${t}</span>`).join('')}</div>`;
+      }
+
+      const card = document.getElementById('detailCard');
+      card.innerHTML = `
+        <button class="detail-card-close" onclick="closeDetailCard()">&times;</button>
+        <div style="text-align: center; margin-bottom: 0.75rem; padding-top: 0.5rem;">
+          <span class="share-card-status-badge" style="background: ${sc.bg}; color: ${sc.color};">${sc.label}</span>
+        </div>
+        ${item.image
+          ? `<img class="detail-card-poster" src="${item.image}" alt="${item.title}">`
+          : `<div style="width:140px;height:210px;margin:0 auto 1rem;border-radius:10px;background:linear-gradient(135deg,#282828,#333);display:flex;align-items:center;justify-content:center;font-size:3rem;">${getTypeEmoji(item.type)}</div>`
+        }
+        <div class="detail-card-title">${item.title}</div>
+        <div class="detail-card-meta">
+          ${getTypeEmoji(item.type)} ${item.type.charAt(0).toUpperCase() + item.type.slice(1)}
+          ${item.genre ? ' &middot; ' + item.genre : ''}
+          ${item.dateLogged ? ' &middot; ' + formatDateForCard(item.dateLogged) : ''}
+        </div>
+        ${starHtml}
+        ${fieldsHtml}
+        <div class="detail-card-actions">
+          <button class="detail-card-action-btn" onclick="closeDetailCard(); openShareCardForItem('${item.id}')" title="Share">📤</button>
+          <button class="detail-card-action-btn" onclick="closeDetailCard(); editItem('${item.id}')" title="Edit">✏️</button>
+          <button class="detail-card-action-btn delete-action" onclick="closeDetailCard(); deleteItem('${item.id}')" title="Delete">🗑️</button>
+        </div>
+      `;
+
+      document.getElementById('detailCardOverlay').classList.add('visible');
+    }
+
+    function closeDetailCard() {
+      const overlay = document.getElementById('detailCardOverlay');
+      overlay.classList.remove('visible');
+      document.getElementById('detailCard').innerHTML = '';
+    }
+
     function renderItemShareCard(item) {
       const stars = legacyToStars(item.rating);
       let starHtml = '';
@@ -6833,8 +7498,8 @@
       }
 
       const statusColors = {
-        'done': { bg: 'rgba(91,155,213,0.2)', color: '#5B9BD5', label: 'Completed' },
-        'current': { bg: 'rgba(99,102,241,0.2)', color: '#6366f1', label: 'Currently Enjoying' },
+        'done': { bg: 'rgba(91,155,213,0.2)', color: '#5B9BD5', label: 'Caught Up' },
+        'current': { bg: 'rgba(99,102,241,0.2)', color: '#6366f1', label: 'Consuming' },
         'want': { bg: 'rgba(245,158,11,0.2)', color: '#f59e0b', label: 'Up Next' }
       };
       const sc = statusColors[item.status] || statusColors['done'];
@@ -6845,7 +7510,7 @@
           <span class="share-card-status-badge" style="background: ${sc.bg}; color: ${sc.color};">${sc.label}</span>
         </div>
         ${item.image
-          ? `<img class="share-card-item-poster" src="${item.image}" crossorigin="anonymous" onerror="this.style.display='none'">`
+          ? `<img class="share-card-item-poster" src="${item.image}">`
           : `<div style="width:140px;height:210px;margin:0 auto 1rem;border-radius:10px;background:linear-gradient(135deg,#282828,#333);display:flex;align-items:center;justify-content:center;font-size:3rem;">${getTypeEmoji(item.type)}</div>`
         }
         <div class="share-card-item-title">${item.title}</div>
@@ -6908,14 +7573,45 @@
       `;
     }
 
+    // Convert external images to data URLs so html2canvas can capture them
+    async function prepareShareCardImages() {
+      const container = document.getElementById('shareCardRender');
+      const imgs = container.querySelectorAll('img');
+      const promises = Array.from(imgs).map(img => {
+        if (!img.src || img.src.startsWith('data:')) return Promise.resolve();
+        return new Promise(resolve => {
+          const tempImg = new Image();
+          tempImg.crossOrigin = 'anonymous';
+          tempImg.onload = () => {
+            try {
+              const c = document.createElement('canvas');
+              c.width = tempImg.naturalWidth;
+              c.height = tempImg.naturalHeight;
+              c.getContext('2d').drawImage(tempImg, 0, 0);
+              img.src = c.toDataURL('image/png');
+            } catch (e) {
+              // CORS blocked — leave original src, html2canvas will skip it
+            }
+            resolve();
+          };
+          tempImg.onerror = () => resolve();
+          // Cache-bust to avoid CORS conflict with previously cached non-CORS version
+          const separator = img.src.includes('?') ? '&' : '?';
+          tempImg.src = img.src + separator + '_cors=1';
+        });
+      });
+      await Promise.all(promises);
+    }
+
     async function downloadShareCard() {
       const element = document.getElementById('shareCardRender');
       try {
+        await prepareShareCardImages();
         const canvas = await html2canvas(element, {
           backgroundColor: null,
           scale: 2,
           useCORS: true,
-          allowTaint: false,
+          allowTaint: true,
           logging: false
         });
         const link = document.createElement('a');
@@ -6931,11 +7627,12 @@
     async function copyShareCardToClipboard() {
       const element = document.getElementById('shareCardRender');
       try {
+        await prepareShareCardImages();
         const canvas = await html2canvas(element, {
           backgroundColor: null,
           scale: 2,
           useCORS: true,
-          allowTaint: false,
+          allowTaint: true,
           logging: false
         });
         canvas.toBlob(async (blob) => {
@@ -7206,83 +7903,107 @@
     let longPressFired = false;
 
     function initLongPress() {
-      const grid = document.getElementById('itemsGrid');
-      if (!grid) return;
+      const containers = [document.getElementById('itemsGrid'), document.getElementById('searchResults'), document.getElementById('libraryResults')];
 
-      let touchStartX = 0, touchStartY = 0;
+      containers.forEach(grid => {
+        if (!grid) return;
 
-      grid.addEventListener('touchstart', (e) => {
-        const card = e.target.closest('.card[data-id]');
-        if (!card) return;
-        const touch = e.touches[0];
-        touchStartX = touch.clientX;
-        touchStartY = touch.clientY;
-        longPressFired = false;
-        longPressTimer = setTimeout(() => {
-          longPressFired = true;
-          quickActionItemId = card.dataset.id;
-          showQuickActionMenu(touch.clientX, touch.clientY);
-        }, 500);
-      }, { passive: true });
+        let touchStartX = 0, touchStartY = 0;
 
-      grid.addEventListener('touchmove', (e) => {
-        if (longPressTimer) {
-          const dx = Math.abs(e.touches[0].clientX - touchStartX);
-          const dy = Math.abs(e.touches[0].clientY - touchStartY);
-          if (dx > 10 || dy > 10) {
-            clearTimeout(longPressTimer);
-            longPressTimer = null;
+        grid.addEventListener('touchstart', (e) => {
+          const card = e.target.closest('.card[data-id]');
+          if (!card) return;
+          const touch = e.touches[0];
+          touchStartX = touch.clientX;
+          touchStartY = touch.clientY;
+          longPressFired = false;
+          longPressTimer = setTimeout(() => {
+            longPressFired = true;
+            quickActionItemId = card.dataset.id;
+            showQuickActionMenu(touch.clientX, touch.clientY);
+          }, 500);
+        }, { passive: true });
+
+        grid.addEventListener('touchmove', (e) => {
+          if (longPressTimer) {
+            const dx = Math.abs(e.touches[0].clientX - touchStartX);
+            const dy = Math.abs(e.touches[0].clientY - touchStartY);
+            if (dx > 10 || dy > 10) {
+              clearTimeout(longPressTimer);
+              longPressTimer = null;
+            }
           }
-        }
-      }, { passive: true });
+        }, { passive: true });
 
-      grid.addEventListener('touchend', (e) => {
-        if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
-        if (longPressFired) { longPressFired = false; return; }
-      });
+        grid.addEventListener('touchend', (e) => {
+          if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
+          if (longPressFired) { longPressFired = false; return; }
+        });
 
-      // Prevent context menu on cards
-      grid.addEventListener('contextmenu', (e) => {
-        if (e.target.closest('.card[data-id]')) e.preventDefault();
-      });
+        // Prevent context menu on cards
+        grid.addEventListener('contextmenu', (e) => {
+          if (e.target.closest('.card[data-id]')) e.preventDefault();
+        });
 
-      // Double-tap on card to toggle priority (touch)
-      // Track whether finger moved during this touch (scroll vs tap)
-      let touchMoved = false;
-      let lastTapTime = 0;
-      let lastTapCard = null;
+        // Touch: double-tap toggles priority, single-tap opens detail card
+        let touchMoved = false;
+        let lastTapTime = 0;
+        let lastTapCard = null;
+        let singleTapTimer = null;
 
-      grid.addEventListener('touchstart', () => {
-        touchMoved = false;
-      }, { passive: true });
+        grid.addEventListener('touchstart', () => {
+          touchMoved = false;
+        }, { passive: true });
 
-      grid.addEventListener('touchmove', () => {
-        touchMoved = true;
-      }, { passive: true });
+        grid.addEventListener('touchmove', () => {
+          touchMoved = true;
+        }, { passive: true });
 
-      grid.addEventListener('touchend', (e) => {
-        if (touchMoved || longPressFired) return; // was a scroll, not a tap
-        const card = e.target.closest('.card[data-id]');
-        if (!card) return;
-        const now = Date.now();
-        if (lastTapCard === card.dataset.id && now - lastTapTime < 350) {
-          e.preventDefault();
-          togglePriority(card.dataset.id);
-          lastTapTime = 0;
-          lastTapCard = null;
-        } else {
-          lastTapTime = now;
-          lastTapCard = card.dataset.id;
-        }
-      });
+        grid.addEventListener('touchend', (e) => {
+          if (touchMoved || longPressFired) return;
+          const card = e.target.closest('.card[data-id]');
+          if (!card) return;
+          const cardId = card.dataset.id;
+          const now = Date.now();
 
-      // Desktop: double-click on card toggles priority
-      grid.addEventListener('dblclick', (e) => {
-        const card = e.target.closest('.card[data-id]');
-        if (card) {
-          e.stopPropagation();
-          togglePriority(card.dataset.id);
-        }
+          if (lastTapCard === cardId && now - lastTapTime < 350) {
+            // Double-tap: toggle priority
+            e.preventDefault();
+            if (singleTapTimer) { clearTimeout(singleTapTimer); singleTapTimer = null; }
+            togglePriority(cardId);
+            lastTapTime = 0;
+            lastTapCard = null;
+          } else {
+            // Potential single tap — wait to see if double-tap follows
+            lastTapTime = now;
+            lastTapCard = cardId;
+            if (singleTapTimer) clearTimeout(singleTapTimer);
+            singleTapTimer = setTimeout(() => {
+              singleTapTimer = null;
+              openDetailCard(cardId);
+              lastTapTime = 0;
+              lastTapCard = null;
+            }, 300);
+          }
+        });
+
+        // Desktop: single click opens detail card
+        grid.addEventListener('click', (e) => {
+          const card = e.target.closest('.card[data-id]');
+          if (!card) return;
+          // Don't open if a button inside was clicked
+          if (e.target.closest('button')) return;
+          openDetailCard(card.dataset.id);
+        });
+
+        // Desktop: double-click on card toggles priority
+        grid.addEventListener('dblclick', (e) => {
+          const card = e.target.closest('.card[data-id]');
+          if (card) {
+            e.stopPropagation();
+            togglePriority(card.dataset.id);
+          }
+        });
       });
     }
 
@@ -7359,6 +8080,83 @@
 
     // Initialize long-press after DOM ready
     initLongPress();
+
+    // Feed card click: open read-only detail view of the sharer's card
+    document.addEventListener('click', (e) => {
+      const card = e.target.closest('.feed-card[data-feed-idx]');
+      if (!card) return;
+      const idx = parseInt(card.getAttribute('data-feed-idx'));
+      const item = feedItemsCache[idx];
+      if (item) openFeedDetailCard(item);
+    });
+
+    function openFeedDetailCard(item) {
+      const stars = legacyToStars(item.rating);
+      let starHtml = '';
+      if (stars !== null) {
+        const full = Math.floor(stars);
+        const half = (stars % 1) >= 0.5;
+        starHtml = '<div class="detail-card-rating">' + '\u2605'.repeat(full) + (half ? '\u00BD' : '') + '</div>';
+      }
+
+      const statusColors = {
+        'done': { bg: 'rgba(91,155,213,0.2)', color: '#5B9BD5', label: 'Caught Up' },
+        'current': { bg: 'rgba(99,102,241,0.2)', color: '#6366f1', label: 'Consuming' },
+        'want': { bg: 'rgba(245,158,11,0.2)', color: '#f59e0b', label: 'Up Next' }
+      };
+      const sc = statusColors[item.status] || statusColors['done'];
+
+      let fieldsHtml = '';
+      if (item.streamingPlatform) fieldsHtml += `<div class="detail-card-field"><strong>Platform:</strong> ${item.streamingPlatform}</div>`;
+      if (item.referral) fieldsHtml += `<div class="detail-card-field"><strong>Rec by:</strong> ${item.referral}</div>`;
+      if (item.premiereDate) fieldsHtml += `<div class="detail-card-field"><strong>Premiere:</strong> ${item.premiereDate}</div>`;
+      if (item.notes) fieldsHtml += `<div class="detail-card-notes">"${item.notes.substring(0, 250)}${item.notes.length > 250 ? '...' : ''}"</div>`;
+      if (item.tags && item.tags.length > 0) {
+        fieldsHtml += `<div class="detail-card-tags">${item.tags.map(t => `<span class="detail-card-tag">${t}</span>`).join('')}</div>`;
+      }
+
+      const group = groups.find(g => g.id === item.groupId);
+      const groupName = group ? group.name : '';
+      const userName = item.userName || 'Unknown';
+
+      const alreadyAdded = items.some(i => i.title === item.title && i.type === item.type);
+      const escapedItem = encodeURIComponent(JSON.stringify({
+        title: item.title, type: item.type, image: item.image || '',
+        streamingPlatform: item.streamingPlatform || '', genre: item.genre || '',
+        referral: item.referral || '', premiereDate: item.premiereDate || ''
+      }));
+
+      const detailCard = document.getElementById('detailCard');
+      detailCard.innerHTML = `
+        <button class="detail-card-close" onclick="closeDetailCard()">&times;</button>
+        <div style="text-align: center; margin-bottom: 0.75rem; padding-top: 0.5rem;">
+          <span class="share-card-status-badge" style="background: ${sc.bg}; color: ${sc.color};">${sc.label}</span>
+        </div>
+        ${item.image
+          ? `<img class="detail-card-poster" src="${item.image}" alt="${item.title}">`
+          : `<div style="width:140px;height:210px;margin:0 auto 1rem;border-radius:10px;background:linear-gradient(135deg,#282828,#333);display:flex;align-items:center;justify-content:center;font-size:3rem;">${getTypeEmoji(item.type)}</div>`
+        }
+        <div class="detail-card-title">${item.title}</div>
+        <div class="detail-card-meta">
+          ${getTypeEmoji(item.type)} ${item.type.charAt(0).toUpperCase() + item.type.slice(1)}
+          ${item.genre ? ' &middot; ' + item.genre : ''}
+          ${item.dateLogged ? ' &middot; ' + formatDateForCard(item.dateLogged) : ''}
+        </div>
+        ${starHtml}
+        ${fieldsHtml}
+        <div style="text-align:center; margin-top:0.75rem; font-size:0.75rem; color:var(--text-tertiary);">
+          Added by ${userName}${groupName ? ' in ' + groupName : ''}
+        </div>
+        <div class="detail-card-actions">
+          ${alreadyAdded
+            ? `<button class="detail-card-action-btn" disabled style="opacity:0.5; cursor:default;">✓ On Shelf</button>`
+            : `<button class="detail-card-action-btn" onclick="addFromFeed('${escapedItem}'); closeDetailCard();" title="Add to my list">+ Add</button>`
+          }
+        </div>
+      `;
+
+      document.getElementById('detailCardOverlay').classList.add('visible');
+    }
 
     // === QUICK-ADD FROM SEARCH (Feature 6) ===
     async function quickAddItem(index, status) {
@@ -7495,26 +8293,31 @@
     </div>
   </div>
 
+  <button class="filter-fab" id="filterFab" onclick="toggleFilterPopup()">
+    <span id="filterFabIcon">🎯</span>
+  </button>
+
+  <div id="filterPopup" class="filter-popup">
+    <div class="quick-action-section">Filter by Type</div>
+    <button class="quick-action-item" onclick="applyMediaFilter('all')">🏠 All</button>
+    <button class="quick-action-item" onclick="applyMediaFilter('movie')">🎬 Movies</button>
+    <button class="quick-action-item" onclick="applyMediaFilter('tv')">📺 TV Shows</button>
+    <button class="quick-action-item" onclick="applyMediaFilter('book')">📚 Books</button>
+    <button class="quick-action-item" onclick="applyMediaFilter('podcast')">🎙️ Podcasts</button>
+  </div>
+
   <nav class="bottom-nav">
     <button class="bottom-nav-btn active" data-type="all" onclick="bottomNavFilter('all')">
       <span class="bottom-nav-icon">🏠</span>
-      <span class="bottom-nav-label">All</span>
+      <span class="bottom-nav-label">Shelf</span>
     </button>
-    <button class="bottom-nav-btn" data-type="book" onclick="bottomNavFilter('book')">
-      <span class="bottom-nav-icon">📚</span>
-      <span class="bottom-nav-label">Books</span>
+    <button class="bottom-nav-btn" onclick="openSearchPage(this)">
+      <span class="bottom-nav-icon">🔍</span>
+      <span class="bottom-nav-label">Search</span>
     </button>
-    <button class="bottom-nav-btn" data-type="tv" onclick="bottomNavFilter('tv')">
-      <span class="bottom-nav-icon">📺</span>
-      <span class="bottom-nav-label">TV</span>
-    </button>
-    <button class="bottom-nav-btn" data-type="movie" onclick="bottomNavFilter('movie')">
-      <span class="bottom-nav-icon">🎬</span>
-      <span class="bottom-nav-label">Movies</span>
-    </button>
-    <button class="bottom-nav-btn" data-type="podcast" onclick="bottomNavFilter('podcast')">
-      <span class="bottom-nav-icon">🎙️</span>
-      <span class="bottom-nav-label">Podcasts</span>
+    <button class="bottom-nav-btn" onclick="openLibrary(this)">
+      <span class="bottom-nav-icon">📖</span>
+      <span class="bottom-nav-label">Library</span>
     </button>
     <button class="bottom-nav-btn" style="position:relative;" onclick="switchToGroups(this)">
       <span class="bottom-nav-icon">👥</span>
@@ -7541,6 +8344,11 @@
     <div class="quick-action-stars" id="quickActionStars"></div>
     <div class="quick-action-divider"></div>
     <button class="quick-action-item danger" onclick="quickDeleteItem()">🗑️ Delete</button>
+  </div>
+
+  <!-- Detail Card Overlay -->
+  <div id="detailCardOverlay" class="detail-overlay" onclick="if(event.target===this)closeDetailCard()">
+    <div class="detail-card" id="detailCard"></div>
   </div>
 
   <!-- Toast Notification -->

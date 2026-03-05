@@ -4135,7 +4135,14 @@
         // Load items
         const itemsSnap = await db.collection('items').where('userId', '==', uid).get();
         itemsSnap.forEach(doc => {
-          loadedItems.push({ id: doc.id, ...doc.data() });
+          loadedItems.push({ ...doc.data(), id: doc.id });
+          // Clean up: remove stale 'id' field stored inside document data
+          const data = doc.data();
+          if ('id' in data) {
+            const cleaned = { ...data };
+            delete cleaned.id;
+            db.collection('items').doc(doc.id).set(cleaned);
+          }
         });
 
         // Load groups the user is a member of

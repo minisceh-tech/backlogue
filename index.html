@@ -7400,12 +7400,55 @@
         ${fieldsHtml}
         <div class="detail-card-actions">
           <button class="detail-card-action-btn" onclick="closeDetailCard(); openShareCardForItem('${item.id}')" title="Share">📤</button>
+          <button class="detail-card-action-btn" onclick="shareToGroup('${item.id}')" title="Share to Group">👥</button>
           <button class="detail-card-action-btn" onclick="closeDetailCard(); editItem('${item.id}')" title="Edit">✏️</button>
           <button class="detail-card-action-btn delete-action" onclick="closeDetailCard(); deleteItem('${item.id}')" title="Delete">🗑️</button>
         </div>
       `;
 
       document.getElementById('detailCardOverlay').classList.add('visible');
+    }
+
+    async function shareToGroup(itemId) {
+      const item = items.find(i => i.id === itemId);
+      if (!item) return;
+
+      const userGroups = groups.filter(g => currentUser.memberOf.includes(g.id));
+      if (userGroups.length === 0) {
+        alert('You are not a member of any groups yet. Create or join a group first!');
+        return;
+      }
+
+      // If only one group, share directly; otherwise let user pick
+      let selectedGroup;
+      if (userGroups.length === 1) {
+        selectedGroup = userGroups[0];
+      } else {
+        const groupNames = userGroups.map((g, i) => `${i + 1}. ${g.name}`).join('\n');
+        const choice = prompt(`Share "${item.title}" to which group?\n\n${groupNames}\n\nEnter number:`);
+        if (!choice) return;
+        const idx = parseInt(choice) - 1;
+        if (isNaN(idx) || idx < 0 || idx >= userGroups.length) {
+          alert('Invalid selection.');
+          return;
+        }
+        selectedGroup = userGroups[idx];
+      }
+
+      try {
+        const sharedItem = {
+          ...item,
+          groupId: selectedGroup.id,
+          userName: currentUser.name,
+          timestamp: Date.now()
+        };
+        await saveSharedItem(sharedItem);
+        closeDetailCard();
+        showToast(`Shared to ${selectedGroup.name}`);
+      } catch (error) {
+        console.error('Error sharing to group:', error);
+        alert('Failed to share. Please try again.');
+      }
     }
 
     function closeDetailCard() {

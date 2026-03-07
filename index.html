@@ -5438,6 +5438,19 @@
       const done = items.filter(i => i.status === 'done').length;
       const current = items.filter(i => i.status === 'current').length;
       const want = items.filter(i => i.status === 'want').length;
+      const completionRate = total > 0 ? Math.round((done / total) * 100) : 0;
+
+      // This year
+      const thisYear = new Date().getFullYear().toString();
+      const doneThisYear = items.filter(i => i.status === 'done' && i.dateLogged && i.dateLogged.startsWith(thisYear)).length;
+
+      // Estimated hours consumed
+      const hoursMap = { movie: 2, tv: 0.75, podcast: 1, book: 8 };
+      const totalHours = items.filter(i => i.status === 'done')
+        .reduce((sum, i) => sum + (hoursMap[i.type] || 1), 0);
+      const hoursDisplay = totalHours >= 1000
+        ? (totalHours / 1000).toFixed(1) + 'k'
+        : Math.round(totalHours).toString();
 
       // By type
       const typeCounts = {};
@@ -5453,7 +5466,7 @@
       const monthCounts = {};
       items.forEach(i => {
         if (i.dateLogged) {
-          const m = i.dateLogged.substring(0, 7); // YYYY-MM
+          const m = i.dateLogged.substring(0, 7);
           monthCounts[m] = (monthCounts[m] || 0) + 1;
         }
       });
@@ -5468,6 +5481,12 @@
       });
       const maxRatingCount = Math.max(...Object.values(ratingDist), 1);
 
+      // Top 5 rated
+      const topRated = items
+        .filter(i => legacyToStars(i.rating) !== null)
+        .sort((a, b) => legacyToStars(b.rating) - legacyToStars(a.rating))
+        .slice(0, 5);
+
       let html = `
         <div class="stats-grid">
           <div class="stat-card"><div class="stat-value">${total}</div><div class="stat-label">Total Items</div></div>
@@ -5475,7 +5494,9 @@
           <div class="stat-card"><div class="stat-value">${current}</div><div class="stat-label">In Progress</div></div>
           <div class="stat-card"><div class="stat-value">${want}</div><div class="stat-label">Up Next</div></div>
           <div class="stat-card"><div class="stat-value">${avgRating}</div><div class="stat-label">Avg Rating</div></div>
-          <div class="stat-card"><div class="stat-value">${rated.length}</div><div class="stat-label">Rated</div></div>
+          <div class="stat-card"><div class="stat-value">${completionRate}%</div><div class="stat-label">Completed</div></div>
+          <div class="stat-card"><div class="stat-value">${doneThisYear}</div><div class="stat-label">Done in ${thisYear}</div></div>
+          <div class="stat-card"><div class="stat-value">${hoursDisplay}</div><div class="stat-label">Est. Hours</div></div>
         </div>
       `;
 
@@ -5517,6 +5538,21 @@
           const [y, mo] = m.split('-');
           const monthNames = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
           html += `<div class="stats-list-item"><span>${monthNames[parseInt(mo)]} ${y}</span><div class="stats-bar"><div class="stats-bar-fill" style="width:${(c/maxMonth*100)}%"></div></div><span>${c}</span></div>`;
+        });
+        html += '</div>';
+      }
+
+      // Top Rated
+      if (topRated.length > 0) {
+        const typeEmojis = { movie: '🎬', tv: '📺', podcast: '🎙️', book: '📚' };
+        html += '<div class="stats-section"><div class="stats-section-title">Your Top Picks</div>';
+        topRated.forEach((item, i) => {
+          const stars = legacyToStars(item.rating);
+          const starStr = stars !== null ? '★'.repeat(Math.floor(stars)) + (stars % 1 ? '½' : '') : '';
+          html += `<div class="stats-list-item">
+            <span style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${typeEmojis[item.type] || ''} ${item.title}</span>
+            <span style="color:#f59e0b; font-size:0.8rem; flex-shrink:0;">${starStr}</span>
+          </div>`;
         });
         html += '</div>';
       }

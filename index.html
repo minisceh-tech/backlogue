@@ -912,6 +912,27 @@
     }
 
 
+    .card.selected {
+      outline: 2px solid var(--accent-primary);
+      outline-offset: 2px;
+    }
+    .card.selected::after {
+      content: '✓';
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 20px;
+      height: 20px;
+      background: var(--accent-primary);
+      color: #fff;
+      border-radius: 50%;
+      font-size: 0.7rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2;
+    }
+
     @keyframes cardAppear {
       from {
         opacity: 0;
@@ -3924,6 +3945,7 @@
       <div class="share-card-types" id="shareCardTypes">
         <button class="share-type-btn active" onclick="switchShareCardType('item')">Item Card</button>
         <button class="share-type-btn" onclick="switchShareCardType('stats')">Stats Card</button>
+        <button class="share-type-btn" onclick="switchShareCardType('watchlist')">Watchlist</button>
       </div>
       <div class="share-card-preview">
         <div id="shareCardRender" class="share-card-render"></div>
@@ -4003,7 +4025,10 @@
         </div>
         <div style="font-size:0.75rem; color:var(--text-tertiary); margin-bottom:0.75rem;">Upload a CSV export to import your existing lists. Duplicates are skipped automatically.</div>
         <input type="file" id="importFileInput" accept=".csv" style="display:none;" onchange="handleImportFile(event)">
-        <button class="btn" style="width:100%;" onclick="document.getElementById('importFileInput').click()">📥 Import CSV</button>
+        <div style="display:flex; gap:0.5rem;">
+          <button class="btn" style="flex:1;" onclick="document.getElementById('importFileInput').click()">📥 Import CSV</button>
+          <button class="btn" style="flex:1; background:var(--bg-accent); color:var(--text-primary); border:1px solid var(--border-medium);" onclick="exportShelfCSV()">📤 Export CSV</button>
+        </div>
       </div>
     </div>
   </div>
@@ -5523,6 +5548,19 @@
         html += '</div>';
       }
 
+      // Recommended By leaderboard
+      const referralCounts = {};
+      items.forEach(i => { if (i.referral) referralCounts[i.referral] = (referralCounts[i.referral] || 0) + 1; });
+      const topReferrals = Object.entries(referralCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
+      if (topReferrals.length > 0) {
+        const maxRef = topReferrals[0][1];
+        html += '<div class="stats-section"><div class="stats-section-title">Top Recommenders</div>';
+        topReferrals.forEach(([name, count]) => {
+          html += `<div class="stats-list-item"><span>${name}</span><div class="stats-bar"><div class="stats-bar-fill" style="width:${(count/maxRef*100)}%"></div></div><span>${count}</span></div>`;
+        });
+        html += '</div>';
+      }
+
       // Top Rated
       if (topRated.length > 0) {
         const typeEmojis = { movie: '🎬', tv: '📺', podcast: '🎙️', book: '📚' };
@@ -5731,8 +5769,9 @@
       });
 
       function renderCardHtml(item, index) {
+        const isSelected = selectionMode && selectedIds.has(item.id);
         return `
-          <div class="card" data-id="${item.id}" data-type="${item.type}" style="animation-delay: ${Math.min(index * 0.05, 0.5)}s">
+          <div class="card${isSelected ? ' selected' : ''}" data-id="${item.id}" data-type="${item.type}" style="animation-delay: ${Math.min(index * 0.05, 0.5)}s">
             <div class="card-image">
               ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : `<div class="card-placeholder">${getTypeEmoji(item.type)}<div class="card-placeholder-title">${item.title}</div></div>`}
             </div>
@@ -7031,7 +7070,12 @@
       const sortOption = document.getElementById('searchSortFilter').value;
 
       const results = items.filter(item => {
-        if (query && !item.title.toLowerCase().includes(query)) return false;
+        if (query) {
+          const inTitle = item.title.toLowerCase().includes(query);
+          const inNotes = item.notes && item.notes.toLowerCase().includes(query);
+          const inTags = item.tags && item.tags.some(t => t.toLowerCase().includes(query));
+          if (!inTitle && !inNotes && !inTags) return false;
+        }
         if (typeFilter !== 'all' && item.type !== typeFilter) return false;
         if (genreFilter !== 'all' && item.genre !== genreFilter) return false;
         if (statusFilter !== 'all' && item.status !== statusFilter) return false;
@@ -7441,9 +7485,47 @@
       });
       if (type === 'item' && currentShareItem) {
         renderItemShareCard(currentShareItem);
+      } else if (type === 'watchlist') {
+        renderWatchlistShareCard();
       } else {
         renderStatsShareCard();
       }
+    }
+
+    function renderWatchlistShareCard() {
+      const watchlist = items.filter(i => i.status === 'want');
+      const typeEmojis = { movie: '🎬', tv: '📺', podcast: '🎙️', book: '📚' };
+      const container = document.getElementById('shareCardRender');
+
+      const listHtml = watchlist.slice(0, 10).map(item => `
+        <div style="display:flex;align-items:center;gap:0.6rem;padding:0.45rem 0;border-bottom:1px solid rgba(255,255,255,0.07);">
+          ${item.image
+            ? `<img src="${item.image}" style="width:28px;height:42px;object-fit:cover;border-radius:4px;flex-shrink:0;">`
+            : `<div style="width:28px;height:42px;border-radius:4px;background:rgba(255,255,255,0.08);display:flex;align-items:center;justify-content:center;font-size:0.85rem;flex-shrink:0;">${typeEmojis[item.type]||'📌'}</div>`
+          }
+          <div style="min-width:0;">
+            <div style="font-size:0.8rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.title}</div>
+            <div style="font-size:0.65rem;color:rgba(255,255,255,0.4);">${typeEmojis[item.type]||''} ${(item.type||'').charAt(0).toUpperCase()+(item.type||'').slice(1)}${item.genre?' · '+item.genre:''}</div>
+          </div>
+        </div>
+      `).join('');
+
+      const overflow = watchlist.length > 10 ? `<div style="text-align:center;font-size:0.65rem;color:rgba(255,255,255,0.35);padding-top:0.5rem;">+ ${watchlist.length - 10} more</div>` : '';
+
+      container.innerHTML = `
+        <div style="height:4px;background:linear-gradient(90deg,#f59e0b,#5B9BD5,#7CB8E8);"></div>
+        <div style="padding:1.5rem 1.5rem 1.25rem;height:calc(100% - 4px);box-sizing:border-box;display:flex;flex-direction:column;">
+          <div style="margin-bottom:1rem;">
+            <div style="font-family:'Playfair Display',serif;font-size:1.25rem;font-weight:700;">Up Next</div>
+            <div style="font-size:0.7rem;color:rgba(255,255,255,0.4);">${currentUser ? currentUser.name : ''} · ${watchlist.length} item${watchlist.length !== 1 ? 's' : ''}</div>
+          </div>
+          ${watchlist.length === 0
+            ? `<div style="flex:1;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.3);font-size:0.85rem;">Nothing on the watchlist yet</div>`
+            : `<div style="flex:1;">${listHtml}${overflow}</div>`
+          }
+          <div style="font-family:'Playfair Display',serif;font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.2);text-align:center;margin-top:0.75rem;">BACKLOGUE</div>
+        </div>
+      `;
     }
 
     // Detail Card Overlay
@@ -8148,6 +8230,35 @@
       el.style.display = el.style.display === 'none' ? 'block' : 'none';
     }
 
+    function exportShelfCSV() {
+      if (!items || items.length === 0) { showToast('Nothing to export'); return; }
+      const headers = ['title', 'type', 'status', 'rating', 'genre', 'platform', 'referral', 'notes', 'tags', 'dateLogged', 'premiereDate'];
+      const statusLabels = { want: 'Up Next', current: 'Consuming', done: 'Caught Up' };
+      const rows = items.map(item => [
+        item.title || '',
+        item.type || '',
+        statusLabels[item.status] || item.status || '',
+        legacyToStars(item.rating) !== null ? legacyToStars(item.rating) : '',
+        item.genre || '',
+        item.streamingPlatform || '',
+        item.referral || '',
+        item.notes || '',
+        (item.tags || []).join('; '),
+        item.dateLogged || '',
+        item.premiereDate || ''
+      ].map(val => `"${String(val).replace(/"/g, '""')}"`));
+
+      const csv = [headers.join(','), ...rows.map(r => r.join(','))].join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `backlogue-export-${new Date().toISOString().slice(0,10)}.csv`;
+      a.click();
+      URL.revokeObjectURL(url);
+      showToast(`Exported ${items.length} items`);
+    }
+
     async function loadProfileSettings() {
       try {
         const doc = await db.collection('publicProfiles').doc(currentUser.id).get();
@@ -8314,6 +8425,7 @@
           if (touchMoved || longPressFired) { longPressFired = false; return; }
           const card = e.target.closest('.card[data-id]');
           if (!card) return;
+          if (selectionMode) { toggleCardSelection(card.dataset.id); return; }
           openDetailCard(card.dataset.id);
         });
 
@@ -8327,6 +8439,7 @@
           const card = e.target.closest('.card[data-id]');
           if (!card) return;
           if (e.target.closest('button')) return;
+          if (selectionMode) { toggleCardSelection(card.dataset.id); return; }
           openDetailCard(card.dataset.id);
         });
       });
@@ -8475,6 +8588,67 @@
       renderItems();
       closeQuickActionMenu();
       showToast(rating === 0 ? 'Rating cleared' : `Rated ${rating} star${rating > 1 ? 's' : ''}`);
+    }
+
+    // === BULK SELECTION ===
+    let selectionMode = false;
+    let selectedIds = new Set();
+
+    function enterSelectionMode(itemId) {
+      selectionMode = true;
+      selectedIds = new Set();
+      if (itemId) selectedIds.add(itemId);
+      updateBulkBar();
+      renderItems();
+    }
+
+    function exitSelectionMode() {
+      selectionMode = false;
+      selectedIds = new Set();
+      document.getElementById('bulkActionBar').style.display = 'none';
+      renderItems();
+    }
+
+    function toggleCardSelection(itemId) {
+      if (selectedIds.has(itemId)) {
+        selectedIds.delete(itemId);
+      } else {
+        selectedIds.add(itemId);
+      }
+      const card = document.querySelector(`.card[data-id="${itemId}"]`);
+      if (card) card.classList.toggle('selected', selectedIds.has(itemId));
+      updateBulkBar();
+    }
+
+    function updateBulkBar() {
+      const bar = document.getElementById('bulkActionBar');
+      bar.style.display = selectionMode ? 'block' : 'none';
+      document.getElementById('bulkCountLabel').textContent =
+        `${selectedIds.size} selected`;
+    }
+
+    async function bulkMoveStatus(status) {
+      if (selectedIds.size === 0) return;
+      const labels = { want: 'Up Next', current: 'Consuming', done: 'Caught Up' };
+      for (const id of selectedIds) {
+        const item = items.find(i => i.id === id);
+        if (!item) continue;
+        item.status = status;
+        if (status === 'done' && !item.dateLogged) item.dateLogged = getTodayDate();
+        await saveItemToFirestore(item);
+      }
+      showToast(`${selectedIds.size} items → ${labels[status]}`);
+      exitSelectionMode();
+    }
+
+    async function bulkDelete() {
+      if (selectedIds.size === 0) return;
+      if (!confirm(`Delete ${selectedIds.size} item${selectedIds.size !== 1 ? 's' : ''}?`)) return;
+      for (const id of [...selectedIds]) {
+        await deleteItem(id);
+      }
+      showToast(`${selectedIds.size} items deleted`);
+      exitSelectionMode();
     }
 
     async function quickDeleteItem() {
@@ -8761,7 +8935,20 @@
     <div class="quick-action-section">Rate</div>
     <div class="quick-action-stars" id="quickActionStars"></div>
     <div class="quick-action-divider"></div>
+    <button class="quick-action-item" onclick="closeQuickActionMenu(); enterSelectionMode(quickActionItemId)">☑️ Select Multiple</button>
     <button class="quick-action-item danger" onclick="quickDeleteItem()">🗑️ Delete</button>
+  </div>
+
+  <!-- Bulk Action Bar -->
+  <div id="bulkActionBar" style="display:none; position:fixed; bottom:0; left:0; right:0; z-index:200; background:var(--bg-secondary); border-top:2px solid var(--accent-primary); padding:0.6rem 1rem calc(0.6rem + env(safe-area-inset-bottom,0px)); display:none;">
+    <div style="display:flex; align-items:center; gap:0.5rem; max-width:600px; margin:0 auto;">
+      <span id="bulkCountLabel" style="font-size:0.85rem; font-weight:600; color:var(--text-primary); flex:1;">0 selected</span>
+      <button onclick="bulkMoveStatus('want')" style="padding:0.4rem 0.7rem; border:1px solid var(--border-light); border-radius:8px; background:var(--bg-accent); color:var(--text-primary); font-size:0.75rem; cursor:pointer;">Up Next</button>
+      <button onclick="bulkMoveStatus('current')" style="padding:0.4rem 0.7rem; border:1px solid var(--border-light); border-radius:8px; background:var(--bg-accent); color:var(--text-primary); font-size:0.75rem; cursor:pointer;">Consuming</button>
+      <button onclick="bulkMoveStatus('done')" style="padding:0.4rem 0.7rem; border:1px solid var(--border-light); border-radius:8px; background:var(--bg-accent); color:var(--text-primary); font-size:0.75rem; cursor:pointer;">Caught Up</button>
+      <button onclick="bulkDelete()" style="padding:0.4rem 0.7rem; border:none; border-radius:8px; background:rgba(239,68,68,0.15); color:#ef4444; font-size:0.75rem; cursor:pointer;">Delete</button>
+      <button onclick="exitSelectionMode()" style="padding:0.4rem 0.7rem; border:none; border-radius:8px; background:none; color:var(--text-secondary); font-size:0.75rem; cursor:pointer;">Cancel</button>
+    </div>
   </div>
 
   <!-- Detail Card Overlay -->

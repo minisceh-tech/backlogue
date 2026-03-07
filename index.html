@@ -1472,6 +1472,24 @@
       display: none;
     }
 
+    .card-rating-overlay {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(transparent, rgba(0,0,0,0.78));
+      color: #f59e0b;
+      font-size: 0.6rem;
+      text-align: center;
+      padding: 0.75rem 0.2rem 0.2rem;
+      letter-spacing: 0.5px;
+      pointer-events: none;
+    }
+    .card-rating-overlay.unrated {
+      color: rgba(255,255,255,0.3);
+      font-size: 0.65rem;
+    }
+
     .card-type-badge {
       font-size: 0.65rem;
       line-height: 1;
@@ -5830,10 +5848,22 @@
       });
 
       function renderCardHtml(item, index) {
+        let ratingOverlay = '';
+        if (item.status === 'done') {
+          const stars = legacyToStars(item.rating);
+          if (stars !== null) {
+            const full = Math.floor(stars);
+            const half = stars % 1 >= 0.5;
+            ratingOverlay = `<div class="card-rating-overlay">${'★'.repeat(full)}${half ? '½' : ''}</div>`;
+          } else {
+            ratingOverlay = `<div class="card-rating-overlay unrated">—</div>`;
+          }
+        }
         return `
           <div class="card" data-id="${item.id}" data-type="${item.type}" style="animation-delay: ${Math.min(index * 0.05, 0.5)}s">
             <div class="card-image">
               ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : `<div class="card-placeholder">${getTypeEmoji(item.type)}<div class="card-placeholder-title">${item.title}</div></div>`}
+              ${ratingOverlay}
             </div>
           </div>
         `;

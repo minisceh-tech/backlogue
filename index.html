@@ -3525,6 +3525,9 @@
         <select id="searchReferralFilter" onchange="runSearch()" class="filter-dropdown filter-dropdown-blue" style="border-radius: 20px; padding: 0.3rem 0.6rem; font-size: 0.7rem;">
           <option value="all">Recommended By</option>
         </select>
+        <select id="searchTagFilter" onchange="runSearch()" class="filter-dropdown filter-dropdown-blue" style="border-radius: 20px; padding: 0.3rem 0.6rem; font-size: 0.7rem;">
+          <option value="all">All Tags</option>
+        </select>
         <select id="searchSortFilter" onchange="runSearch()" class="filter-dropdown filter-dropdown-blue" style="border-radius: 20px; padding: 0.3rem 0.6rem; font-size: 0.7rem;">
           <option value="default">Sort: Default</option>
           <option value="dateLogged">Date Logged</option>
@@ -7001,6 +7004,15 @@
         uniqueRefs.map(r => `<option value="${r}">${r}</option>`).join('');
       refSelect.value = prevRef;
 
+      // Populate tags dropdown
+      const tagSelect = document.getElementById('searchTagFilter');
+      const allTags = [...new Set(items.flatMap(i => i.tags || []))].sort();
+      const prevTag = tagSelect.value;
+      tagSelect.innerHTML = '<option value="all">All Tags</option>' +
+        allTags.map(t => `<option value="${t}">${t}</option>`).join('');
+      tagSelect.value = prevTag;
+      tagSelect.style.display = allTags.length > 0 ? '' : 'none';
+
       document.getElementById('searchInput').focus();
       runSearch();
     }
@@ -7011,6 +7023,7 @@
       const genreFilter = document.getElementById('searchGenreFilter').value;
       const statusFilter = document.getElementById('searchStatusFilter').value;
       const referralFilter = document.getElementById('searchReferralFilter').value;
+      const tagFilter = document.getElementById('searchTagFilter')?.value || 'all';
       const sortOption = document.getElementById('searchSortFilter').value;
 
       const results = items.filter(item => {
@@ -7019,6 +7032,7 @@
         if (genreFilter !== 'all' && item.genre !== genreFilter) return false;
         if (statusFilter !== 'all' && item.status !== statusFilter) return false;
         if (referralFilter !== 'all' && item.referral !== referralFilter) return false;
+        if (tagFilter !== 'all' && !(item.tags && item.tags.includes(tagFilter))) return false;
         return true;
       });
 

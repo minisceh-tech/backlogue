@@ -5316,6 +5316,17 @@
       return emojis[type];
     }
 
+    function cardRatingOverlay(item) {
+      if (item.status !== 'done') return '';
+      const stars = legacyToStars(item.rating);
+      if (stars !== null) {
+        const full = Math.floor(stars);
+        const half = stars % 1 >= 0.5;
+        return `<div class="card-rating-overlay">${'★'.repeat(full)}${half ? '½' : ''}</div>`;
+      }
+      return `<div class="card-rating-overlay unrated">—</div>`;
+    }
+
     // --- Star Rating Helpers ---
     function legacyToStars(rating) {
       if (rating === null || rating === undefined) return null;
@@ -5848,22 +5859,11 @@
       });
 
       function renderCardHtml(item, index) {
-        let ratingOverlay = '';
-        if (item.status === 'done') {
-          const stars = legacyToStars(item.rating);
-          if (stars !== null) {
-            const full = Math.floor(stars);
-            const half = stars % 1 >= 0.5;
-            ratingOverlay = `<div class="card-rating-overlay">${'★'.repeat(full)}${half ? '½' : ''}</div>`;
-          } else {
-            ratingOverlay = `<div class="card-rating-overlay unrated">—</div>`;
-          }
-        }
         return `
           <div class="card" data-id="${item.id}" data-type="${item.type}" style="animation-delay: ${Math.min(index * 0.05, 0.5)}s">
             <div class="card-image">
               ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : `<div class="card-placeholder">${getTypeEmoji(item.type)}<div class="card-placeholder-title">${item.title}</div></div>`}
-              ${ratingOverlay}
+              ${cardRatingOverlay(item)}
             </div>
           </div>
         `;
@@ -7203,15 +7203,14 @@
         emptyState.style.display = 'block';
       } else {
         emptyState.style.display = 'none';
-        container.innerHTML = results.map((item, i) => {
-          return `
+        container.innerHTML = results.map((item, i) => `
             <div class="card" data-id="${item.id}" data-type="${item.type}" style="animation-delay: ${Math.min(i * 0.05, 0.5)}s">
               <div class="card-image">
                 ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : `<div class="card-placeholder">${getTypeEmoji(item.type)}<div class="card-placeholder-title">${item.title}</div></div>`}
+                ${cardRatingOverlay(item)}
               </div>
             </div>
-          `;
-        }).join('');
+          `).join('');
       }
     }
 
@@ -7305,6 +7304,7 @@
           <div class="card" data-id="${item.id}" data-type="${item.type}" style="animation-delay: ${Math.min(i * 0.05, 0.5)}s">
             <div class="card-image">
               ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : `<div class="card-placeholder">${getTypeEmoji(item.type)}<div class="card-placeholder-title">${item.title}</div></div>`}
+              ${cardRatingOverlay(item)}
             </div>
           </div>
         `).join('');

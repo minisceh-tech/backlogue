@@ -912,27 +912,6 @@
     }
 
 
-    .card.selected {
-      outline: 2px solid var(--accent-primary);
-      outline-offset: 2px;
-    }
-    .card.selected::after {
-      content: '✓';
-      position: absolute;
-      top: 4px;
-      right: 4px;
-      width: 20px;
-      height: 20px;
-      background: var(--accent-primary);
-      color: #fff;
-      border-radius: 50%;
-      font-size: 0.7rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 2;
-    }
-
     @keyframes cardAppear {
       from {
         opacity: 0;
@@ -5769,9 +5748,8 @@
       });
 
       function renderCardHtml(item, index) {
-        const isSelected = selectionMode && selectedIds.has(item.id);
         return `
-          <div class="card${isSelected ? ' selected' : ''}" data-id="${item.id}" data-type="${item.type}" style="animation-delay: ${Math.min(index * 0.05, 0.5)}s">
+          <div class="card" data-id="${item.id}" data-type="${item.type}" style="animation-delay: ${Math.min(index * 0.05, 0.5)}s">
             <div class="card-image">
               ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : `<div class="card-placeholder">${getTypeEmoji(item.type)}<div class="card-placeholder-title">${item.title}</div></div>`}
             </div>
@@ -8425,7 +8403,6 @@
           if (touchMoved || longPressFired) { longPressFired = false; return; }
           const card = e.target.closest('.card[data-id]');
           if (!card) return;
-          if (selectionMode) { toggleCardSelection(card.dataset.id); return; }
           openDetailCard(card.dataset.id);
         });
 
@@ -8439,7 +8416,6 @@
           const card = e.target.closest('.card[data-id]');
           if (!card) return;
           if (e.target.closest('button')) return;
-          if (selectionMode) { toggleCardSelection(card.dataset.id); return; }
           openDetailCard(card.dataset.id);
         });
       });
@@ -8588,67 +8564,6 @@
       renderItems();
       closeQuickActionMenu();
       showToast(rating === 0 ? 'Rating cleared' : `Rated ${rating} star${rating > 1 ? 's' : ''}`);
-    }
-
-    // === BULK SELECTION ===
-    let selectionMode = false;
-    let selectedIds = new Set();
-
-    function enterSelectionMode(itemId) {
-      selectionMode = true;
-      selectedIds = new Set();
-      if (itemId) selectedIds.add(itemId);
-      updateBulkBar();
-      renderItems();
-    }
-
-    function exitSelectionMode() {
-      selectionMode = false;
-      selectedIds = new Set();
-      document.getElementById('bulkActionBar').style.display = 'none';
-      renderItems();
-    }
-
-    function toggleCardSelection(itemId) {
-      if (selectedIds.has(itemId)) {
-        selectedIds.delete(itemId);
-      } else {
-        selectedIds.add(itemId);
-      }
-      const card = document.querySelector(`.card[data-id="${itemId}"]`);
-      if (card) card.classList.toggle('selected', selectedIds.has(itemId));
-      updateBulkBar();
-    }
-
-    function updateBulkBar() {
-      const bar = document.getElementById('bulkActionBar');
-      bar.style.display = selectionMode ? 'block' : 'none';
-      document.getElementById('bulkCountLabel').textContent =
-        `${selectedIds.size} selected`;
-    }
-
-    async function bulkMoveStatus(status) {
-      if (selectedIds.size === 0) return;
-      const labels = { want: 'Up Next', current: 'Consuming', done: 'Caught Up' };
-      for (const id of selectedIds) {
-        const item = items.find(i => i.id === id);
-        if (!item) continue;
-        item.status = status;
-        if (status === 'done' && !item.dateLogged) item.dateLogged = getTodayDate();
-        await saveItemToFirestore(item);
-      }
-      showToast(`${selectedIds.size} items → ${labels[status]}`);
-      exitSelectionMode();
-    }
-
-    async function bulkDelete() {
-      if (selectedIds.size === 0) return;
-      if (!confirm(`Delete ${selectedIds.size} item${selectedIds.size !== 1 ? 's' : ''}?`)) return;
-      for (const id of [...selectedIds]) {
-        await deleteItem(id);
-      }
-      showToast(`${selectedIds.size} items deleted`);
-      exitSelectionMode();
     }
 
     async function quickDeleteItem() {
@@ -8935,20 +8850,7 @@
     <div class="quick-action-section">Rate</div>
     <div class="quick-action-stars" id="quickActionStars"></div>
     <div class="quick-action-divider"></div>
-    <button class="quick-action-item" onclick="closeQuickActionMenu(); enterSelectionMode(quickActionItemId)">☑️ Select Multiple</button>
     <button class="quick-action-item danger" onclick="quickDeleteItem()">🗑️ Delete</button>
-  </div>
-
-  <!-- Bulk Action Bar -->
-  <div id="bulkActionBar" style="display:none; position:fixed; bottom:0; left:0; right:0; z-index:200; background:var(--bg-secondary); border-top:2px solid var(--accent-primary); padding:0.6rem 1rem calc(0.6rem + env(safe-area-inset-bottom,0px)); display:none;">
-    <div style="display:flex; align-items:center; gap:0.5rem; max-width:600px; margin:0 auto;">
-      <span id="bulkCountLabel" style="font-size:0.85rem; font-weight:600; color:var(--text-primary); flex:1;">0 selected</span>
-      <button onclick="bulkMoveStatus('want')" style="padding:0.4rem 0.7rem; border:1px solid var(--border-light); border-radius:8px; background:var(--bg-accent); color:var(--text-primary); font-size:0.75rem; cursor:pointer;">Up Next</button>
-      <button onclick="bulkMoveStatus('current')" style="padding:0.4rem 0.7rem; border:1px solid var(--border-light); border-radius:8px; background:var(--bg-accent); color:var(--text-primary); font-size:0.75rem; cursor:pointer;">Consuming</button>
-      <button onclick="bulkMoveStatus('done')" style="padding:0.4rem 0.7rem; border:1px solid var(--border-light); border-radius:8px; background:var(--bg-accent); color:var(--text-primary); font-size:0.75rem; cursor:pointer;">Caught Up</button>
-      <button onclick="bulkDelete()" style="padding:0.4rem 0.7rem; border:none; border-radius:8px; background:rgba(239,68,68,0.15); color:#ef4444; font-size:0.75rem; cursor:pointer;">Delete</button>
-      <button onclick="exitSelectionMode()" style="padding:0.4rem 0.7rem; border:none; border-radius:8px; background:none; color:var(--text-secondary); font-size:0.75rem; cursor:pointer;">Cancel</button>
-    </div>
   </div>
 
   <!-- Detail Card Overlay -->

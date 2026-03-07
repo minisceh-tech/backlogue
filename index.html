@@ -7412,12 +7412,12 @@
       const card = document.getElementById('detailCard');
       card.innerHTML = `
         <button class="detail-card-close" onclick="closeDetailCard()">&times;</button>
-        <div style="text-align: center; padding-top: 0.5rem; position: relative; display: inline-block; width: 100%;">
-          <span class="share-card-status-badge" onclick="cycleDetailCardStatus('${item.id}')" style="background: ${sc.bg}; color: ${sc.color}; cursor: pointer;" title="Tap to change status">${sc.label} ▾</span>
-          <div id="statusPickerInline" data-open="0" data-item-id="" style="display:none; position:absolute; left:50%; transform:translateX(-50%); top:calc(100% + 4px); background:var(--bg-card); border:1px solid var(--border-medium); border-radius:10px; box-shadow:0 4px 16px rgba(0,0,0,0.2); overflow:hidden; z-index:100; min-width:160px;">
-            <button onclick="selectDetailCardStatus('want')" style="display:flex; align-items:center; gap:0.5rem; width:100%; padding:0.65rem 1rem; border:none; background:${item.status === 'want' ? 'rgba(245,158,11,0.12)' : 'transparent'}; color:${item.status === 'want' ? '#f59e0b' : 'var(--text-primary)'}; cursor:pointer; font-size:0.88rem; text-align:left;">📌 Up Next</button>
-            <button onclick="selectDetailCardStatus('current')" style="display:flex; align-items:center; gap:0.5rem; width:100%; padding:0.65rem 1rem; border:none; border-top:1px solid var(--border-light); background:${item.status === 'current' ? 'rgba(99,102,241,0.12)' : 'transparent'}; color:${item.status === 'current' ? '#6366f1' : 'var(--text-primary)'}; cursor:pointer; font-size:0.88rem; text-align:left;">🔥 Consuming</button>
-            <button onclick="selectDetailCardStatus('done')" style="display:flex; align-items:center; gap:0.5rem; width:100%; padding:0.65rem 1rem; border:none; border-top:1px solid var(--border-light); background:${item.status === 'done' ? 'rgba(91,155,213,0.12)' : 'transparent'}; color:${item.status === 'done' ? '#5B9BD5' : 'var(--text-primary)'}; cursor:pointer; font-size:0.88rem; text-align:left;">✅ Caught Up</button>
+        <div style="text-align: center; padding-top: 0.5rem; margin-bottom: 0.75rem;">
+          <span class="share-card-status-badge" onclick="cycleDetailCardStatus('${item.id}')" style="background: ${sc.bg}; color: ${sc.color}; cursor: pointer;">${sc.label} ▾</span>
+          <div id="statusPickerInline" data-open="0" data-item-id="" style="display:none; margin-top:0.5rem;">
+            <button onclick="selectDetailCardStatus('want')" style="display:block; width:100%; padding:0.6rem; border:none; border-bottom:1px solid var(--border-light); background:var(--bg-card); color:var(--text-primary); cursor:pointer; font-size:0.9rem; font-family:inherit; font-weight:${item.status === 'want' ? '600' : '400'};">Up Next</button>
+            <button onclick="selectDetailCardStatus('current')" style="display:block; width:100%; padding:0.6rem; border:none; border-bottom:1px solid var(--border-light); background:var(--bg-card); color:var(--text-primary); cursor:pointer; font-size:0.9rem; font-family:inherit; font-weight:${item.status === 'current' ? '600' : '400'};">Consuming</button>
+            <button onclick="selectDetailCardStatus('done')" style="display:block; width:100%; padding:0.6rem; border:none; background:var(--bg-card); color:var(--text-primary); cursor:pointer; font-size:0.9rem; font-family:inherit; font-weight:${item.status === 'done' ? '600' : '400'};">Caught Up</button>
           </div>
         </div>
         ${item.image

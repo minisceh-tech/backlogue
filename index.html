@@ -2652,6 +2652,67 @@
       color: #e11d48;
     }
 
+    /* Now Consuming Banner */
+    .now-consuming-banner {
+      display: flex;
+      gap: 0.6rem;
+      overflow-x: auto;
+      padding: 0 0 0.75rem;
+      scrollbar-width: none;
+      -ms-overflow-style: none;
+    }
+    .now-consuming-banner::-webkit-scrollbar { display: none; }
+    .now-consuming-item {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border-light);
+      border-left: 3px solid var(--accent-primary);
+      border-radius: 10px;
+      padding: 0.5rem 0.75rem;
+      min-width: 180px;
+      max-width: 220px;
+      flex-shrink: 0;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .now-consuming-item:hover { background: var(--bg-accent); }
+    .now-consuming-thumb {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      object-fit: cover;
+      flex-shrink: 0;
+    }
+    .now-consuming-thumb-placeholder {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      background: var(--bg-accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+      flex-shrink: 0;
+    }
+    .now-consuming-info { min-width: 0; }
+    .now-consuming-label {
+      font-size: 0.6rem;
+      color: var(--accent-primary);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .now-consuming-title {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
     /* Status Pills */
     .status-pills {
       display: flex;
@@ -3458,6 +3519,7 @@
     <div id="groupTabsContainer" style="display: none;"></div>
     <!-- My Shelf Tab -->
     <div id="myShelf" class="tab-content active">
+      <div id="nowConsumingBanner" style="display:none;"></div>
       <div id="itemsGrid" class="shelf-sections"></div>
       <div id="emptyState" class="empty-state" style="display: none;">
         <div class="empty-state-icon">📚</div>
@@ -5545,6 +5607,31 @@
     function renderItems() {
       const grid = document.getElementById('itemsGrid');
       const emptyState = document.getElementById('emptyState');
+
+      // Now Consuming banner
+      const banner = document.getElementById('nowConsumingBanner');
+      if (banner) {
+        const consuming = items.filter(i => i.status === 'current');
+        if (consuming.length > 0) {
+          banner.style.display = 'block';
+          banner.innerHTML = '<div class="now-consuming-banner">' +
+            consuming.map(item => `
+              <div class="now-consuming-item" onclick="openDetailCard('${item.id}')">
+                ${item.image
+                  ? `<img class="now-consuming-thumb" src="${item.image}" alt="">`
+                  : `<div class="now-consuming-thumb-placeholder">${getTypeEmoji(item.type)}</div>`
+                }
+                <div class="now-consuming-info">
+                  <div class="now-consuming-label">Consuming</div>
+                  <div class="now-consuming-title">${item.title}</div>
+                </div>
+              </div>
+            `).join('') +
+          '</div>';
+        } else {
+          banner.style.display = 'none';
+        }
+      }
 
       let filteredItems = items.filter(item => {
         // Apply media type filter

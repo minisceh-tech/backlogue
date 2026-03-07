@@ -3634,6 +3634,7 @@
             <label for="itemTitle">Title</label>
             <input type="search" id="itemTitle" required name="notafield" autocomplete="nope" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other" oninput="if(typeof handleTitleInput==='function') handleTitleInput();">
             <div id="autocompleteResults" class="autocomplete-results"></div>
+            <div id="dupWarning" style="display:none; margin-top:0.5rem; padding:0.6rem 0.9rem; background:#f59e0b; color:#000; border-radius:8px; font-size:0.85rem; font-weight:600;"></div>
             <div class="helper-text">Start typing to search, or just enter the title manually</div>
           </div>
         </div>
@@ -4725,6 +4726,8 @@
       const typeSelect = document.getElementById('itemType');
       const resultsDiv = document.getElementById('autocompleteResults');
       if (!titleInput || !resultsDiv) return;
+      const dupWarning = document.getElementById('dupWarning');
+      if (dupWarning) dupWarning.style.display = 'none';
 
       const query = titleInput.value.trim();
       const type = typeSelect.value;
@@ -5071,10 +5074,14 @@
         document.getElementById('autocompleteResults').classList.remove('active');
 
         // Warn if already on shelf
+        const dupWarning = document.getElementById('dupWarning');
         const dup = items.find(i => i.title.toLowerCase() === result.title.toLowerCase() && i.type === result.type);
-        if (dup) {
+        if (dup && dupWarning) {
           const labels = { want: 'Up Next', current: 'Consuming', done: 'Caught Up' };
-          showToast(`Already on your shelf (${labels[dup.status] || dup.status})`);
+          dupWarning.textContent = `⚠️ Already on your shelf — ${labels[dup.status] || dup.status}`;
+          dupWarning.style.display = 'block';
+        } else if (dupWarning) {
+          dupWarning.style.display = 'none';
         }
 
         // Reset premiere label

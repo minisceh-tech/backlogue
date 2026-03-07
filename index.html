@@ -4888,7 +4888,7 @@
 
         if (!data.results || data.results.length === 0) return [];
 
-        return data.results.slice(0, 8).map(item => ({
+        return data.results.slice(0, 15).map(item => ({
           title: type === 'movie' ? item.title : item.name,
           year: (type === 'movie' ? item.release_date : item.first_air_date)?.substring(0, 4) || '',
           premiereDate: (type === 'movie' ? item.release_date : item.first_air_date) || '',
@@ -4907,7 +4907,7 @@
     async function searchBooks(query) {
       try {
         // Use CORS proxy to avoid CORS issues
-        const searchUrl = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=8&printType=books`;
+        const searchUrl = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=20&printType=books&orderBy=relevance&langRestrict=en`;
         
         const response = await fetch(searchUrl, {
           method: 'GET',

@@ -3086,99 +3086,26 @@
 
     .share-card-render {
       width: 400px;
-      min-height: 220px;
-      background: linear-gradient(135deg, #0d1117 0%, #161b22 60%, #0d1b2a 100%);
+      height: 500px;
+      background: #0d1117;
       border-radius: 16px;
       font-family: 'Inter', sans-serif;
-      color: #e1e1e1;
+      color: #ffffff;
       position: relative;
       overflow: hidden;
-      transform: scale(0.85);
+      transform: scale(0.75);
       transform-origin: top center;
-    }
-
-    .share-card-render::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 3px;
-      background: linear-gradient(90deg, #5B9BD5, #7CB8E8, #f59e0b);
-    }
-
-    .share-card-render.stats-card {
-      min-height: 400px;
-      padding: 2rem;
-    }
-
-    .share-card-branding {
-      text-align: center;
-      margin-top: 1.5rem;
-      padding-top: 1rem;
-      border-top: 1px solid rgba(255,255,255,0.1);
-    }
-
-    .share-card-branding .brand {
-      font-family: 'Playfair Display', serif;
-      font-size: 0.85rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: rgba(255,255,255,0.5);
-    }
-
-    .share-card-item-poster {
-      width: 140px;
-      height: 210px;
-      border-radius: 10px;
-      object-fit: cover;
-      margin: 0 auto 1rem;
-      display: block;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-    }
-
-    .share-card-item-title {
-      font-family: 'Playfair Display', serif;
-      font-size: 1.4rem;
-      font-weight: 700;
-      text-align: center;
-      margin-bottom: 0.5rem;
-      line-height: 1.2;
-    }
-
-    .share-card-item-meta {
-      text-align: center;
-      font-size: 0.85rem;
-      color: rgba(255,255,255,0.7);
-      margin-bottom: 0.75rem;
-    }
-
-    .share-card-rating {
-      text-align: center;
-      font-size: 1.5rem;
-      color: #f59e0b;
-      margin-bottom: 0.5rem;
-      letter-spacing: 2px;
-    }
-
-    .share-card-review {
-      font-size: 0.8rem;
-      color: rgba(255,255,255,0.75);
-      text-align: center;
-      font-style: italic;
-      line-height: 1.5;
-      max-height: 4.5em;
-      overflow: hidden;
+      flex-shrink: 0;
     }
 
     .share-card-status-badge {
       display: inline-block;
       padding: 0.3rem 0.8rem;
       border-radius: 20px;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       font-weight: 600;
       text-transform: uppercase;
-      letter-spacing: 0.05em;
+      letter-spacing: 0.07em;
     }
 
     .share-card-stats-grid {
@@ -7748,40 +7675,48 @@
       if (stars !== null) {
         const full = Math.floor(stars);
         const half = (stars % 1) >= 0.5;
-        starHtml = `<div style="color:#f59e0b;font-size:1.1rem;letter-spacing:2px;margin-bottom:0.4rem;">${'\u2605'.repeat(full)}${half ? '\u00BD' : ''}</div>`;
+        starHtml = `<div style="color:#f59e0b;font-size:1.3rem;letter-spacing:3px;margin-bottom:0.5rem;">${'\u2605'.repeat(full)}${half ? '\u00BD' : ''}</div>`;
       }
 
       const statusColors = {
-        'done': { bg: 'rgba(91,155,213,0.25)', color: '#7CB8E8', label: 'Caught Up' },
-        'current': { bg: 'rgba(99,102,241,0.25)', color: '#818cf8', label: 'Consuming' },
-        'want': { bg: 'rgba(245,158,11,0.25)', color: '#fbbf24', label: 'Up Next' }
+        'done':    { bg: 'rgba(91,155,213,0.3)',  color: '#7CB8E8', label: 'Caught Up' },
+        'current': { bg: 'rgba(99,102,241,0.3)',  color: '#818cf8', label: 'Consuming' },
+        'want':    { bg: 'rgba(245,158,11,0.3)',  color: '#fbbf24', label: 'Up Next' }
       };
       const sc = statusColors[item.status] || statusColors['done'];
-
-      const posterHtml = item.image
-        ? `<img src="${item.image}" style="width:110px;height:165px;object-fit:cover;border-radius:8px;flex-shrink:0;box-shadow:0 8px 24px rgba(0,0,0,0.6);">`
-        : `<div style="width:110px;height:165px;flex-shrink:0;border-radius:8px;background:linear-gradient(135deg,#1e1e1e,#2d2d2d);display:flex;align-items:center;justify-content:center;font-size:2.5rem;">${getTypeEmoji(item.type)}</div>`;
 
       const typeLabel = item.type.charAt(0).toUpperCase() + item.type.slice(1);
       const metaParts = [getTypeEmoji(item.type) + ' ' + typeLabel];
       if (item.genre) metaParts.push(item.genre);
       if (item.dateLogged) metaParts.push(formatDateForCard(item.dateLogged));
 
+      const blurBg = item.image
+        ? `<img src="${item.image}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(24px) brightness(0.35);transform:scale(1.1);">`
+        : '';
+      const posterImg = item.image
+        ? `<img src="${item.image}" style="height:210px;width:auto;max-width:150px;border-radius:12px;object-fit:cover;box-shadow:0 16px 48px rgba(0,0,0,0.7);position:relative;z-index:1;">`
+        : `<div style="height:210px;width:140px;border-radius:12px;background:linear-gradient(135deg,#1e2a3a,#2d3748);display:flex;align-items:center;justify-content:center;font-size:3.5rem;position:relative;z-index:1;">${getTypeEmoji(item.type)}</div>`;
+
       const container = document.getElementById('shareCardRender');
-      container.classList.remove('stats-card');
       container.innerHTML = `
-        <div style="display:flex;gap:0;min-height:220px;">
-          ${posterHtml}
-          <div style="flex:1;padding:1.25rem 1.25rem 1rem;display:flex;flex-direction:column;justify-content:space-between;min-width:0;">
-            <div>
-              <span class="share-card-status-badge" style="background:${sc.bg};color:${sc.color};margin-bottom:0.6rem;display:inline-block;">${sc.label}</span>
-              <div style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;line-height:1.25;margin-bottom:0.35rem;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;">${item.title}</div>
-              <div style="font-size:0.7rem;color:rgba(255,255,255,0.5);margin-bottom:0.5rem;">${metaParts.join(' · ')}</div>
-              ${starHtml}
-              ${item.notes ? `<div style="font-size:0.72rem;color:rgba(255,255,255,0.65);font-style:italic;line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;">"${item.notes}"</div>` : ''}
-            </div>
-            <div style="font-family:'Playfair Display',serif;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-top:0.5rem;">BACKLOGUE</div>
+        <!-- Top half: blurred bg + centered poster -->
+        <div style="position:relative;height:285px;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+          ${blurBg}
+          <div style="position:absolute;inset:0;background:linear-gradient(to bottom, rgba(13,17,23,0.2) 0%, rgba(13,17,23,0.7) 100%);z-index:0;"></div>
+          ${posterImg}
+        </div>
+        <!-- Gradient fade into bottom panel -->
+        <div style="position:absolute;top:240px;left:0;right:0;height:60px;background:linear-gradient(to bottom,transparent,#0d1117);z-index:2;pointer-events:none;"></div>
+        <!-- Bottom info panel -->
+        <div style="position:absolute;bottom:0;left:0;right:0;padding:1rem 1.5rem 1.25rem;background:#0d1117;z-index:3;">
+          <div style="margin-bottom:0.5rem;">
+            <span class="share-card-status-badge" style="background:${sc.bg};color:${sc.color};">${sc.label}</span>
           </div>
+          <div style="font-family:'Playfair Display',serif;font-size:1.35rem;font-weight:700;line-height:1.2;margin-bottom:0.3rem;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">${item.title}</div>
+          <div style="font-size:0.72rem;color:rgba(255,255,255,0.5);margin-bottom:0.5rem;">${metaParts.join(' · ')}</div>
+          ${starHtml}
+          ${item.notes ? `<div style="font-size:0.75rem;color:rgba(255,255,255,0.65);font-style:italic;line-height:1.45;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">"${item.notes}"</div>` : ''}
+          <div style="margin-top:0.75rem;font-family:'Playfair Display',serif;font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.25);">BACKLOGUE</div>
         </div>
       `;
     }
@@ -7815,11 +7750,13 @@
       });
 
       const container = document.getElementById('shareCardRender');
-      container.classList.add('stats-card');
       container.innerHTML = `
-        <div style="text-align:center;margin-bottom:1.5rem;">
-          <div style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;margin-bottom:0.25rem;">My Media Journey</div>
-          <div style="font-size:0.75rem;color:rgba(255,255,255,0.5);">${currentUser ? currentUser.name : 'A Backloguer'}</div>
+        <!-- Top accent bar -->
+        <div style="height:4px;background:linear-gradient(90deg,#5B9BD5,#7CB8E8,#f59e0b);"></div>
+        <div style="padding:1.75rem 1.75rem 1.5rem;height:calc(100% - 4px);box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;">
+        <div style="text-align:center;margin-bottom:1.25rem;">
+          <div style="font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;margin-bottom:0.25rem;">My Media Journey</div>
+          <div style="font-size:0.75rem;color:rgba(255,255,255,0.45);">${currentUser ? currentUser.name : 'A Backloguer'}</div>
         </div>
         <div class="share-card-stats-grid">
           <div class="share-card-stat"><div class="share-card-stat-value">${total}</div><div class="share-card-stat-label">Total Items</div></div>
@@ -7831,7 +7768,8 @@
         <div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:0.75rem;">
           ${typeHtml}
         </div>
-        <div class="share-card-branding"><div class="brand">BACKLOGUE</div></div>
+        <div style="font-family:'Playfair Display',serif;font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.25);text-align:center;padding-top:0.75rem;">BACKLOGUE</div>
+        </div>
       `;
     }
 

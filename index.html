@@ -5843,43 +5843,47 @@
 
     // Render feeds
     // Add item from group feed to personal list
-    async function addFromFeed(encodedItem) {
+    function addFromFeed(encodedItem) {
       try {
         const data = JSON.parse(decodeURIComponent(encodedItem));
-        // Check if already exists
         if (items.some(i => i.title === data.title && i.type === data.type)) {
+          showToast('Already on your shelf');
           return;
         }
-        const newItem = {
-          id: Date.now().toString(),
-          title: data.title,
-          type: data.type,
-          status: 'want',
-          watchSoon: false,
-          rating: null,
-          image: data.image,
-          streamingPlatform: data.streamingPlatform,
-          genre: data.genre,
-          referral: data.referral,
-          notes: '',
-          premiereDate: data.premiereDate || '',
-          dateLogged: '',
-          tags: [],
-          group: '',
-          userId: currentUser.id
-        };
-        items.push(newItem);
-        await saveItemToFirestore(newItem);
-        renderItems();
-        await renderFeeds();
-        // Re-render active group tab if any
-        const activeGroupTab = document.querySelector('#groupTabsContent .tab-content.active');
-        if (activeGroupTab) {
-          const groupId = activeGroupTab.id.replace('group-', '');
-          await renderGroupFeed(groupId);
+        // Pre-fill the add modal with the shared item's data
+        openAddModal();
+        // Set type
+        selectType(data.type || 'movie');
+        // Set title
+        document.getElementById('itemTitle').value = data.title || '';
+        // Set hidden image field
+        document.getElementById('itemImage').value = data.image || '';
+        // Set genre
+        if (data.genre) {
+          updateGenreOptions(data.type || 'movie');
+          const genreEl = document.getElementById('itemGenre');
+          if ([...genreEl.options].some(o => o.value === data.genre)) {
+            genreEl.value = data.genre;
+          } else {
+            genreEl.value = 'Other';
+            document.getElementById('itemGenreOther').value = data.genre;
+            document.getElementById('itemGenreOther').style.display = 'block';
+          }
+        }
+        if (data.streamingPlatform) document.getElementById('itemStreamingPlatform').value = data.streamingPlatform;
+        if (data.premiereDate) document.getElementById('itemPremiereDate').value = data.premiereDate;
+        // Show a mini poster preview in the modal title area
+        if (data.image) {
+          const preview = document.getElementById('modalItemPreview');
+          document.getElementById('previewImage').src = data.image;
+          document.getElementById('previewTitle').textContent = data.title;
+          document.getElementById('previewType').textContent = (data.type || '').charAt(0).toUpperCase() + (data.type || '').slice(1);
+          preview.classList.add('visible');
+          document.getElementById('addModeFields').style.display = 'none';
+          document.getElementById('editModeTypeTitle').style.display = 'none';
         }
       } catch (error) {
-        console.error('Error adding from feed:', error);
+        console.error('Error pre-filling add modal from feed:', error);
       }
     }
 

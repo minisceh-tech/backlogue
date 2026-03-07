@@ -3504,7 +3504,12 @@
       <div id="emptyState" class="empty-state" style="display: none;">
         <div class="empty-state-icon">📚</div>
         <div class="empty-state-text">Your shelf is empty</div>
-        <p>Add your first item to get started</p>
+        <p style="color:var(--text-tertiary); font-size:0.9rem; margin-bottom:1.5rem;">Start by adding something you're watching, reading, or listening to.</p>
+        <button class="btn" onclick="handleFabClick()" style="margin-bottom:1rem;">+ Add Your First Item</button>
+        <div style="font-size:0.8rem; color:var(--text-tertiary);">
+          Already on Letterboxd or Goodreads?<br>
+          <a onclick="openProfileSettings()" style="color:var(--accent-primary); cursor:pointer;">Import your existing lists →</a>
+        </div>
       </div>
     </div>
 
@@ -4066,17 +4071,23 @@
       <div class="tutorial-slide" data-slide="2">
         <div class="tutorial-slide-icon">&#11088;</div>
         <div class="tutorial-slide-title">Organize Your Way</div>
-        <div class="tutorial-slide-text">Sort by status &mdash; Consuming, Up Next, and Caught Up. Tap any card to see details and edit.</div>
+        <div class="tutorial-slide-text">Sort by status — Consuming, Up Next, and Caught Up. Tap any card to see details, change status, or rate it.</div>
       </div>
       <div class="tutorial-slide" data-slide="3">
         <div class="tutorial-slide-icon">&#128101;</div>
         <div class="tutorial-slide-title">Share &amp; Discover</div>
-        <div class="tutorial-slide-text">Create groups with friends, share your shelf, and discover what others are watching and reading.</div>
+        <div class="tutorial-slide-text">Create groups with friends, share titles from your shelf, and see what others are watching and reading.</div>
       </div>
       <div class="tutorial-slide" data-slide="4">
+        <div class="tutorial-slide-icon">&#127922;</div>
+        <div class="tutorial-slide-title">Can't Decide? Let Us Pick</div>
+        <div class="tutorial-slide-text">Tap 🎲 Surprise Me on your shelf to get a random pick from your Up Next list. Already on Letterboxd or Goodreads? Import your lists from Profile.</div>
+      </div>
+      <div class="tutorial-slide" data-slide="5">
         <div class="tutorial-slide-icon">&#128640;</div>
         <div class="tutorial-slide-title">Ready to Start?</div>
-        <div class="tutorial-slide-text">Tap the + button to add your first title and start building your shelf.</div>
+        <div class="tutorial-slide-text">Tap below to add your first title and start building your shelf.</div>
+        <button class="btn" onclick="closeTutorial(); handleFabClick();" style="margin-top:1rem;">+ Add Your First Item</button>
       </div>
       <div class="tutorial-dots">
         <div class="tutorial-dot active" data-dot="0"></div>
@@ -4084,6 +4095,7 @@
         <div class="tutorial-dot" data-dot="2"></div>
         <div class="tutorial-dot" data-dot="3"></div>
         <div class="tutorial-dot" data-dot="4"></div>
+        <div class="tutorial-dot" data-dot="5"></div>
       </div>
       <div class="tutorial-nav">
         <button class="tutorial-btn-skip" onclick="closeTutorial()">Skip</button>
@@ -6088,7 +6100,7 @@
 
     // === TUTORIAL ===
     let tutorialSlideIndex = 0;
-    const TUTORIAL_SLIDE_COUNT = 5;
+    const TUTORIAL_SLIDE_COUNT = 6;
 
     function showTutorial() {
       tutorialSlideIndex = 0;

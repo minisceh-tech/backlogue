@@ -7427,6 +7427,10 @@
         </div>
         ${starHtml}
         ${fieldsHtml}
+        ${item.type !== 'podcast' ? `<div id="descriptionSection" style="margin: 0.5rem 0;">
+          <a onclick="loadDescription('${item.id}')" id="descriptionToggle" style="color:var(--accent-primary); font-size:0.85rem; cursor:pointer;">More Info</a>
+          <div id="descriptionText" style="display:none; font-size:0.85rem; color:var(--text-secondary); line-height:1.5; margin-top:0.5rem;"></div>
+        </div>` : ''}
         <div class="detail-card-actions">
           <button class="detail-card-action-btn" onclick="closeDetailCard(); openShareCardForItem('${item.id}')" title="Share">📤</button>
           <button class="detail-card-action-btn" onclick="shareToGroup('${item.id}')" title="Share to Group">👥</button>
@@ -7436,6 +7440,59 @@
       `;
 
       document.getElementById('detailCardOverlay').classList.add('visible');
+    }
+
+    async function loadDescription(itemId) {
+      const item = items.find(i => i.id === itemId);
+      if (!item) return;
+
+      const toggle = document.getElementById('descriptionToggle');
+      const textDiv = document.getElementById('descriptionText');
+      if (!toggle || !textDiv) return;
+
+      // If already loaded, toggle visibility
+      if (textDiv.dataset.loaded) {
+        const visible = textDiv.style.display !== 'none';
+        textDiv.style.display = visible ? 'none' : 'block';
+        toggle.textContent = visible ? 'More Info' : 'Hide';
+        return;
+      }
+
+      toggle.textContent = 'Loading...';
+
+      try {
+        let description = '';
+
+        if (item.type === 'movie' || item.type === 'tv') {
+          const mediaType = item.type === 'movie' ? 'movie' : 'tv';
+          const url = `https://api.themoviedb.org/3/search/${mediaType}?api_key=${TMDB_API_KEY}&query=${encodeURIComponent(item.title)}&page=1`;
+          const res = await fetch(url);
+          const data = await res.json();
+          if (data.results && data.results.length > 0) {
+            description = data.results[0].overview || '';
+          }
+        } else if (item.type === 'book') {
+          const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(item.title)}&maxResults=1&langRestrict=en`;
+          const res = await fetch(url);
+          const data = await res.json();
+          if (data.items && data.items.length > 0) {
+            description = data.items[0].volumeInfo?.description || '';
+          }
+        }
+
+        if (description) {
+          textDiv.textContent = description;
+          textDiv.dataset.loaded = '1';
+          textDiv.style.display = 'block';
+          toggle.textContent = 'Hide';
+        } else {
+          toggle.textContent = 'No description available';
+          toggle.style.cursor = 'default';
+        }
+      } catch (err) {
+        toggle.textContent = 'Could not load description';
+        toggle.style.cursor = 'default';
+      }
     }
 
     async function shareToGroup(itemId) {

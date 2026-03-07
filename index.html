@@ -7690,12 +7690,23 @@
       if (item.genre) metaParts.push(item.genre);
       if (item.dateLogged) metaParts.push(formatDateForCard(item.dateLogged));
 
+      const typeGradients = {
+        movie:   'linear-gradient(135deg, #1a1a3e 0%, #2d1b4e 100%)',
+        tv:      'linear-gradient(135deg, #0d2137 0%, #1a3a5c 100%)',
+        book:    'linear-gradient(135deg, #1a2e1a 0%, #2d4a2d 100%)',
+        podcast: 'linear-gradient(135deg, #2e1a1a 0%, #4a2d2d 100%)'
+      };
+      const typeBg = typeGradients[item.type] || typeGradients.movie;
+
       const blurBg = item.image
         ? `<img src="${item.image}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:blur(24px) brightness(0.35);transform:scale(1.1);">`
-        : '';
+        : `<div style="position:absolute;inset:0;background:${typeBg};"></div>`;
       const posterImg = item.image
         ? `<img src="${item.image}" style="height:210px;width:auto;max-width:150px;border-radius:12px;object-fit:cover;box-shadow:0 16px 48px rgba(0,0,0,0.7);position:relative;z-index:1;">`
-        : `<div style="height:210px;width:140px;border-radius:12px;background:linear-gradient(135deg,#1e2a3a,#2d3748);display:flex;align-items:center;justify-content:center;font-size:3.5rem;position:relative;z-index:1;">${getTypeEmoji(item.type)}</div>`;
+        : `<div style="position:relative;z-index:1;text-align:center;">
+            <div style="font-size:5rem;line-height:1;margin-bottom:0.5rem;">${getTypeEmoji(item.type)}</div>
+            <div style="font-family:'Playfair Display',serif;font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.4);">${item.type}</div>
+           </div>`;
 
       const container = document.getElementById('shareCardRender');
       container.innerHTML = `

@@ -1098,6 +1098,26 @@
       background: rgba(239,68,68,0.3);
     }
 
+    .group-picker-item {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--bg-accent);
+      border: 1px solid var(--border-light);
+      border-radius: 10px;
+      cursor: pointer;
+      text-align: left;
+      transition: background 0.15s;
+    }
+    .group-picker-item:hover, .group-picker-item:active {
+      background: var(--bg-hover);
+    }
+    .group-picker-icon { font-size: 1.25rem; }
+    .group-picker-name { flex: 1; font-weight: 500; font-size: 0.95rem; color: var(--text-primary); }
+    .group-picker-members { font-size: 0.75rem; color: var(--text-tertiary); }
+
     .card-rating {
       margin-top: 0.25rem;
       font-size: 1rem;
@@ -7419,36 +7439,53 @@
         return;
       }
 
-      // If only one group, share directly; otherwise let user pick
-      let selectedGroup;
+      // If only one group, share directly
       if (userGroups.length === 1) {
-        selectedGroup = userGroups[0];
-      } else {
-        const groupNames = userGroups.map((g, i) => `${i + 1}. ${g.name}`).join('\n');
-        const choice = prompt(`Share "${item.title}" to which group?\n\n${groupNames}\n\nEnter number:`);
-        if (!choice) return;
-        const idx = parseInt(choice) - 1;
-        if (isNaN(idx) || idx < 0 || idx >= userGroups.length) {
-          alert('Invalid selection.');
-          return;
-        }
-        selectedGroup = userGroups[idx];
+        await doShareToGroup(item, userGroups[0]);
+        return;
       }
 
+      // Show group picker
+      closeDetailCard();
+      const overlay = document.getElementById('groupPickerOverlay');
+      const list = document.getElementById('groupPickerList');
+      list.innerHTML = userGroups.map(g => `
+        <button class="group-picker-item" onclick="pickGroupAndShare('${item.id}', '${g.id}')">
+          <span class="group-picker-icon">👥</span>
+          <span class="group-picker-name">${g.name}</span>
+          <span class="group-picker-members">${g.members ? g.members.length : 0} members</span>
+        </button>
+      `).join('');
+      overlay.classList.add('visible');
+    }
+
+    async function pickGroupAndShare(itemId, groupId) {
+      const item = items.find(i => i.id === itemId);
+      const group = groups.find(g => g.id === groupId);
+      if (!item || !group) return;
+      document.getElementById('groupPickerOverlay').classList.remove('visible');
+      await doShareToGroup(item, group);
+    }
+
+    async function doShareToGroup(item, group) {
       try {
         const sharedItem = {
           ...item,
-          groupId: selectedGroup.id,
+          groupId: group.id,
           userName: currentUser.name,
           timestamp: Date.now()
         };
         await saveSharedItem(sharedItem);
         closeDetailCard();
-        showToast(`Shared to ${selectedGroup.name}`);
+        showToast(`Shared to ${group.name}`);
       } catch (error) {
         console.error('Error sharing to group:', error);
         alert('Failed to share. Please try again.');
       }
+    }
+
+    function closeGroupPicker() {
+      document.getElementById('groupPickerOverlay').classList.remove('visible');
     }
 
     function closeDetailCard() {
@@ -8268,6 +8305,15 @@
   <!-- Detail Card Overlay -->
   <div id="detailCardOverlay" class="detail-overlay" onclick="if(event.target===this)closeDetailCard()">
     <div class="detail-card" id="detailCard"></div>
+  </div>
+
+  <!-- Group Picker Overlay -->
+  <div id="groupPickerOverlay" class="detail-overlay" onclick="if(event.target===this)closeGroupPicker()" style="z-index:10001;">
+    <div class="detail-card" style="max-width:320px; padding:1.25rem;">
+      <button class="detail-card-close" onclick="closeGroupPicker()">&times;</button>
+      <div style="text-align:center; font-weight:600; font-size:1rem; margin-bottom:1rem; padding-top:0.25rem;">Share to Group</div>
+      <div id="groupPickerList" style="display:flex; flex-direction:column; gap:0.5rem; max-height:60vh; overflow-y:auto;"></div>
+    </div>
   </div>
 
   <!-- Toast Notification -->

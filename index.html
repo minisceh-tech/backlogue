@@ -3496,6 +3496,13 @@
       <button class="status-pill" data-status="want" onclick="statusPillScroll('want')">Up Next</button>
       <button class="status-pill" data-status="done" onclick="statusPillScroll('done')">Caught Up</button>
       <button class="status-pill" onclick="openRandomPicker()">🎲 Surprise Me</button>
+      <select id="shelfSortSelect" onchange="sortFilter(this.value)" class="filter-dropdown filter-dropdown-blue" style="border-radius:20px; padding:0.3rem 0.6rem; font-size:0.7rem; flex-shrink:0;">
+        <option value="default">Sort</option>
+        <option value="dateAdded">Date Added</option>
+        <option value="dateLogged">Date Logged</option>
+        <option value="rating">Rating</option>
+        <option value="title">A-Z</option>
+      </select>
     </div>
     <div id="groupTabsContainer" style="display: none;"></div>
     <!-- My Shelf Tab -->

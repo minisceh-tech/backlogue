@@ -8079,11 +8079,47 @@
       const item = items.find(i => i.id === quickActionItemId);
       if (!item) return;
       item.status = status;
+      if (status === 'done' && !item.dateLogged) {
+        item.dateLogged = getTodayDate();
+      }
       await saveItemToFirestore(item);
       renderItems();
       closeQuickActionMenu();
       const labels = { want: 'Up Next', current: 'Consuming', done: 'Caught Up' };
       showToast(`Moved to ${labels[status] || status}`);
+      // Prompt for rating if marking as done and not already rated
+      if (status === 'done' && !item.rating) {
+        showRatingPrompt(item.id);
+      }
+    }
+
+    let ratingPromptItemId = null;
+
+    function showRatingPrompt(itemId) {
+      const item = items.find(i => i.id === itemId);
+      if (!item) return;
+      ratingPromptItemId = itemId;
+      document.getElementById('ratingPromptTitle').textContent = item.title;
+      // Reset stars
+      document.querySelectorAll('#ratingPromptOverlay .star-btn').forEach(b => b.classList.remove('full'));
+      document.getElementById('ratingPromptOverlay').classList.add('visible');
+    }
+
+    async function submitRatingPrompt(rating) {
+      if (!ratingPromptItemId) return;
+      const item = items.find(i => i.id === ratingPromptItemId);
+      if (item) {
+        item.rating = rating;
+        await saveItemToFirestore(item);
+        renderItems();
+        showToast(`Rated ${rating} star${rating > 1 ? 's' : ''}`);
+      }
+      dismissRatingPrompt();
+    }
+
+    function dismissRatingPrompt() {
+      document.getElementById('ratingPromptOverlay').classList.remove('visible');
+      ratingPromptItemId = null;
     }
 
     async function quickRate(rating) {
@@ -8379,6 +8415,23 @@
       <button class="detail-card-close" onclick="closeGroupPicker()">&times;</button>
       <div style="text-align:center; font-weight:600; font-size:1rem; margin-bottom:1rem; padding-top:0.25rem;">Share to Group</div>
       <div id="groupPickerList" style="display:flex; flex-direction:column; gap:0.5rem; max-height:60vh; overflow-y:auto;"></div>
+    </div>
+  </div>
+
+  <!-- Rate on Completion Prompt -->
+  <div id="ratingPromptOverlay" class="detail-overlay" onclick="if(event.target===this)dismissRatingPrompt()" style="z-index:10002;">
+    <div class="detail-card" style="max-width:300px; padding:1.5rem; text-align:center;">
+      <div style="font-size:1.5rem; margin-bottom:0.25rem;">✅</div>
+      <div style="font-weight:600; font-size:1rem; margin-bottom:0.25rem;" id="ratingPromptTitle"></div>
+      <div style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:1.25rem;">How would you rate it?</div>
+      <div class="star-rating-picker" style="justify-content:center; font-size:2rem; gap:0.25rem; margin-bottom:1rem;">
+        <button class="star-btn" onclick="submitRatingPrompt(1)">★</button>
+        <button class="star-btn" onclick="submitRatingPrompt(2)">★</button>
+        <button class="star-btn" onclick="submitRatingPrompt(3)">★</button>
+        <button class="star-btn" onclick="submitRatingPrompt(4)">★</button>
+        <button class="star-btn" onclick="submitRatingPrompt(5)">★</button>
+      </div>
+      <a onclick="dismissRatingPrompt()" style="color:var(--text-tertiary); font-size:0.8rem; cursor:pointer;">Skip</a>
     </div>
   </div>
 

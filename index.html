@@ -3086,10 +3086,9 @@
 
     .share-card-render {
       width: 400px;
-      min-height: 480px;
-      background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+      min-height: 220px;
+      background: linear-gradient(135deg, #0d1117 0%, #161b22 60%, #0d1b2a 100%);
       border-radius: 16px;
-      padding: 2rem;
       font-family: 'Inter', sans-serif;
       color: #e1e1e1;
       position: relative;
@@ -3104,8 +3103,13 @@
       top: 0;
       left: 0;
       right: 0;
-      height: 4px;
+      height: 3px;
       background: linear-gradient(90deg, #5B9BD5, #7CB8E8, #f59e0b);
+    }
+
+    .share-card-render.stats-card {
+      min-height: 400px;
+      padding: 2rem;
     }
 
     .share-card-branding {
@@ -7744,34 +7748,41 @@
       if (stars !== null) {
         const full = Math.floor(stars);
         const half = (stars % 1) >= 0.5;
-        starHtml = '<div class="share-card-rating">' + '\u2605'.repeat(full) + (half ? '\u00BD' : '') + '</div>';
+        starHtml = `<div style="color:#f59e0b;font-size:1.1rem;letter-spacing:2px;margin-bottom:0.4rem;">${'\u2605'.repeat(full)}${half ? '\u00BD' : ''}</div>`;
       }
 
       const statusColors = {
-        'done': { bg: 'rgba(91,155,213,0.2)', color: '#5B9BD5', label: 'Caught Up' },
-        'current': { bg: 'rgba(99,102,241,0.2)', color: '#6366f1', label: 'Consuming' },
-        'want': { bg: 'rgba(245,158,11,0.2)', color: '#f59e0b', label: 'Up Next' }
+        'done': { bg: 'rgba(91,155,213,0.25)', color: '#7CB8E8', label: 'Caught Up' },
+        'current': { bg: 'rgba(99,102,241,0.25)', color: '#818cf8', label: 'Consuming' },
+        'want': { bg: 'rgba(245,158,11,0.25)', color: '#fbbf24', label: 'Up Next' }
       };
       const sc = statusColors[item.status] || statusColors['done'];
 
+      const posterHtml = item.image
+        ? `<img src="${item.image}" style="width:110px;height:165px;object-fit:cover;border-radius:8px;flex-shrink:0;box-shadow:0 8px 24px rgba(0,0,0,0.6);">`
+        : `<div style="width:110px;height:165px;flex-shrink:0;border-radius:8px;background:linear-gradient(135deg,#1e1e1e,#2d2d2d);display:flex;align-items:center;justify-content:center;font-size:2.5rem;">${getTypeEmoji(item.type)}</div>`;
+
+      const typeLabel = item.type.charAt(0).toUpperCase() + item.type.slice(1);
+      const metaParts = [getTypeEmoji(item.type) + ' ' + typeLabel];
+      if (item.genre) metaParts.push(item.genre);
+      if (item.dateLogged) metaParts.push(formatDateForCard(item.dateLogged));
+
       const container = document.getElementById('shareCardRender');
+      container.classList.remove('stats-card');
       container.innerHTML = `
-        <div style="text-align: center; margin-bottom: 0.5rem;">
-          <span class="share-card-status-badge" style="background: ${sc.bg}; color: ${sc.color};">${sc.label}</span>
+        <div style="display:flex;gap:0;min-height:220px;">
+          ${posterHtml}
+          <div style="flex:1;padding:1.25rem 1.25rem 1rem;display:flex;flex-direction:column;justify-content:space-between;min-width:0;">
+            <div>
+              <span class="share-card-status-badge" style="background:${sc.bg};color:${sc.color};margin-bottom:0.6rem;display:inline-block;">${sc.label}</span>
+              <div style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;line-height:1.25;margin-bottom:0.35rem;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;">${item.title}</div>
+              <div style="font-size:0.7rem;color:rgba(255,255,255,0.5);margin-bottom:0.5rem;">${metaParts.join(' · ')}</div>
+              ${starHtml}
+              ${item.notes ? `<div style="font-size:0.72rem;color:rgba(255,255,255,0.65);font-style:italic;line-height:1.4;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;">"${item.notes}"</div>` : ''}
+            </div>
+            <div style="font-family:'Playfair Display',serif;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.3);margin-top:0.5rem;">BACKLOGUE</div>
+          </div>
         </div>
-        ${item.image
-          ? `<img class="share-card-item-poster" src="${item.image}">`
-          : `<div style="width:140px;height:210px;margin:0 auto 1rem;border-radius:10px;background:linear-gradient(135deg,#282828,#333);display:flex;align-items:center;justify-content:center;font-size:3rem;">${getTypeEmoji(item.type)}</div>`
-        }
-        <div class="share-card-item-title">${item.title}</div>
-        <div class="share-card-item-meta">
-          ${getTypeEmoji(item.type)} ${item.type.charAt(0).toUpperCase() + item.type.slice(1)}
-          ${item.genre ? ' &middot; ' + item.genre : ''}
-          ${item.dateLogged ? ' &middot; ' + formatDateForCard(item.dateLogged) : ''}
-        </div>
-        ${starHtml}
-        ${item.notes ? `<div class="share-card-review">"${item.notes.substring(0, 150)}${item.notes.length > 150 ? '...' : ''}"</div>` : ''}
-        <div class="share-card-branding"><div class="brand">BACKLOGUE</div></div>
       `;
     }
 
@@ -7804,6 +7815,7 @@
       });
 
       const container = document.getElementById('shareCardRender');
+      container.classList.add('stats-card');
       container.innerHTML = `
         <div style="text-align:center;margin-bottom:1.5rem;">
           <div style="font-family:'Playfair Display',serif;font-size:1.3rem;font-weight:700;margin-bottom:0.25rem;">My Media Journey</div>

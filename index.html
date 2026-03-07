@@ -3662,6 +3662,12 @@
         </div>
 
         <!-- Where to Watch and Recommended by (always visible) -->
+        <div class="form-group" id="episodeGroup" style="display: none;">
+          <label for="itemEpisode">Episode</label>
+          <input type="text" id="itemEpisode" placeholder="e.g. Ep. 42: The One Where...">
+          <div class="helper-text">Optional — leave blank to track the whole show</div>
+        </div>
+
         <div class="form-group" id="streamingPlatformGroup" style="display: none;">
           <label for="itemStreamingPlatform">Where to Watch</label>
           <select id="itemStreamingPlatform">
@@ -4532,6 +4538,7 @@
           rating: ratingVal === '' ? null : parseFloat(ratingVal),
           image: document.getElementById('itemImage').value,
           streamingPlatform: document.getElementById('itemStreamingPlatform').value,
+          episode: document.getElementById('itemEpisode').value.trim(),
           referral: document.getElementById('itemReferral').value,
           genre: document.getElementById('itemGenre').value === 'Other' ? (document.getElementById('itemGenreOther').value || 'Other') : document.getElementById('itemGenre').value,
           notes: document.getElementById('itemNotes').value,
@@ -4615,6 +4622,7 @@
             rating: ratingValForm === '' ? null : parseFloat(ratingValForm),
             image: document.getElementById('itemImage').value,
             streamingPlatform: document.getElementById('itemStreamingPlatform').value,
+            episode: document.getElementById('itemEpisode').value.trim(),
             referral: document.getElementById('itemReferral').value,
             genre: document.getElementById('itemGenre').value === 'Other' ? (document.getElementById('itemGenreOther').value || 'Other') : document.getElementById('itemGenre').value,
             notes: document.getElementById('itemNotes').value,
@@ -4744,14 +4752,13 @@
     function toggleStreamingPlatform() {
       const typeSelect = document.getElementById('itemType');
       const streamingGroup = document.getElementById('streamingPlatformGroup');
+      const episodeGroup = document.getElementById('episodeGroup');
       const type = typeSelect.value;
-      
+
       // Show streaming platform for movies and TV shows
-      if (type === 'movie' || type === 'tv') {
-        streamingGroup.style.display = 'block';
-      } else {
-        streamingGroup.style.display = 'none';
-      }
+      streamingGroup.style.display = (type === 'movie' || type === 'tv') ? 'block' : 'none';
+      // Show episode field for podcasts only
+      episodeGroup.style.display = (type === 'podcast') ? 'block' : 'none';
     }
 
     // Update status labels based on media type
@@ -6104,6 +6111,7 @@
         document.getElementById('itemImage').value = item.image || '';
         document.getElementById('itemStreamingPlatform').value = item.streamingPlatform || '';
         document.getElementById('itemReferral').value = item.referral || '';
+        document.getElementById('itemEpisode').value = item.episode || '';
         // Update genre options for the item's type, then set value
         updateGenreOptions(item.type);
         const genreSelect = document.getElementById('itemGenre');
@@ -7391,6 +7399,7 @@
       const sc = statusColors[item.status] || statusColors['done'];
 
       let fieldsHtml = '';
+      if (item.episode) fieldsHtml += `<div class="detail-card-field"><strong>Episode:</strong> ${item.episode}</div>`;
       if (item.streamingPlatform) fieldsHtml += `<div class="detail-card-field"><strong>Platform:</strong> ${item.streamingPlatform}</div>`;
       if (item.referral) fieldsHtml += `<div class="detail-card-field"><strong>Rec by:</strong> ${item.referral}</div>`;
       if (item.premiereDate) fieldsHtml += `<div class="detail-card-field"><strong>Premiere:</strong> ${item.premiereDate}</div>`;

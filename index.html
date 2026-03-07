@@ -7982,14 +7982,17 @@
 
         let touchStartX = 0, touchStartY = 0;
         let touchMoved = false;
+        let swipeCard = null;
 
         grid.addEventListener('touchstart', (e) => {
           touchMoved = false;
+          swipeCard = null;
           const card = e.target.closest('.card[data-id]');
           if (!card) return;
           const touch = e.touches[0];
           touchStartX = touch.clientX;
           touchStartY = touch.clientY;
+          swipeCard = card;
           longPressFired = false;
           longPressTimer = setTimeout(() => {
             longPressFired = true;
@@ -8012,7 +8015,25 @@
 
         grid.addEventListener('touchend', (e) => {
           if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
-          if (touchMoved || longPressFired) { longPressFired = false; return; }
+          if (longPressFired) { longPressFired = false; return; }
+
+          const touch = e.changedTouches[0];
+          const dx = touch.clientX - touchStartX;
+          const dy = touch.clientY - touchStartY;
+          const absDx = Math.abs(dx);
+          const absDy = Math.abs(dy);
+
+          // Swipe: horizontal movement > 60px and more horizontal than vertical
+          if (swipeCard && absDx > 60 && absDx > absDy * 1.5) {
+            if (dx > 0) {
+              swipeCycleStatus(swipeCard.dataset.id);
+            } else {
+              swipeDeletePrompt(swipeCard.dataset.id);
+            }
+            return;
+          }
+
+          if (touchMoved) return;
           const card = e.target.closest('.card[data-id]');
           if (!card) return;
           openDetailCard(card.dataset.id);
@@ -8091,6 +8112,50 @@
       if (status === 'done' && !item.rating) {
         showRatingPrompt(item.id);
       }
+    }
+
+    // === SWIPE GESTURES ===
+    async function swipeCycleStatus(itemId) {
+      const item = items.find(i => i.id === itemId);
+      if (!item) return;
+      const cycle = { want: 'current', current: 'done', done: 'want' };
+      const newStatus = cycle[item.status] || 'want';
+      const wasUnrated = !item.rating;
+      item.status = newStatus;
+      if (newStatus === 'done' && !item.dateLogged) {
+        item.dateLogged = getTodayDate();
+      }
+      await saveItemToFirestore(item);
+      renderItems();
+      const labels = { want: 'Up Next', current: 'Consuming', done: 'Caught Up' };
+      showToast(`→ ${labels[newStatus]}`);
+      if (newStatus === 'done' && wasUnrated) {
+        showRatingPrompt(itemId);
+      }
+    }
+
+    function swipeDeletePrompt(itemId) {
+      const item = items.find(i => i.id === itemId);
+      if (!item) return;
+      quickActionItemId = itemId;
+      showSwipeDeleteConfirm(item.title);
+    }
+
+    function showSwipeDeleteConfirm(title) {
+      const overlay = document.getElementById('swipeDeleteOverlay');
+      document.getElementById('swipeDeleteTitle').textContent = title;
+      overlay.classList.add('visible');
+    }
+
+    function closeSwipeDelete() {
+      document.getElementById('swipeDeleteOverlay').classList.remove('visible');
+      quickActionItemId = null;
+    }
+
+    async function confirmSwipeDelete() {
+      if (!quickActionItemId) return;
+      closeSwipeDelete();
+      await deleteItem(quickActionItemId);
     }
 
     let ratingPromptItemId = null;
@@ -8415,6 +8480,19 @@
       <button class="detail-card-close" onclick="closeGroupPicker()">&times;</button>
       <div style="text-align:center; font-weight:600; font-size:1rem; margin-bottom:1rem; padding-top:0.25rem;">Share to Group</div>
       <div id="groupPickerList" style="display:flex; flex-direction:column; gap:0.5rem; max-height:60vh; overflow-y:auto;"></div>
+    </div>
+  </div>
+
+  <!-- Swipe Delete Confirmation -->
+  <div id="swipeDeleteOverlay" class="detail-overlay" onclick="if(event.target===this)closeSwipeDelete()" style="z-index:10002;">
+    <div class="detail-card" style="max-width:300px; padding:1.5rem; text-align:center;">
+      <div style="font-size:1.5rem; margin-bottom:0.5rem;">🗑️</div>
+      <div style="font-weight:600; font-size:1rem; margin-bottom:0.25rem;" id="swipeDeleteTitle"></div>
+      <div style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:1.25rem;">Remove from your shelf?</div>
+      <div style="display:flex; gap:0.75rem; justify-content:center;">
+        <button onclick="closeSwipeDelete()" style="flex:1; padding:0.6rem; border:1px solid var(--border-medium); border-radius:8px; background:var(--bg-accent); color:var(--text-primary); cursor:pointer; font-size:0.9rem;">Cancel</button>
+        <button onclick="confirmSwipeDelete()" style="flex:1; padding:0.6rem; border:none; border-radius:8px; background:#ef4444; color:white; cursor:pointer; font-size:0.9rem; font-weight:500;">Delete</button>
+      </div>
     </div>
   </div>
 

@@ -3495,6 +3495,7 @@
       <button class="status-pill" data-status="current" onclick="statusPillScroll('current')">Consuming</button>
       <button class="status-pill" data-status="want" onclick="statusPillScroll('want')">Up Next</button>
       <button class="status-pill" data-status="done" onclick="statusPillScroll('done')">Caught Up</button>
+      <button class="status-pill" onclick="openRandomPicker()" title="Surprise me">🎲</button>
     </div>
     <div id="groupTabsContainer" style="display: none;"></div>
     <!-- My Shelf Tab -->
@@ -8136,6 +8137,51 @@
       }
     }
 
+    // === RANDOM PICKER ===
+    let currentRandomType = 'all';
+    let currentRandomItemId = null;
+
+    function openRandomPicker() {
+      document.getElementById('randomTypeStep').style.display = 'block';
+      document.getElementById('randomResultStep').style.display = 'none';
+      document.getElementById('randomPickerOverlay').classList.add('visible');
+    }
+
+    function closeRandomPicker() {
+      document.getElementById('randomPickerOverlay').classList.remove('visible');
+    }
+
+    function pickRandom(type) {
+      currentRandomType = type;
+      const pool = items.filter(i => i.status === 'want' && (type === 'all' || i.type === type));
+      if (pool.length === 0) {
+        showToast(`Nothing in Up Next${type !== 'all' ? ' for that type' : ''}`);
+        closeRandomPicker();
+        return;
+      }
+      const item = pool[Math.floor(Math.random() * pool.length)];
+      currentRandomItemId = item.id;
+
+      // Show result
+      document.getElementById('randomTypeStep').style.display = 'none';
+      document.getElementById('randomResultStep').style.display = 'block';
+      document.getElementById('randomResultTitle').textContent = item.title;
+      document.getElementById('randomResultMeta').textContent =
+        `${getTypeEmoji(item.type)} ${item.type.charAt(0).toUpperCase() + item.type.slice(1)}${item.genre ? ' · ' + item.genre : ''}`;
+
+      const img = document.getElementById('randomResultImage');
+      const placeholder = document.getElementById('randomResultPlaceholder');
+      if (item.image) {
+        img.src = item.image;
+        img.style.display = 'block';
+        placeholder.style.display = 'none';
+      } else {
+        img.style.display = 'none';
+        placeholder.style.display = 'flex';
+        placeholder.textContent = getTypeEmoji(item.type);
+      }
+    }
+
     let ratingPromptItemId = null;
 
     function showRatingPrompt(itemId) {
@@ -8473,6 +8519,40 @@
       <button class="detail-card-close" onclick="closeGroupPicker()">&times;</button>
       <div style="text-align:center; font-weight:600; font-size:1rem; margin-bottom:1rem; padding-top:0.25rem;">Share to Group</div>
       <div id="groupPickerList" style="display:flex; flex-direction:column; gap:0.5rem; max-height:60vh; overflow-y:auto;"></div>
+    </div>
+  </div>
+
+  <!-- Random Picker -->
+  <div id="randomPickerOverlay" class="detail-overlay" onclick="if(event.target===this)closeRandomPicker()" style="z-index:10002;">
+    <div class="detail-card" style="max-width:300px; padding:1.5rem; text-align:center;">
+      <button class="detail-card-close" onclick="closeRandomPicker()">&times;</button>
+      <div style="font-size:1.75rem; margin-bottom:0.25rem;">🎲</div>
+      <div style="font-weight:600; font-size:1rem; margin-bottom:1rem;">Surprise Me</div>
+
+      <!-- Type picker -->
+      <div id="randomTypeStep">
+        <div style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:0.75rem;">What are you in the mood for?</div>
+        <div style="display:flex; flex-direction:column; gap:0.5rem;">
+          <button class="group-picker-item" onclick="pickRandom('all')"><span class="group-picker-name">Anything</span></button>
+          <button class="group-picker-item" onclick="pickRandom('movie')"><span class="group-picker-name">🎬 Movie</span></button>
+          <button class="group-picker-item" onclick="pickRandom('tv')"><span class="group-picker-name">📺 TV Show</span></button>
+          <button class="group-picker-item" onclick="pickRandom('book')"><span class="group-picker-name">📚 Book</span></button>
+          <button class="group-picker-item" onclick="pickRandom('podcast')"><span class="group-picker-name">🎙️ Podcast</span></button>
+        </div>
+      </div>
+
+      <!-- Result -->
+      <div id="randomResultStep" style="display:none;">
+        <div style="color:var(--text-secondary); font-size:0.8rem; margin-bottom:0.75rem;">Your next watch:</div>
+        <img id="randomResultImage" src="" alt="" style="width:100px; height:150px; object-fit:cover; border-radius:8px; margin-bottom:0.75rem; display:none;">
+        <div id="randomResultPlaceholder" style="width:100px; height:150px; border-radius:8px; margin:0 auto 0.75rem; background:linear-gradient(135deg,#282828,#333); display:flex; align-items:center; justify-content:center; font-size:2.5rem;"></div>
+        <div id="randomResultTitle" style="font-weight:600; font-size:1rem; margin-bottom:0.25rem;"></div>
+        <div id="randomResultMeta" style="color:var(--text-secondary); font-size:0.8rem; margin-bottom:1rem;"></div>
+        <div style="display:flex; gap:0.5rem; justify-content:center;">
+          <button onclick="pickRandom(currentRandomType)" style="padding:0.5rem 1rem; border:1px solid var(--border-medium); border-radius:8px; background:transparent; color:var(--text-primary); cursor:pointer; font-size:0.85rem;">🎲 Pick Again</button>
+          <button onclick="closeRandomPicker(); openDetailCard(currentRandomItemId)" style="padding:0.5rem 1rem; border:none; border-radius:8px; background:var(--accent-primary); color:white; cursor:pointer; font-size:0.85rem; font-weight:500;">View</button>
+        </div>
+      </div>
     </div>
   </div>
 

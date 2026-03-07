@@ -7413,7 +7413,7 @@
       card.innerHTML = `
         <button class="detail-card-close" onclick="closeDetailCard()">&times;</button>
         <div style="text-align: center; margin-bottom: 0.75rem; padding-top: 0.5rem;">
-          <span class="share-card-status-badge" style="background: ${sc.bg}; color: ${sc.color};">${sc.label}</span>
+          <span class="share-card-status-badge" onclick="cycleDetailCardStatus('${item.id}')" style="background: ${sc.bg}; color: ${sc.color}; cursor: pointer;" title="Tap to change status">${sc.label} ▾</span>
         </div>
         ${item.image
           ? `<img class="detail-card-poster" src="${item.image}" alt="${item.title}">`
@@ -7552,6 +7552,27 @@
 
     function closeGroupPicker() {
       document.getElementById('groupPickerOverlay').classList.remove('visible');
+    }
+
+    async function cycleDetailCardStatus(itemId) {
+      const item = items.find(i => i.id === itemId);
+      if (!item) return;
+      const cycle = { want: 'current', current: 'done', done: 'want' };
+      const newStatus = cycle[item.status] || 'want';
+      const wasUnrated = !item.rating;
+      item.status = newStatus;
+      if (newStatus === 'done' && !item.dateLogged) {
+        item.dateLogged = getTodayDate();
+      }
+      await saveItemToFirestore(item);
+      renderItems();
+      // Re-open detail card to reflect new status
+      openDetailCard(itemId);
+      const labels = { want: 'Up Next', current: 'Consuming', done: 'Caught Up' };
+      showToast(`→ ${labels[newStatus]}`);
+      if (newStatus === 'done' && wasUnrated) {
+        showRatingPrompt(itemId);
+      }
     }
 
     function closeDetailCard() {

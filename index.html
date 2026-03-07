@@ -7523,6 +7523,12 @@
           ${item.dateLogged ? ' &middot; ' + formatDateForCard(item.dateLogged) : ''}
         </div>
         ${starHtml}
+        ${item.status === 'done' ? `<div style="text-align:center; margin: 0.25rem 0 0.5rem;">
+          <label style="font-size:0.75rem; color:var(--text-tertiary); display:block; margin-bottom:0.2rem;">Logged</label>
+          <input type="date" id="detailDateLogged" value="${item.dateLogged || ''}"
+            onchange="saveDetailDateLogged('${item.id}', this.value)"
+            style="background:var(--bg-accent); border:1px solid var(--border-light); border-radius:8px; padding:0.3rem 0.6rem; font-size:0.8rem; color:var(--text-primary); font-family:inherit; text-align:center;">
+        </div>` : ''}
         ${fieldsHtml}
         ${item.type !== 'podcast' ? `<div id="descriptionSection" style="margin: 0.5rem 0;">
           <a onclick="loadDescription('${item.id}')" id="descriptionToggle" style="color:var(--accent-primary); font-size:0.85rem; cursor:pointer;">More Info</a>
@@ -7628,6 +7634,15 @@
       if (!item || !group) return;
       document.getElementById('groupPickerOverlay').classList.remove('visible');
       await doShareToGroup(item, group);
+    }
+
+    async function saveDetailDateLogged(itemId, value) {
+      const item = items.find(i => i.id === itemId);
+      if (!item) return;
+      item.dateLogged = value;
+      await saveItemToFirestore(item);
+      showToast('Date updated');
+      renderItems();
     }
 
     async function doShareToGroup(item, group) {

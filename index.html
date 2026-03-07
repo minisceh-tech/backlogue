@@ -3959,7 +3959,7 @@
         <div id="shareCardRender" class="share-card-render"></div>
       </div>
       <div class="share-card-actions">
-        <button class="btn" onclick="downloadShareCard()">📥 Download</button>
+        <button class="btn" onclick="shareCard()">📤 Share</button>
         <button class="btn btn-secondary" onclick="copyShareCardToClipboard()">📋 Copy</button>
       </div>
     </div>
@@ -8006,7 +8006,7 @@
       await Promise.all(promises);
     }
 
-    async function downloadShareCard() {
+    async function shareCard() {
       const element = document.getElementById('shareCardRender');
       try {
         await prepareShareCardImages();
@@ -8017,10 +8017,29 @@
           allowTaint: true,
           logging: false
         });
-        const link = document.createElement('a');
-        link.download = 'backlogue-card.png';
-        link.href = canvas.toDataURL('image/png');
-        link.click();
+        canvas.toBlob(async (blob) => {
+          const file = new File([blob], 'backlogue-card.png', { type: 'image/png' });
+          if (navigator.canShare && navigator.canShare({ files: [file] })) {
+            // Native share sheet (iOS/Android) — save to Photos, Instagram, etc.
+            try {
+              await navigator.share({ files: [file], title: 'Backlogue' });
+            } catch (err) {
+              if (err.name !== 'AbortError') {
+                // Share failed, fall back to download
+                const link = document.createElement('a');
+                link.download = 'backlogue-card.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+              }
+            }
+          } else {
+            // Desktop fallback: trigger download
+            const link = document.createElement('a');
+            link.download = 'backlogue-card.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+          }
+        }, 'image/png');
       } catch (err) {
         console.error('Share card generation error:', err);
         alert('Failed to generate image. Try again.');

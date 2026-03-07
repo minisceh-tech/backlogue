@@ -4746,7 +4746,7 @@
         return;
       }
 
-      resultsDiv.innerHTML = '<div class="loading-indicator">Searching...</div>';
+      resultsDiv.innerHTML = '<div class="loading-indicator">🔍 Searching...</div>';
       resultsDiv.classList.add('active');
 
       searchTimeout = setTimeout(() => {
@@ -4889,23 +4889,19 @@
           
           // If OMDB fails or returns nothing, show message
           if (results.length === 0) {
-            resultsDiv.innerHTML = '<div class="loading-indicator">No results found. Try entering the title manually.</div>';
+            resultsDiv.innerHTML = '<div class="loading-indicator" style="color:var(--text-tertiary);">No matches found — type the title manually to add it.</div>';
             return;
           }
         } else if (type === 'book') {
           results = await searchBooks(query);
-          
-          // If book search fails or returns nothing, show message
           if (results.length === 0) {
-            resultsDiv.innerHTML = '<div class="loading-indicator">No book results found. Try entering the title manually.</div>';
+            resultsDiv.innerHTML = '<div class="loading-indicator" style="color:var(--text-tertiary);">No books found — type the title manually to add it.</div>';
             return;
           }
         } else if (type === 'podcast') {
           results = await searchPodcasts(query);
-          
-          // If podcast search fails or returns nothing, show message
           if (results.length === 0) {
-            resultsDiv.innerHTML = '<div class="loading-indicator">No results found. Try entering the title manually.</div>';
+            resultsDiv.innerHTML = '<div class="loading-indicator" style="color:var(--text-tertiary);">No podcasts found — type the title manually to add it.</div>';
             return;
           }
         }
@@ -4913,7 +4909,7 @@
         displayAutocompleteResults(results, type);
       } catch (error) {
         console.error('Search error:', error);
-        resultsDiv.innerHTML = '<div class="loading-indicator">Search temporarily unavailable. Please enter title manually.</div>';
+        resultsDiv.innerHTML = '<div class="loading-indicator" style="color:var(--text-tertiary);">Search unavailable — type the title manually to add it.</div>';
       }
     }
 
@@ -5017,14 +5013,16 @@
       const resultsDiv = document.getElementById('autocompleteResults');
 
       if (results.length === 0) {
-        resultsDiv.innerHTML = '<div class="loading-indicator">No results found. You can enter the title manually.</div>';
+        resultsDiv.innerHTML = '<div class="loading-indicator" style="color:var(--text-tertiary);">No matches found — type the title manually to add it.</div>';
         return;
       }
 
       const typeEmoji = getTypeEmoji(type);
       searchResults = results;
-      
-      resultsDiv.innerHTML = results.map((result, index) => `
+
+      resultsDiv.innerHTML =
+        `<div style="padding:0.4rem 0.75rem; font-size:0.7rem; color:var(--text-tertiary); border-bottom:1px solid var(--border-light);">${results.length} result${results.length !== 1 ? 's' : ''} — tap to select</div>` +
+        results.map((result, index) => `
         <div class="autocomplete-item" onclick="selectSearchResult(${index})">
           ${result.image
             ? `<img src="${result.image}" alt="${result.title}" class="autocomplete-image">`

@@ -4015,6 +4015,14 @@
           <button class="btn" onclick="savePublicProfile()">Save & Publish</button>
         </div>
       </div>
+
+      <!-- Import Section -->
+      <div style="margin-top:1.5rem; padding-top:1.5rem; border-top:1px solid var(--border-light);">
+        <div style="font-weight:600; font-size:0.9rem; margin-bottom:0.25rem;">Import from Letterboxd or Goodreads</div>
+        <div style="font-size:0.75rem; color:var(--text-tertiary); margin-bottom:0.75rem;">Upload a CSV export from Letterboxd or Goodreads to import your existing lists.</div>
+        <input type="file" id="importFileInput" accept=".csv" style="display:none;" onchange="handleImportFile(event)">
+        <button class="btn" style="width:100%;" onclick="document.getElementById('importFileInput').click()">📥 Import CSV</button>
+      </div>
     </div>
   </div>
 
@@ -7893,6 +7901,131 @@
       document.getElementById('profileSettingsModal').classList.add('active');
     }
 
+    // ========== CSV IMPORT ==========
+    function parseCSV(text) {
+      const lines = text.trim().split('\n');
+      const headers = lines[0].split(',').map(h => h.replace(/^"|"$/g, '').trim().toLowerCase());
+      return lines.slice(1).map(line => {
+        // Handle quoted fields with commas inside
+        const cols = [];
+        let cur = '', inQuote = false;
+        for (let i = 0; i < line.length; i++) {
+          const ch = line[i];
+          if (ch === '"') { inQuote = !inQuote; }
+          else if (ch === ',' && !inQuote) { cols.push(cur.trim()); cur = ''; }
+          else { cur += ch; }
+        }
+        cols.push(cur.trim());
+        const row = {};
+        headers.forEach((h, i) => { row[h] = (cols[i] || '').replace(/^"|"$/g, '').trim(); });
+        return row;
+      });
+    }
+
+    async function handleImportFile(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+      event.target.value = '';
+      closeModal('profileSettingsModal');
+
+      const text = await file.text();
+      const rows = parseCSV(text);
+      if (rows.length === 0) { alert('No data found in file.'); return; }
+
+      // Detect source by headers
+      const headers = Object.keys(rows[0]);
+      const isLetterboxd = headers.includes('letterboxd uri') || headers.includes('name') && headers.includes('year');
+      const isGoodreads = headers.includes('bookshelves') || headers.includes('exclusive shelf');
+
+      let imported = 0, skipped = 0;
+      const details = [];
+
+      for (const row of rows) {
+        let title, type, status, rating, year;
+
+        if (isLetterboxd) {
+          title = row['name'] || row['title'] || '';
+          type = 'movie';
+          year = row['year'] || '';
+          // Detect if from diary (watched) or watchlist
+          const isWatchlist = headers.includes('watchlist') || !row['rating'];
+          if (row['rating'] && parseFloat(row['rating']) > 0) {
+            status = 'done';
+            rating = parseFloat(row['rating']) * 2; // Letterboxd is /5, convert to /10
+          } else if (row['watched date'] || row['date']) {
+            status = 'done';
+          } else {
+            status = 'want';
+          }
+          if (row['rating']) rating = parseFloat(row['rating']) * 2;
+        } else if (isGoodreads) {
+          title = row['title'] || '';
+          type = 'book';
+          year = row['year published'] || row['original publication year'] || '';
+          const shelf = (row['exclusive shelf'] || row['bookshelves'] || '').toLowerCase();
+          if (shelf.includes('read') && !shelf.includes('to-read') && !shelf.includes('currently')) {
+            status = 'done';
+          } else if (shelf.includes('currently')) {
+            status = 'current';
+          } else {
+            status = 'want';
+          }
+          const gr = parseFloat(row['my rating']);
+          if (gr > 0) rating = gr * 2; // Goodreads is /5
+        } else {
+          alert('File not recognized as Letterboxd or Goodreads export.');
+          return;
+        }
+
+        if (!title) continue;
+
+        // Skip duplicates
+        if (items.some(i => i.title.toLowerCase() === title.toLowerCase() && i.type === type)) {
+          skipped++;
+          details.push(`⏭ Skipped: ${title}`);
+          continue;
+        }
+
+        const newItem = {
+          id: Date.now().toString() + Math.random().toString(36).slice(2),
+          title,
+          type,
+          status,
+          rating: rating || null,
+          image: '',
+          streamingPlatform: '',
+          episode: '',
+          referral: '',
+          genre: '',
+          notes: '',
+          premiereDate: year ? `${year}-01-01` : '',
+          dateLogged: status === 'done' ? getTodayDate() : '',
+          tags: [],
+          group: '',
+          userId: currentUser.id,
+          watchSoon: false
+        };
+
+        items.push(newItem);
+        await saveItemToFirestore(newItem);
+        imported++;
+        details.push(`✓ ${title}`);
+      }
+
+      renderItems();
+
+      // Show results
+      document.getElementById('importSummary').textContent =
+        `${imported} imported, ${skipped} skipped as duplicates`;
+      document.getElementById('importDetails').innerHTML =
+        details.map(d => `<div style="padding:0.2rem 0;">${d}</div>`).join('');
+      document.getElementById('importOverlay').classList.add('visible');
+    }
+
+    function closeImport() {
+      document.getElementById('importOverlay').classList.remove('visible');
+    }
+
     async function loadProfileSettings() {
       try {
         const doc = await db.collection('publicProfiles').doc(currentUser.id).get();
@@ -8519,6 +8652,17 @@
       <button class="detail-card-close" onclick="closeGroupPicker()">&times;</button>
       <div style="text-align:center; font-weight:600; font-size:1rem; margin-bottom:1rem; padding-top:0.25rem;">Share to Group</div>
       <div id="groupPickerList" style="display:flex; flex-direction:column; gap:0.5rem; max-height:60vh; overflow-y:auto;"></div>
+    </div>
+  </div>
+
+  <!-- Import Results -->
+  <div id="importOverlay" class="detail-overlay" onclick="if(event.target===this)closeImport()" style="z-index:10002;">
+    <div class="detail-card" style="max-width:320px; padding:1.5rem;">
+      <button class="detail-card-close" onclick="closeImport()">&times;</button>
+      <div style="font-weight:600; font-size:1rem; margin-bottom:0.25rem; text-align:center;">📥 Import Complete</div>
+      <div id="importSummary" style="color:var(--text-secondary); font-size:0.85rem; margin:0.75rem 0; text-align:center;"></div>
+      <div id="importDetails" style="font-size:0.8rem; color:var(--text-tertiary); max-height:200px; overflow-y:auto; margin-bottom:1rem;"></div>
+      <button class="btn" style="width:100%;" onclick="closeImport()">Done</button>
     </div>
   </div>
 

@@ -7489,7 +7489,6 @@
       if (item.referral) fieldsHtml += `<div class="detail-card-field"><strong>Rec by:</strong> ${item.referral}</div>`;
       if (item.premiereDate) fieldsHtml += `<div class="detail-card-field"><strong>Premiere:</strong> ${item.premiereDate}</div>`;
       if (item.group) fieldsHtml += `<div class="detail-card-field"><strong>Group:</strong> 📁 ${getGroupName(item.group)}</div>`;
-      if (item.notes) fieldsHtml += `<div class="detail-card-notes">"${item.notes.substring(0, 250)}${item.notes.length > 250 ? '...' : ''}"</div>`;
       if (item.tags && item.tags.length > 0) {
         fieldsHtml += `<div class="detail-card-tags">${item.tags.map(t => `<span class="detail-card-tag">${t}</span>`).join('')}</div>`;
       }
@@ -7521,6 +7520,13 @@
           <a onclick="loadDescription('${item.id}')" id="descriptionToggle" style="color:var(--accent-primary); font-size:0.85rem; cursor:pointer;">More Info</a>
           <div id="descriptionText" style="display:none; font-size:0.85rem; color:var(--text-secondary); line-height:1.5; margin-top:0.5rem;"></div>
         </div>` : ''}
+        <div style="margin: 0.75rem 0 0.25rem;">
+          <textarea id="quickNoteInput"
+            placeholder="Add a note..."
+            onblur="saveQuickNote('${item.id}')"
+            style="width:100%; box-sizing:border-box; background:var(--bg-accent); border:1px solid var(--border-light); border-radius:8px; padding:0.6rem; font-size:0.85rem; color:var(--text-primary); font-family:inherit; resize:none; min-height:60px; line-height:1.5;"
+          >${item.notes ? item.notes.replace(/</g, '&lt;') : ''}</textarea>
+        </div>
         <div class="detail-card-actions">
           <button class="detail-card-action-btn" onclick="closeDetailCard(); openShareCardForItem('${item.id}')" title="Share">📤</button>
           <button class="detail-card-action-btn" onclick="shareToGroup('${item.id}')" title="Share to Group">👥</button>
@@ -7621,6 +7627,18 @@
       if (!item || !group) return;
       document.getElementById('groupPickerOverlay').classList.remove('visible');
       await doShareToGroup(item, group);
+    }
+
+    async function saveQuickNote(itemId) {
+      const item = items.find(i => i.id === itemId);
+      if (!item) return;
+      const textarea = document.getElementById('quickNoteInput');
+      if (!textarea) return;
+      const newNote = textarea.value.trim();
+      if (newNote === (item.notes || '').trim()) return; // no change
+      item.notes = newNote;
+      await saveItemToFirestore(item);
+      showToast(newNote ? 'Note saved' : 'Note cleared');
     }
 
     async function doShareToGroup(item, group) {

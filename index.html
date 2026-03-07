@@ -7435,7 +7435,7 @@
           <button class="detail-card-action-btn" onclick="closeDetailCard(); openShareCardForItem('${item.id}')" title="Share">📤</button>
           <button class="detail-card-action-btn" onclick="shareToGroup('${item.id}')" title="Share to Group">👥</button>
           <button class="detail-card-action-btn" onclick="closeDetailCard(); editItem('${item.id}')" title="Edit">✏️</button>
-          <button class="detail-card-action-btn delete-action" onclick="closeDetailCard(); deleteItem('${item.id}')" title="Delete">🗑️</button>
+          <button class="detail-card-action-btn delete-action" onclick="closeDetailCard(); quickActionItemId='${item.id}'; document.getElementById('deleteConfirmOverlay').classList.add('visible'); document.getElementById('deleteConfirmTitle').textContent='${item.title.replace(/'/g, "\\'")}'" title="Delete">🗑️</button>
         </div>
       `;
 
@@ -8135,9 +8135,24 @@
 
     async function quickDeleteItem() {
       if (!quickActionItemId) return;
+      const item = items.find(i => i.id === quickActionItemId);
+      if (!item) return;
       closeQuickActionMenu();
+      const overlay = document.getElementById('deleteConfirmOverlay');
+      document.getElementById('deleteConfirmTitle').textContent = item.title;
+      overlay.classList.add('visible');
+    }
+
+    function closeDeleteConfirm() {
+      document.getElementById('deleteConfirmOverlay').classList.remove('visible');
+    }
+
+    async function confirmDeleteItem() {
+      if (!quickActionItemId) return;
+      closeDeleteConfirm();
       await deleteItem(quickActionItemId);
       showToast('Item deleted');
+      quickActionItemId = null;
     }
 
     // Initialize long-press after DOM ready
@@ -8415,6 +8430,19 @@
       <button class="detail-card-close" onclick="closeGroupPicker()">&times;</button>
       <div style="text-align:center; font-weight:600; font-size:1rem; margin-bottom:1rem; padding-top:0.25rem;">Share to Group</div>
       <div id="groupPickerList" style="display:flex; flex-direction:column; gap:0.5rem; max-height:60vh; overflow-y:auto;"></div>
+    </div>
+  </div>
+
+  <!-- Delete Confirmation -->
+  <div id="deleteConfirmOverlay" class="detail-overlay" onclick="if(event.target===this)closeDeleteConfirm()" style="z-index:10002;">
+    <div class="detail-card" style="max-width:300px; padding:1.5rem; text-align:center;">
+      <div style="font-size:1.5rem; margin-bottom:0.5rem;">🗑️</div>
+      <div style="font-weight:600; font-size:1rem; margin-bottom:0.25rem;" id="deleteConfirmTitle"></div>
+      <div style="color:var(--text-secondary); font-size:0.85rem; margin-bottom:1.25rem;">Remove from your shelf?</div>
+      <div style="display:flex; gap:0.75rem; justify-content:center;">
+        <button onclick="closeDeleteConfirm()" style="flex:1; padding:0.6rem; border:1px solid var(--border-medium); border-radius:8px; background:var(--bg-accent); color:var(--text-primary); cursor:pointer; font-size:0.9rem;">Cancel</button>
+        <button onclick="confirmDeleteItem()" style="flex:1; padding:0.6rem; border:none; border-radius:8px; background:#ef4444; color:white; cursor:pointer; font-size:0.9rem; font-weight:500;">Delete</button>
+      </div>
     </div>
   </div>
 

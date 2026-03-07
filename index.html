@@ -7412,8 +7412,13 @@
       const card = document.getElementById('detailCard');
       card.innerHTML = `
         <button class="detail-card-close" onclick="closeDetailCard()">&times;</button>
-        <div style="text-align: center; margin-bottom: 0.75rem; padding-top: 0.5rem;">
+        <div style="text-align: center; padding-top: 0.5rem;">
           <span class="share-card-status-badge" onclick="cycleDetailCardStatus('${item.id}')" style="background: ${sc.bg}; color: ${sc.color}; cursor: pointer;" title="Tap to change status">${sc.label} ▾</span>
+        </div>
+        <div id="statusPickerInline" data-open="0" data-item-id="" style="display:none; justify-content:center; gap:0.5rem; margin: 0.5rem 0 0.75rem;">
+          <button onclick="selectDetailCardStatus('want')" style="padding:0.35rem 0.75rem; border-radius:20px; border:1.5px solid #f59e0b; background:${item.status === 'want' ? 'rgba(245,158,11,0.2)' : 'transparent'}; color:#f59e0b; cursor:pointer; font-size:0.78rem; font-weight:500;">📌 Up Next</button>
+          <button onclick="selectDetailCardStatus('current')" style="padding:0.35rem 0.75rem; border-radius:20px; border:1.5px solid #6366f1; background:${item.status === 'current' ? 'rgba(99,102,241,0.2)' : 'transparent'}; color:#6366f1; cursor:pointer; font-size:0.78rem; font-weight:500;">🔥 Consuming</button>
+          <button onclick="selectDetailCardStatus('done')" style="padding:0.35rem 0.75rem; border-radius:20px; border:1.5px solid #5B9BD5; background:${item.status === 'done' ? 'rgba(91,155,213,0.2)' : 'transparent'}; color:#5B9BD5; cursor:pointer; font-size:0.78rem; font-weight:500;">✅ Caught Up</button>
         </div>
         ${item.image
           ? `<img class="detail-card-poster" src="${item.image}" alt="${item.title}">`
@@ -7554,11 +7559,29 @@
       document.getElementById('groupPickerOverlay').classList.remove('visible');
     }
 
-    async function cycleDetailCardStatus(itemId) {
+    function cycleDetailCardStatus(itemId) {
+      // Show inline status picker
+      const picker = document.getElementById('statusPickerInline');
+      if (!picker) return;
+      if (picker.dataset.open === '1') {
+        picker.style.display = 'none';
+        picker.dataset.open = '0';
+        return;
+      }
+      picker.dataset.itemId = itemId;
+      picker.style.display = 'flex';
+      picker.dataset.open = '1';
+    }
+
+    async function selectDetailCardStatus(newStatus) {
+      const picker = document.getElementById('statusPickerInline');
+      const itemId = picker?.dataset.itemId;
+      if (!itemId) return;
+      picker.style.display = 'none';
+      picker.dataset.open = '0';
+
       const item = items.find(i => i.id === itemId);
-      if (!item) return;
-      const cycle = { want: 'current', current: 'done', done: 'want' };
-      const newStatus = cycle[item.status] || 'want';
+      if (!item || item.status === newStatus) return;
       const wasUnrated = !item.rating;
       item.status = newStatus;
       if (newStatus === 'done' && !item.dateLogged) {
@@ -7566,7 +7589,6 @@
       }
       await saveItemToFirestore(item);
       renderItems();
-      // Re-open detail card to reflect new status
       openDetailCard(itemId);
       const labels = { want: 'Up Next', current: 'Consuming', done: 'Caught Up' };
       showToast(`→ ${labels[newStatus]}`);

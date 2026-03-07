@@ -673,7 +673,7 @@
 
       /* Bottom nav */
       .bottom-nav-btn {
-        padding: 0.3rem 1.25rem;
+        padding: 0.3rem 0.4rem;
       }
 
       .bottom-nav-icon {
@@ -2713,8 +2713,10 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      justify-content: center;
       gap: 0.1rem;
-      padding: 0.3rem 1rem;
+      flex: 1;
+      padding: 0.3rem 0.5rem;
       background: none;
       border: none;
       cursor: pointer;
@@ -3540,6 +3542,33 @@
       <div id="searchEmptyState" class="search-empty-state">
         <div class="empty-icon">🔍</div>
         <div>No results found</div>
+      </div>
+    </div>
+
+    <div id="libraryPage" class="tab-content">
+      <input type="text" id="librarySearchInput" class="search-input" placeholder="Search your library..." oninput="renderLibrary()">
+      <div class="search-filters-row">
+        <select id="libraryTypeFilter" onchange="renderLibrary()" class="filter-dropdown filter-dropdown-blue" style="border-radius: 20px; padding: 0.3rem 0.6rem; font-size: 0.7rem;">
+          <option value="all">All Types</option>
+          <option value="movie">Movie</option>
+          <option value="tv">TV</option>
+          <option value="podcast">Podcast</option>
+          <option value="book">Book</option>
+        </select>
+        <select id="libraryGenreFilter" onchange="renderLibrary()" class="filter-dropdown filter-dropdown-blue" style="border-radius: 20px; padding: 0.3rem 0.6rem; font-size: 0.7rem;">
+          <option value="all">All Genres</option>
+        </select>
+        <select id="librarySortFilter" onchange="renderLibrary()" class="filter-dropdown filter-dropdown-blue" style="border-radius: 20px; padding: 0.3rem 0.6rem; font-size: 0.7rem;">
+          <option value="dateLogged">Date Logged</option>
+          <option value="rating">Rating</option>
+          <option value="az">A-Z</option>
+          <option value="dateAdded">Date Added</option>
+        </select>
+      </div>
+      <div id="libraryResults" class="search-results-grid"></div>
+      <div id="libraryEmptyState" class="search-empty-state">
+        <div class="empty-icon">📖</div>
+        <div>No completed items yet</div>
       </div>
     </div>
 
@@ -5730,11 +5759,11 @@
 
             html += `</div>`;
 
-            // Show "View all in Search" link if more than 15 completed items
+            // Show "View all in Library" link if more than 15 completed items
             if (status === 'done' && typeItems.length > 15) {
               const typeLabel = typeLabels[type] || type;
               html += `<div style="text-align:center; padding:0.5rem;">
-                <a onclick="openSearchWithFilters('${type}', 'done')" style="color:var(--accent); cursor:pointer; font-size:0.85rem; text-decoration:none;">
+                <a onclick="openLibrary(null, '${type}')" style="color:var(--accent); cursor:pointer; font-size:0.85rem; text-decoration:none;">
                   View all ${typeItems.length} ${typeLabel.toLowerCase()} &rarr;
                 </a>
               </div>`;
@@ -7114,6 +7143,91 @@
       runSearch();
     }
 
+    function openLibrary(btn, presetType) {
+      document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
+      if (btn) {
+        btn.classList.add('active');
+      } else {
+        const libBtn = document.querySelector('.bottom-nav-btn[onclick="openLibrary(this)"]');
+        if (libBtn) libBtn.classList.add('active');
+      }
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.getElementById('libraryPage').classList.add('active');
+      document.querySelector('.status-pills').style.display = 'none';
+      setFabMode('add');
+      closeFabMenu();
+
+      // Populate genre dropdown from completed items only
+      const genreSelect = document.getElementById('libraryGenreFilter');
+      const uniqueGenres = [...new Set(items.filter(i => i.status === 'done' && i.genre).map(i => i.genre))].sort();
+      const prevGenre = genreSelect.value;
+      genreSelect.innerHTML = '<option value="all">All Genres</option>' +
+        uniqueGenres.map(g => `<option value="${g}">${g}</option>`).join('');
+      genreSelect.value = uniqueGenres.includes(prevGenre) ? prevGenre : 'all';
+
+      if (presetType) document.getElementById('libraryTypeFilter').value = presetType;
+
+      document.getElementById('librarySearchInput').focus();
+      renderLibrary();
+    }
+
+    function renderLibrary() {
+      const query = (document.getElementById('librarySearchInput').value || '').toLowerCase().trim();
+      const typeFilter = document.getElementById('libraryTypeFilter').value;
+      const genreFilter = document.getElementById('libraryGenreFilter').value;
+      const sortOption = document.getElementById('librarySortFilter').value;
+
+      const results = items.filter(item => {
+        if (item.status !== 'done') return false;
+        if (query) {
+          const inTitle = item.title.toLowerCase().includes(query);
+          const inNotes = item.notes && item.notes.toLowerCase().includes(query);
+          const inTags = item.tags && item.tags.some(t => t.toLowerCase().includes(query));
+          if (!inTitle && !inNotes && !inTags) return false;
+        }
+        if (typeFilter !== 'all' && item.type !== typeFilter) return false;
+        if (genreFilter !== 'all' && item.genre !== genreFilter) return false;
+        return true;
+      });
+
+      switch (sortOption) {
+        case 'dateLogged':
+          results.sort((a, b) => {
+            const dateA = a.dateLogged || '';
+            const dateB = b.dateLogged || '';
+            if (dateB !== dateA) return dateB.localeCompare(dateA);
+            return Number(b.id) - Number(a.id);
+          });
+          break;
+        case 'rating':
+          results.sort((a, b) => (b.rating || 0) - (a.rating || 0));
+          break;
+        case 'az':
+          results.sort((a, b) => (a.title || '').localeCompare(b.title || ''));
+          break;
+        case 'dateAdded':
+          results.sort((a, b) => Number(b.id) - Number(a.id));
+          break;
+      }
+
+      const container = document.getElementById('libraryResults');
+      const emptyState = document.getElementById('libraryEmptyState');
+
+      if (results.length === 0) {
+        container.innerHTML = '';
+        emptyState.style.display = 'block';
+      } else {
+        emptyState.style.display = 'none';
+        container.innerHTML = results.map((item, i) => `
+          <div class="card" data-id="${item.id}" data-type="${item.type}" style="animation-delay: ${Math.min(i * 0.05, 0.5)}s">
+            <div class="card-image">
+              ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : `<div class="card-placeholder">${getTypeEmoji(item.type)}<div class="card-placeholder-title">${item.title}</div></div>`}
+            </div>
+          </div>
+        `).join('');
+      }
+    }
+
     // Open invite modal for an existing group (pick from user's groups)
     function openInviteModalForExisting() {
       const userGroups = groups.filter(g => currentUser.memberOf.includes(g.id));
@@ -8363,7 +8477,7 @@
     let longPressFired = false;
 
     function initLongPress() {
-      const containers = [document.getElementById('itemsGrid'), document.getElementById('searchResults')];
+      const containers = [document.getElementById('itemsGrid'), document.getElementById('searchResults'), document.getElementById('libraryResults')];
 
       containers.forEach(grid => {
         if (!grid) return;
@@ -8824,6 +8938,10 @@
     <button class="bottom-nav-btn" onclick="openSearchPage(this)">
       <span class="bottom-nav-icon">🔍</span>
       <span class="bottom-nav-label">Search</span>
+    </button>
+    <button class="bottom-nav-btn" onclick="openLibrary(this)">
+      <span class="bottom-nav-icon">📖</span>
+      <span class="bottom-nav-label">Library</span>
     </button>
     <button class="bottom-nav-btn" style="position:relative;" onclick="switchToGroups(this)">
       <span class="bottom-nav-icon">👥</span>

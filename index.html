@@ -4510,6 +4510,7 @@
       await renderFeeds();
       hideAuthModals();
       await checkJoinRequestsBadge();
+      await checkGroupFeedBadge();
 
       // Check for localStorage migration on first login
       await checkLocalStorageMigration(firebaseUser);
@@ -6976,6 +6977,26 @@
       btn.classList.add('active');
       document.querySelector('.status-pills').style.display = 'none';
       setFabMode('group');
+      // Mark feed as seen
+      localStorage.setItem('lastSeenGroupFeed', Date.now().toString());
+      document.getElementById('newItemsBadge').style.display = 'none';
+    }
+
+    async function checkGroupFeedBadge() {
+      try {
+        if (!currentUser || !currentUser.memberOf || currentUser.memberOf.length === 0) return;
+        const lastSeen = parseInt(localStorage.getItem('lastSeenGroupFeed') || '0');
+        const sharedItems = await loadSharedItems();
+        const hasNew = sharedItems.some(i =>
+          i.timestamp > lastSeen &&
+          i.userId !== currentUser.id &&
+          i.userName !== currentUser.name
+        );
+        const badge = document.getElementById('newItemsBadge');
+        if (badge) badge.style.display = hasNew ? 'block' : 'none';
+      } catch (e) {
+        console.log('Error checking group feed badge:', e);
+      }
     }
 
     function openSearchPage(btn) {
@@ -7601,6 +7622,7 @@
         await saveSharedItem(sharedItem);
         closeDetailCard();
         showToast(`Shared to ${group.name}`);
+        checkGroupFeedBadge();
       } catch (error) {
         console.error('Error sharing to group:', error);
         alert('Failed to share. Please try again.');
@@ -8666,6 +8688,7 @@
       <span class="bottom-nav-icon">👥</span>
       <span class="bottom-nav-label">Groups</span>
       <span class="join-request-badge" id="joinBadge" style="display:none;"></span>
+      <span class="join-request-badge" id="newItemsBadge" style="display:none; right:6px; top:4px;"></span>
     </button>
     <button class="bottom-nav-btn" onclick="openStatsModal()">
       <span class="bottom-nav-icon">📊</span>

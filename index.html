@@ -3394,17 +3394,18 @@
       bottom: 80px;
       left: 50%;
       transform: translateX(-50%) translateY(20px);
-      background: var(--bg-secondary);
-      color: var(--text-primary);
-      padding: 0.6rem 1.2rem;
-      border-radius: 8px;
-      font-size: 0.8rem;
-      box-shadow: var(--shadow-lg);
-      border: 1px solid var(--border-light);
+      background: var(--text-primary);
+      color: var(--bg-primary);
+      padding: 0.6rem 1.4rem;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
       z-index: 3000;
       opacity: 0;
-      transition: opacity 0.3s, transform 0.3s;
+      transition: opacity 0.2s, transform 0.2s;
       pointer-events: none;
+      white-space: nowrap;
     }
     .toast.visible {
       opacity: 1;
@@ -8620,10 +8621,19 @@
 
         grid.addEventListener('touchend', (e) => {
           if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
-          if (touchMoved || longPressFired) { longPressFired = false; return; }
+          if (longPressFired) { longPressFired = false; return; }
           const card = e.target.closest('.card[data-id]');
           if (!card) return;
-          openDetailCard(card.dataset.id);
+          const touch = e.changedTouches[0];
+          const dx = touch.clientX - touchStartX;
+          const dy = touch.clientY - touchStartY;
+          // Swipe up: primarily vertical upward, not a horizontal scroll
+          if (dy < -55 && Math.abs(dx) < 45) {
+            swipeUpStatus(card.dataset.id);
+            return;
+          }
+          // Regular tap
+          if (!touchMoved) openDetailCard(card.dataset.id);
         });
 
         // Prevent context menu on cards
@@ -8639,6 +8649,22 @@
           openDetailCard(card.dataset.id);
         });
       });
+    }
+
+    async function swipeUpStatus(itemId) {
+      const item = items.find(i => i.id === itemId);
+      if (!item) return;
+      const cycle = { want: 'current', current: 'done', done: 'want' };
+      const newStatus = cycle[item.status] || 'want';
+      const labels = { want: 'Up Next', current: 'Consuming', done: 'Caught Up' };
+      const wasUnrated = !item.rating;
+      item.status = newStatus;
+      if (newStatus === 'done' && !item.dateLogged) item.dateLogged = getTodayDate();
+      if (newStatus !== 'done') item.dateLogged = '';
+      renderItems();
+      showToast(`→ ${labels[newStatus]}`);
+      await saveItemToFirestore(item);
+      if (newStatus === 'done' && wasUnrated) showRatingPrompt(itemId);
     }
 
     function showQuickActionMenu(x, y) {

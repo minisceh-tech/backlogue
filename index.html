@@ -8622,18 +8622,19 @@
         grid.addEventListener('touchend', (e) => {
           if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
           if (longPressFired) { longPressFired = false; return; }
+          if (touchMoved) return;
           const card = e.target.closest('.card[data-id]');
           if (!card) return;
-          const touch = e.changedTouches[0];
-          const dx = touch.clientX - touchStartX;
-          const dy = touch.clientY - touchStartY;
-          // Swipe up: primarily vertical upward, not a horizontal scroll
-          if (dy < -55 && Math.abs(dx) < 45) {
+          const now = Date.now();
+          const lastTap = parseInt(card.dataset.lastTap || '0');
+          if (now - lastTap < 300) {
+            // Double-tap: cycle status
+            card.dataset.lastTap = '0';
             swipeUpStatus(card.dataset.id);
-            return;
+          } else {
+            card.dataset.lastTap = now;
+            openDetailCard(card.dataset.id);
           }
-          // Regular tap
-          if (!touchMoved) openDetailCard(card.dataset.id);
         });
 
         // Prevent context menu on cards
@@ -8641,12 +8642,17 @@
           if (e.target.closest('.card[data-id]')) e.preventDefault();
         });
 
-        // Desktop: single click opens detail card
+        // Desktop: single click opens, double-click cycles status
         grid.addEventListener('click', (e) => {
           const card = e.target.closest('.card[data-id]');
           if (!card) return;
           if (e.target.closest('button')) return;
           openDetailCard(card.dataset.id);
+        });
+        grid.addEventListener('dblclick', (e) => {
+          const card = e.target.closest('.card[data-id]');
+          if (!card) return;
+          swipeUpStatus(card.dataset.id);
         });
       });
     }

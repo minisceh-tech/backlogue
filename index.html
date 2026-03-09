@@ -5064,6 +5064,8 @@
     let pendingGroupId = null;
     let inviteFields = [];
     let currentFabMode = 'add'; // 'add' or 'group'
+    let _profileEnabled = false;
+    let _profileSyncTimer = null;
 
     // Load data from Firestore for authenticated user
     async function loadData(firebaseUser) {
@@ -5141,6 +5143,7 @@
         const itemData = { ...item };
         delete itemData.id; // Don't store id inside the doc
         await db.collection('items').doc(item.id).set(itemData);
+        scheduleProfileSync();
         return true;
       } catch (error) {
         console.error('Error saving item:', error);
@@ -5153,10 +5156,67 @@
     async function deleteItemFromFirestore(itemId) {
       try {
         await db.collection('items').doc(itemId).delete();
+        scheduleProfileSync();
         return true;
       } catch (error) {
         console.error('Error deleting item:', error);
         return false;
+      }
+    }
+
+    // ========== AUTO-SYNC PUBLIC PROFILE ==========
+    function scheduleProfileSync() {
+      if (!_profileEnabled) return;
+      clearTimeout(_profileSyncTimer);
+      _profileSyncTimer = setTimeout(autoSyncPublicProfile, 3000);
+    }
+
+    async function autoSyncPublicProfile() {
+      if (!currentUser || !_profileEnabled) return;
+      try {
+        const doc = await db.collection('publicProfiles').doc(currentUser.id).get();
+        if (!doc.exists || !doc.data().enabled) return;
+        const existing = doc.data();
+        const showRatings = existing.showRatings !== false;
+        const showReviews = existing.showReviews || false;
+        const privacy = existing.privacy || {};
+
+        const publicItems = items.map(item => ({
+          title: item.title, type: item.type, status: item.status,
+          rating: showRatings ? legacyToStars(item.rating) : null,
+          image: item.image || '', genre: item.genre || '',
+          notes: showReviews ? (item.notes || '') : '',
+          dateLogged: item.dateLogged || ''
+        }));
+
+        const spotlight = ['movie','tv','book','podcast'].map(type => {
+          const cur = items.filter(i => i.type === type && i.status === 'current')
+            .sort((a, b) => b.id.localeCompare(a.id));
+          if (!cur.length) return null;
+          return { id: cur[0].id, title: cur[0].title, image: cur[0].image || '', type };
+        });
+
+        const tc = {};
+        items.forEach(i => { tc[i.type] = (tc[i.type] || 0) + 1; });
+        const rated = items.filter(i => legacyToStars(i.rating) !== null);
+        const avgRating = rated.length
+          ? (rated.reduce((s, i) => s + legacyToStars(i.rating), 0) / rated.length).toFixed(1)
+          : null;
+        const genreCounts = {};
+        items.forEach(i => { if (i.genre) genreCounts[i.genre] = (genreCounts[i.genre]||0)+1; });
+        const topGenre = Object.entries(genreCounts).sort((a,b)=>b[1]-a[1])[0]?.[0] || null;
+
+        await db.collection('publicProfiles').doc(currentUser.id).update({
+          items: publicItems, spotlight, lastUpdated: Date.now(),
+          stats: {
+            total: items.length,
+            completed: items.filter(i=>i.status==='done').length,
+            current: items.filter(i=>i.status==='current').length,
+            avgRating, topGenre, typeCounts: tc
+          }
+        });
+      } catch(e) {
+        console.error('Auto-sync profile error:', e);
       }
     }
 
@@ -5456,6 +5516,11 @@
 
       currentMediaFilter = 'all';
       currentStatusFilter = 'all';
+
+      // Check if public profile is enabled (for auto-sync)
+      db.collection('publicProfiles').doc(currentUser.id).get().then(doc => {
+        _profileEnabled = doc.exists && doc.data().enabled === true;
+      }).catch(() => {});
 
       renderItems();
       updateContentOffset();
@@ -9899,7 +9964,8 @@
         };
 
         await db.collection('publicProfiles').doc(currentUser.id).set(profileData);
-        alert(enabled ? 'Public profile published!' : 'Public profile disabled.');
+        _profileEnabled = enabled;
+        alert(enabled ? 'Public profile published! It will stay in sync automatically.' : 'Public profile disabled.');
         closeModal('profileSettingsModal');
       } catch (err) {
         console.error('Error saving public profile:', err);

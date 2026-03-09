@@ -3989,9 +3989,6 @@
 
   <div class="container" style="position:relative;">
     <div id="headerSpacer" style="width:100%;"></div>
-    <div id="pullToRefresh" class="pull-refresh-indicator">
-      <div class="spinner"></div> Refreshing...
-    </div>
     <!-- Shelf Hero (populated by updateShelfHero) -->
     <div class="shelf-hero" id="shelfHero" style="display:none;">
       <div class="shelf-hero-bg" id="shelfHeroBg"></div>
@@ -9569,65 +9566,6 @@
     }
 
     // === PULL-TO-REFRESH (Feature 7) ===
-    (function initPullToRefresh() {
-      const container = document.querySelector('.container');
-      const indicator = document.getElementById('pullToRefresh');
-      if (!container || !indicator) return;
-
-      let ptrStartY = 0;
-      let ptrActive = false;
-      let ptrPulling = false;
-      const threshold = 60;
-
-      container.addEventListener('touchstart', (e) => {
-        // Only activate when scrolled to top and on the shelf tab
-        if (container.scrollTop > 0) return;
-        const shelf = document.getElementById('myShelf');
-        if (!shelf || !shelf.classList.contains('active')) return;
-        ptrStartY = e.touches[0].clientY;
-        ptrActive = true;
-        ptrPulling = false;
-      }, { passive: true });
-
-      container.addEventListener('touchmove', (e) => {
-        if (!ptrActive) return;
-        const deltaY = e.touches[0].clientY - ptrStartY;
-        const deltaX = Math.abs(e.touches[0].clientX - (e.touches[0].clientX)); // no horizontal needed
-        if (deltaY > 0 && container.scrollTop <= 0) {
-          ptrPulling = true;
-          const pull = Math.min(deltaY, threshold + 30);
-          container.style.transform = `translateY(${pull}px)`;
-          container.style.transition = 'none';
-        }
-      }, { passive: true });
-
-      container.addEventListener('touchend', async () => {
-        if (!ptrActive || !ptrPulling) {
-          ptrActive = false;
-          return;
-        }
-
-        const currentTransform = container.style.transform;
-        const match = currentTransform.match(/translateY\(([0-9.]+)px\)/);
-        const pullDistance = match ? parseFloat(match[1]) : 0;
-
-        container.style.transition = 'transform 0.3s ease';
-        container.style.transform = '';
-        ptrActive = false;
-        ptrPulling = false;
-
-        if (pullDistance >= threshold && auth.currentUser) {
-          showToast('Refreshing...');
-          try {
-            await init(auth.currentUser);
-            showToast('Refreshed!');
-          } catch (err) {
-            console.error('Pull-to-refresh error:', err);
-            showToast('Refresh failed');
-          }
-        }
-      }, { passive: true });
-    })();
 
     // Firebase Auth state listener - main entry point
     auth.onAuthStateChanged(async (firebaseUser) => {

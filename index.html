@@ -4906,22 +4906,8 @@
             <input type="checkbox" id="profileShowStats" checked>
           </label>
         </div>
-        <div class="form-group">
-          <label style="margin-bottom:0.5rem;">Spotlight <span style="font-size:0.72rem;font-weight:400;color:var(--text-tertiary);">Pin one favorite per type</span></label>
-          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.4rem;" id="spotlightPicker">
-            <div class="spotlight-pick-slot" data-type="movie" onclick="openSpotlightPicker('movie')">
-              <div id="spotlightSlot_movie" class="spotlight-pick-empty"><span style="font-size:1.1rem;">🎥</span><span style="font-size:0.6rem;color:var(--text-tertiary);">Film</span></div>
-            </div>
-            <div class="spotlight-pick-slot" data-type="tv" onclick="openSpotlightPicker('tv')">
-              <div id="spotlightSlot_tv" class="spotlight-pick-empty"><span style="font-size:1.1rem;">📺</span><span style="font-size:0.6rem;color:var(--text-tertiary);">Show</span></div>
-            </div>
-            <div class="spotlight-pick-slot" data-type="book" onclick="openSpotlightPicker('book')">
-              <div id="spotlightSlot_book" class="spotlight-pick-empty"><span style="font-size:1.1rem;">📚</span><span style="font-size:0.6rem;color:var(--text-tertiary);">Book</span></div>
-            </div>
-            <div class="spotlight-pick-slot" data-type="podcast" onclick="openSpotlightPicker('podcast')">
-              <div id="spotlightSlot_podcast" class="spotlight-pick-empty"><span style="font-size:1.1rem;">🎙️</span><span style="font-size:0.6rem;color:var(--text-tertiary);">Podcast</span></div>
-            </div>
-          </div>
+        <div style="font-size:0.75rem;color:var(--text-tertiary);background:var(--bg-accent);border-radius:8px;padding:0.5rem 0.75rem;margin-bottom:0.75rem;">
+          Your profile automatically shows your most recently started item in each category as a "Currently" row.
         </div>
         <div class="form-group">
           <label>Your Profile Link</label>
@@ -9469,14 +9455,18 @@
         const typeEmojis = { movie: '🎥', tv: '📺', podcast: '🎙️', book: '📚' };
         const typeLabels = { movie: 'Film', tv: 'Show', podcast: 'Podcast', book: 'Book' };
         const types = ['movie', 'tv', 'book', 'podcast'];
-        spotlightEl.style.display = 'grid';
-        spotlightEl.innerHTML = types.map((type, i) => {
-          const item = data.spotlight[i];
-          if (item && item.image) {
-            return `<div class="spotlight-tile" title="${item.title || ''}"><img src="${item.image}" alt="${item.title || ''}"><div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.7));padding:0.3rem 0.25rem 0.2rem;font-size:0.55rem;color:#fff;line-height:1.2;">${item.title || ''}</div></div>`;
-          }
-          return `<div class="spotlight-tile"><div class="spotlight-tile-empty"><span>${typeEmojis[type]}</span><span class="spotlight-tile-label">${typeLabels[type]}</span></div></div>`;
-        }).join('');
+        spotlightEl.style.display = 'block';
+        spotlightEl.innerHTML =
+          `<div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-tertiary);margin-bottom:0.5rem;">Currently</div>` +
+          `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;">` +
+          types.map((type, i) => {
+            const item = data.spotlight[i];
+            if (item && item.image) {
+              return `<div class="spotlight-tile" title="${item.title || ''}"><img src="${item.image}" alt="${item.title || ''}"><div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.75));padding:0.3rem 0.25rem 0.2rem;font-size:0.55rem;color:#fff;line-height:1.2;">${item.title || ''}</div></div>`;
+            }
+            return `<div class="spotlight-tile"><div class="spotlight-tile-empty"><span>${typeEmojis[type]}</span><span class="spotlight-tile-label">${typeLabels[type]}</span></div></div>`;
+          }).join('') +
+          `</div>`;
       } else {
         spotlightEl.style.display = 'none';
       }
@@ -9871,8 +9861,15 @@
           privacy[t] = el ? el.value : 'public';
         });
 
-        // Build spotlight array [movie, tv, book, podcast]
-        const spotlight = ['movie','tv','book','podcast'].map(t => _spotlightSelections[t] || null);
+        // Auto-build spotlight from most recently added In Progress item per type
+        const spotlight = ['movie','tv','book','podcast'].map(type => {
+          const inProgress = items
+            .filter(i => i.type === type && i.status === 'current')
+            .sort((a, b) => b.id.localeCompare(a.id)); // id is timestamp-prefixed, so desc = most recent
+          if (!inProgress.length) return null;
+          const it = inProgress[0];
+          return { id: it.id, title: it.title, image: it.image || '', type: it.type };
+        });
 
         const profileData = {
           enabled,

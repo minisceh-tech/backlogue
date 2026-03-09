@@ -7713,12 +7713,10 @@
       if (!item) return;
 
       const stars = legacyToStars(item.rating);
-      let starHtml = '';
-      if (stars !== null) {
-        const full = Math.floor(stars);
-        const half = (stars % 1) >= 0.5;
-        starHtml = '<div class="detail-card-rating">' + '\u2605'.repeat(full) + (half ? '\u00BD' : '') + '</div>';
-      }
+      const starHtml = `<div style="text-align:center; margin:0.4rem 0;">
+        ${[1,2,3,4,5].map(n => `<span onclick="saveDetailRating('${item.id}', ${n})" style="font-size:1.8rem; cursor:pointer; color:${stars !== null && n <= stars ? '#f59e0b' : 'var(--text-tertiary)'}; padding:0.1rem; transition:color 0.15s;">★</span>`).join('')}
+        ${stars !== null ? `<span onclick="saveDetailRating('${item.id}', 0)" style="font-size:0.7rem; color:var(--text-tertiary); cursor:pointer; margin-left:0.3rem; vertical-align:middle;">Clear</span>` : ''}
+      </div>`;
 
       const statusColors = {
         'done': { bg: 'rgba(91,155,213,0.2)', color: '#5B9BD5', label: 'Caught Up' },
@@ -7871,6 +7869,16 @@
       if (!item || !group) return;
       document.getElementById('groupPickerOverlay').classList.remove('visible');
       await doShareToGroup(item, group);
+    }
+
+    async function saveDetailRating(itemId, rating) {
+      const item = items.find(i => i.id === itemId);
+      if (!item) return;
+      item.rating = rating === 0 ? null : rating;
+      await saveItemToFirestore(item);
+      renderItems();
+      openDetailCard(itemId);
+      showToast(rating === 0 ? 'Rating cleared' : `${'★'.repeat(rating)}`);
     }
 
     async function saveDetailDateLogged(itemId, value) {
@@ -8578,10 +8586,7 @@
       setTimeout(() => toast.classList.remove('visible'), duration);
     }
 
-    // === LONG-PRESS QUICK-EDIT MENU (Feature 5) + PRIORITY TAP ===
-    let longPressTimer = null;
     let quickActionItemId = null;
-    let longPressFired = false;
 
     function initLongPress() {
       const containers = [document.getElementById('itemsGrid'), document.getElementById('searchResults'), document.getElementById('libraryResults')];
@@ -8599,29 +8604,13 @@
           const touch = e.touches[0];
           touchStartX = touch.clientX;
           touchStartY = touch.clientY;
-          longPressFired = false;
-          longPressTimer = setTimeout(() => {
-            longPressFired = true;
-            quickActionItemId = card.dataset.id;
-            showQuickActionMenu(touch.clientX, touch.clientY);
-          }, 500);
         }, { passive: true });
 
         grid.addEventListener('touchmove', (e) => {
           touchMoved = true;
-          if (longPressTimer) {
-            const dx = Math.abs(e.touches[0].clientX - touchStartX);
-            const dy = Math.abs(e.touches[0].clientY - touchStartY);
-            if (dx > 10 || dy > 10) {
-              clearTimeout(longPressTimer);
-              longPressTimer = null;
-            }
-          }
         }, { passive: true });
 
         grid.addEventListener('touchend', (e) => {
-          if (longPressTimer) { clearTimeout(longPressTimer); longPressTimer = null; }
-          if (longPressFired) { longPressFired = false; return; }
           if (touchMoved) return;
           const card = e.target.closest('.card[data-id]');
           if (!card) return;
@@ -8673,65 +8662,6 @@
       if (newStatus === 'done' && wasUnrated) showRatingPrompt(itemId);
     }
 
-    function showQuickActionMenu(x, y) {
-      const menu = document.getElementById('quickActionMenu');
-      // Build star picker
-      const starsDiv = document.getElementById('quickActionStars');
-      let starsHtml = '';
-      for (let i = 1; i <= 5; i++) {
-        starsHtml += `<span onclick="quickRate(${i})">${'★'}</span>`;
-      }
-      starsHtml += `<span onclick="quickRate(0)" style="font-size:0.75rem;margin-left:4px;">Clear</span>`;
-      starsDiv.innerHTML = starsHtml;
-
-      // Position menu, keeping it in viewport
-      const menuW = 190, menuH = 280;
-      let left = Math.min(x, window.innerWidth - menuW - 10);
-      let top = Math.min(y, window.innerHeight - menuH - 10);
-      left = Math.max(10, left);
-      top = Math.max(10, top);
-      menu.style.left = left + 'px';
-      menu.style.top = top + 'px';
-      menu.classList.add('visible');
-
-      // Close on outside tap
-      setTimeout(() => {
-        document.addEventListener('touchstart', closeQuickMenuOutside, { once: true });
-        document.addEventListener('click', closeQuickMenuOutside, { once: true });
-      }, 10);
-    }
-
-    function closeQuickMenuOutside(e) {
-      const menu = document.getElementById('quickActionMenu');
-      if (!menu.contains(e.target)) {
-        menu.classList.remove('visible');
-        quickActionItemId = null;
-      }
-    }
-
-    function closeQuickActionMenu() {
-      document.getElementById('quickActionMenu').classList.remove('visible');
-      quickActionItemId = null;
-    }
-
-    async function quickChangeStatus(status) {
-      if (!quickActionItemId) return;
-      const item = items.find(i => i.id === quickActionItemId);
-      if (!item) return;
-      item.status = status;
-      if (status === 'done' && !item.dateLogged) {
-        item.dateLogged = getTodayDate();
-      }
-      await saveItemToFirestore(item);
-      renderItems();
-      closeQuickActionMenu();
-      const labels = { want: 'Up Next', current: 'Consuming', done: 'Caught Up' };
-      showToast(`Moved to ${labels[status] || status}`);
-      // Prompt for rating if marking as done and not already rated
-      if (status === 'done' && !item.rating) {
-        showRatingPrompt(item.id);
-      }
-    }
 
     // === RANDOM PICKER ===
     let currentRandomType = 'all';
@@ -8807,22 +8737,10 @@
       ratingPromptItemId = null;
     }
 
-    async function quickRate(rating) {
-      if (!quickActionItemId) return;
-      const item = items.find(i => i.id === quickActionItemId);
-      if (!item) return;
-      item.rating = rating === 0 ? null : rating;
-      await saveItemToFirestore(item);
-      renderItems();
-      closeQuickActionMenu();
-      showToast(rating === 0 ? 'Rating cleared' : `Rated ${rating} star${rating > 1 ? 's' : ''}`);
-    }
-
     async function quickDeleteItem() {
       if (!quickActionItemId) return;
       const item = items.find(i => i.id === quickActionItemId);
       if (!item) return;
-      closeQuickActionMenu();
       const overlay = document.getElementById('deleteConfirmOverlay');
       document.getElementById('deleteConfirmTitle').textContent = item.title;
       overlay.classList.add('visible');
@@ -9097,17 +9015,6 @@
     </button>
   </nav>
   <!-- Quick Action Menu (Long-Press) -->
-  <div id="quickActionMenu" class="quick-action-menu">
-    <div class="quick-action-section">Change Status</div>
-    <button class="quick-action-item" onclick="quickChangeStatus('want')">📌 Up Next</button>
-    <button class="quick-action-item" onclick="quickChangeStatus('current')">🔥 Consuming</button>
-    <button class="quick-action-item" onclick="quickChangeStatus('done')">✅ Caught Up</button>
-    <div class="quick-action-divider"></div>
-    <div class="quick-action-section">Rate</div>
-    <div class="quick-action-stars" id="quickActionStars"></div>
-    <div class="quick-action-divider"></div>
-    <button class="quick-action-item danger" onclick="quickDeleteItem()">🗑️ Delete</button>
-  </div>
 
   <!-- Detail Card Overlay -->
   <div id="detailCardOverlay" class="detail-overlay" onclick="if(event.target===this)closeDetailCard()">

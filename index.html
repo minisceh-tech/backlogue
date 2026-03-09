@@ -3912,7 +3912,7 @@
           </svg>
         </button>
       </div>
-      <button onclick="goToShelf()" style="background:none;border:none;padding:0;cursor:pointer;"><div class="brand-name">Cued</div></button>
+      <button onclick="goToShelf()" style="background:none;border:none;padding:8px 6px;margin:-8px -6px;cursor:pointer;display:flex;align-items:center;"><div class="brand-name">Cued</div></button>
       <div class="header-right" style="flex:1; justify-content:flex-end; gap:0.25rem;">
         <button class="header-icon-btn" id="headerSortBtn" onclick="toggleSortPopover(this)" title="Sort" aria-label="Sort" style="display:none;">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -6079,6 +6079,7 @@
       const sortBtn = document.getElementById('headerSortBtn'); if(sortBtn) sortBtn.style.display = '';
       setFabMode('add');
       closeFabMenu();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function setTypeFilter(value, btn) {

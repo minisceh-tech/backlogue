@@ -9557,46 +9557,70 @@
       });
 
       if (visibleItems.length > 0) {
+        // Build type pills — only for types that have items
+        const presentTypes = [...new Set(visibleItems.map(i => i.type))];
+        const typeLabels = { movie: '🎥 Movies', tv: '📺 TV', book: '📚 Books', podcast: '🎙️ Podcasts' };
         const pills = document.getElementById('publicProfilePills');
-        pills.innerHTML = `
-          <button class="status-pill active" onclick="filterPublicProfile('all', this)">All</button>
-          <button class="status-pill" onclick="filterPublicProfile('current', this)">In Progress</button>
-          <button class="status-pill" onclick="filterPublicProfile('want', this)">Queued</button>
-          <button class="status-pill" onclick="filterPublicProfile('done', this)">Finished</button>
-        `;
+        pills.innerHTML =
+          `<button class="status-pill active" onclick="filterPublicProfileType('all', this)">All</button>` +
+          ['movie','tv','book','podcast'].filter(t => presentTypes.includes(t)).map(t =>
+            `<button class="status-pill" onclick="filterPublicProfileType('${t}', this)">${typeLabels[t]}</button>`
+          ).join('');
         window._publicItems = visibleItems;
         window._publicShowRatings = data.showRatings;
         window._publicShowReviews = data.showReviews;
-        renderPublicProfileGrid(visibleItems, data.showRatings, data.showReviews);
+        renderPublicProfileSections(visibleItems, data.showRatings, data.showReviews);
       }
     }
 
-    function filterPublicProfile(status, btn) {
+    function filterPublicProfileType(type, btn) {
       document.querySelectorAll('#publicProfilePills .status-pill').forEach(p => p.classList.remove('active'));
-      if (btn) btn.classList.add('active'); else { const gb = document.getElementById('navGroupsBtn'); if(gb) gb.classList.add('active'); }
-      let filtered = window._publicItems;
-      if (status !== 'all') {
-        filtered = filtered.filter(i => i.status === status);
-      }
-      renderPublicProfileGrid(filtered, window._publicShowRatings, window._publicShowReviews);
+      if (btn) btn.classList.add('active');
+      const filtered = type === 'all' ? window._publicItems : window._publicItems.filter(i => i.type === type);
+      renderPublicProfileSections(filtered, window._publicShowRatings, window._publicShowReviews, type !== 'all');
     }
 
-    function renderPublicProfileGrid(profileItems, showRatings, showReviews) {
+    function renderPublicProfileSections(profileItems, showRatings, showReviews, singleType) {
       const grid = document.getElementById('publicProfileGrid');
-      const typeEmojis = { movie: '\uD83C\uDFAC', tv: '\uD83D\uDCFA', podcast: '\uD83C\uDF99\uFE0F', book: '\uD83D\uDCDA' };
-      grid.innerHTML = profileItems.map(item => `
-        <div class="card" style="cursor: default;">
-          <div class="card-image">
-            ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : `<div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;font-size:2rem;background:var(--bg-accent);">${typeEmojis[item.type] || ''}</div>`}
-          </div>
-          <div class="card-content">
-            <div class="card-type-badge">${typeEmojis[item.type] || ''}</div>
-            ${showRatings && item.rating ? renderStarDisplayPublic(item.rating) : ''}
-            ${item.genre ? `<div class="card-genre">${item.genre}</div>` : ''}
-            ${showReviews && item.notes ? `<div class="card-notes-label">Review:</div><div class="card-notes">${item.notes}</div>` : ''}
-          </div>
-        </div>
-      `).join('');
+      const typeEmojis = { movie: '🎥', tv: '📺', podcast: '🎙️', book: '📚' };
+      const typeHeadings = { movie: 'Movies', tv: 'TV Shows', book: 'Books', podcast: 'Podcasts' };
+      const statusOrder = ['current','want','done'];
+      const statusLabels = { current: 'In Progress', want: 'Queued', done: 'Finished' };
+      const typeOrder = ['movie','tv','book','podcast'];
+
+      let html = '';
+      const types = singleType
+        ? [...new Set(profileItems.map(i => i.type))]
+        : typeOrder.filter(t => profileItems.some(i => i.type === t));
+
+      types.forEach(type => {
+        const typeItems = profileItems.filter(i => i.type === type);
+        if (!typeItems.length) return;
+
+        if (!singleType) {
+          html += `<div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-tertiary);margin:1.25rem 0 0.5rem;font-weight:600;">${typeEmojis[type]} ${typeHeadings[type]}</div>`;
+        }
+
+        statusOrder.forEach(status => {
+          const statusItems = typeItems.filter(i => i.status === status);
+          if (!statusItems.length) return;
+          html += `<div style="font-size:0.7rem;color:var(--text-tertiary);margin:0.75rem 0 0.4rem;">${statusLabels[status]}</div>`;
+          html += `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:0.5rem;margin-bottom:0.5rem;">`;
+          statusItems.forEach(item => {
+            html += `<div style="border-radius:8px;overflow:hidden;background:var(--bg-accent);position:relative;">
+              <div style="aspect-ratio:2/3;width:100%;overflow:hidden;background:var(--bg-accent);display:flex;align-items:center;justify-content:center;">
+                ${item.image
+                  ? `<img loading="lazy" src="${item.image}" alt="${item.title}" style="width:100%;height:100%;object-fit:cover;">`
+                  : `<span style="font-size:1.6rem;">${typeEmojis[item.type]||''}</span>`}
+              </div>
+              ${showRatings && item.rating ? `<div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.75));padding:0.3rem 0.25rem 0.2rem;font-size:0.6rem;color:#f59e0b;line-height:1;">${'★'.repeat(Math.round(item.rating))}</div>` : ''}
+            </div>`;
+          });
+          html += `</div>`;
+        });
+      });
+
+      grid.innerHTML = html || '<div style="text-align:center;padding:2rem;color:var(--text-tertiary);">Nothing here yet.</div>';
     }
 
     function renderStarDisplayPublic(rating) {

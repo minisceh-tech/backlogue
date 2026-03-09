@@ -640,7 +640,7 @@
       max-width: 1400px;
       margin: 0 auto;
       padding: 1rem 1rem 5rem;
-      padding-top: var(--content-top, 150px);
+      padding-top: var(--content-top, 80px);
     }
 
     .tab {
@@ -3094,30 +3094,7 @@
     .type-nav-btn.active .type-nav-label { color: var(--accent-primary); }
 
     /* Bottom Navigation Bar */
-    .bottom-nav {
-      position: fixed;
-      top: calc(54px + env(safe-area-inset-top, 0px));
-      left: 0;
-      right: 0;
-      height: 56px;
-      z-index: 198;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      gap: 0;
-      background: rgba(6,12,15,0.85);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
-      border-bottom: 1px solid rgba(255,255,255,0.08);
-      box-shadow: 0 1px 0 rgba(255,255,255,0.05);
-      padding: 0;
-    }
 
-    body.light-mode .bottom-nav {
-      background: rgba(250,250,249,0.88);
-      border-bottom: 1px solid #e4e4e7;
-      box-shadow: 0 1px 0 rgba(0,0,0,0.06);
-    }
 
     .bottom-nav-btn {
       display: flex;
@@ -3826,6 +3803,50 @@
       padding-bottom: 72px;
     }
 
+    /* === OVERLAY PAGES (Search, Library, Groups) === */
+    #searchPage.tab-content.active,
+    #libraryPage.tab-content.active,
+    #groupFeeds.tab-content.active {
+      position: fixed;
+      top: calc(54px + env(safe-area-inset-top, 0px));
+      left: 0; right: 0; bottom: 0;
+      z-index: 190;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      animation: slideUpOverlay 0.32s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    @keyframes slideUpOverlay {
+      from { transform: translateY(100%); opacity: 0.5; }
+      to   { transform: translateY(0);   opacity: 1; }
+    }
+
+    .overlay-back-bar {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.75rem 1rem 0.5rem;
+      position: sticky;
+      top: 0;
+      background: var(--bg-primary);
+      z-index: 10;
+      border-bottom: 1px solid var(--border-light);
+    }
+
+    .overlay-back-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      background: none;
+      border: none;
+      color: var(--accent-primary);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      padding: 0.25rem 0;
+    }
+
   </style>
   <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
@@ -3841,6 +3862,12 @@
   <div class="header">
     <div class="header-main">
       <div class="header-left" style="flex:1;">
+        <button class="header-icon-btn" onclick="openSearchPage()" title="Search" aria-label="Search">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M10.5 10.5L14 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
       </div>
       <div class="brand-name">Backlogue</div>
       <div class="header-right" style="flex:1; justify-content:flex-end; gap:0.25rem;">
@@ -3848,6 +3875,16 @@
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M2 4h12M4 8h8M6 12h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
+        </button>
+        <button class="header-icon-btn" id="headerActivityBtn" onclick="switchToGroups()" title="Friends &amp; Groups" aria-label="Friends and Groups" style="position:relative;">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="5.5" cy="5" r="2.5" stroke="currentColor" stroke-width="1.5"/>
+            <circle cx="10.5" cy="5" r="2.5" stroke="currentColor" stroke-width="1.5"/>
+            <path d="M1 13c0-2.209 2.015-4 4.5-4s4.5 1.791 4.5 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+            <path d="M11 9.2c1.977.41 3.5 1.97 3.5 3.8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+          <span class="join-request-badge" id="joinBadge" style="display:none;"></span>
+          <span class="join-request-badge" id="newItemsBadge" style="display:none; right:0px; top:0px;"></span>
         </button>
         <button class="header-icon-btn" id="headerUserBtn" onclick="openProfileSettings()" title="Account" aria-label="Account">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -3961,6 +3998,13 @@
 
     <!-- Group Feeds Tab -->
     <div id="groupFeeds" class="tab-content">
+      <div class="overlay-back-bar">
+        <button class="overlay-back-btn" onclick="goToShelf()">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back
+        </button>
+        <span style="font-family:'Bricolage Grotesque',sans-serif; font-weight:700; font-size:1rem;">Friends &amp; Groups</span>
+      </div>
       <div class="feed-filters">
         <select id="feedGroupFilter" onchange="filterFeeds()" class="filter-dropdown filter-dropdown-blue" style="border-radius: 20px; padding: 0.3rem 0.6rem; font-size: 0.7rem; min-width: 0;">
           <option value="all">All Groups</option>
@@ -3992,6 +4036,12 @@
 
     <!-- Search Page Tab -->
     <div id="searchPage" class="tab-content">
+      <div class="overlay-back-bar">
+        <button class="overlay-back-btn" onclick="goToShelf()">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back
+        </button>
+      </div>
       <input type="text" id="searchInput" class="search-input" placeholder="Search your shelf..." oninput="runSearch()">
       <div class="search-filters-row">
         <select id="searchTypeFilter" onchange="runSearch()" class="filter-dropdown filter-dropdown-blue" style="border-radius: 20px; padding: 0.3rem 0.6rem; font-size: 0.7rem;">
@@ -4032,6 +4082,12 @@
     </div>
 
     <div id="libraryPage" class="tab-content">
+      <div class="overlay-back-bar">
+        <button class="overlay-back-btn" onclick="goToShelf()">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          Back
+        </button>
+      </div>
       <input type="text" id="librarySearchInput" class="search-input" placeholder="Search your library..." oninput="renderLibrary()">
       <div class="search-filters-row">
         <select id="libraryTypeFilter" onchange="renderLibrary()" class="filter-dropdown filter-dropdown-blue" style="border-radius: 20px; padding: 0.3rem 0.6rem; font-size: 0.7rem;">
@@ -4457,7 +4513,10 @@
     <div class="modal-content">
       <button class="modal-close" onclick="closeModal('profileSettingsModal')" aria-label="Close">&times;</button>
       <h2 class="modal-header">Settings</h2>
-      <button class="btn" style="width:100%; margin-bottom:1rem;" onclick="openStatsModal(); closeModal('profileSettingsModal')">📊 My Stats</button>
+      <div style="display:flex; gap:0.5rem; margin-bottom:1rem;">
+        <button class="btn" style="flex:1;" onclick="openStatsModal(); closeModal('profileSettingsModal')">📊 Stats</button>
+        <button class="btn" style="flex:1;" onclick="openLibrary(); closeModal('profileSettingsModal')">📖 Library</button>
+      </div>
       <div class="form-group">
         <label class="toggle-row">
           <span>Light Mode</span>
@@ -4827,14 +4886,14 @@
 
     // ========== AUTHENTICATION FUNCTIONS ==========
 
-    // Measure actual nav bottom and set content offset
+    // Measure actual header bottom and set content offset
     function updateContentOffset() {
       requestAnimationFrame(() => {
-        const nav = document.querySelector('.bottom-nav');
-        if (!nav) return;
-        const navBottom = nav.getBoundingClientRect().bottom;
-        if (navBottom > 20) {
-          document.documentElement.style.setProperty('--content-top', (navBottom + 20) + 'px');
+        const header = document.querySelector('.header');
+        if (!header) return;
+        const headerBottom = header.getBoundingClientRect().bottom;
+        if (headerBottom > 0) {
+          document.documentElement.style.setProperty('--content-top', (headerBottom + 16) + 'px');
         }
       });
     }
@@ -5967,17 +6026,23 @@
       setTypeFilter(type, btn);
     }
 
+    function goToShelf() {
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.getElementById('myShelf').classList.add('active');
+      const sf = document.getElementById('shelfFilters'); if (sf) sf.style.display = '';
+      const sortBtn = document.getElementById('headerSortBtn'); if(sortBtn) sortBtn.style.display = '';
+      setFabMode('add');
+      closeFabMenu();
+    }
+
     function setTypeFilter(value, btn) {
       currentMediaFilter = value;
       document.querySelectorAll('#typeChipsRow .type-nav-btn').forEach(c => c.classList.remove('active'));
       if (btn) btn.classList.add('active');
-      // Show sort button and switch to shelf
-      const sortBtn = document.getElementById('headerSortBtn'); if(sortBtn) sortBtn.style.display = '';
-      document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
-      const shelfBtn = document.querySelector('.bottom-nav-btn[data-type="all"]'); if(shelfBtn) shelfBtn.classList.add('active');
       if (!document.getElementById('myShelf').classList.contains('active')) {
-        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
-        document.getElementById('myShelf').classList.add('active');
+        goToShelf();
+      } else {
+        const sortBtn = document.getElementById('headerSortBtn'); if(sortBtn) sortBtn.style.display = '';
       }
       renderItems();
     }
@@ -7644,10 +7709,9 @@
 
     // Switch to Groups tab and set FAB to green
     function switchToGroups(btn) {
-      switchTab('groupFeeds', { target: btn || document.getElementById('navGroupsBtn') });
-      document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('#typeChipsRow .type-nav-btn').forEach(b => b.classList.remove('active'));
-      const gb = btn || document.getElementById('navGroupsBtn'); if(gb) gb.classList.add('active');
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+      document.getElementById('groupFeeds').classList.add('active');
+      const sf = document.getElementById('shelfFilters'); if(sf) sf.style.display = 'none';
       const sortBtn = document.getElementById('headerSortBtn'); if(sortBtn) sortBtn.style.display = 'none';
       setFabMode('group');
       // Mark feed as seen
@@ -7673,11 +7737,9 @@
     }
 
     function openSearchPage(btn) {
-      document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('#typeChipsRow .type-nav-btn').forEach(b => b.classList.remove('active'));
-      if (btn) btn.classList.add('active');
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       document.getElementById('searchPage').classList.add('active');
+      const sf = document.getElementById('shelfFilters'); if(sf) sf.style.display = 'none';
       const sortBtn = document.getElementById('headerSortBtn'); if(sortBtn) sortBtn.style.display = 'none';
       setFabMode('add');
       closeFabMenu();
@@ -7787,16 +7849,9 @@
     }
 
     function openLibrary(btn, presetType) {
-      document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('#typeChipsRow .type-nav-btn').forEach(b => b.classList.remove('active'));
-      if (btn) {
-        btn.classList.add('active');
-      } else {
-        const libBtn = document.querySelector('.bottom-nav-btn[onclick="openLibrary(this)"]');
-        if (libBtn) libBtn.classList.add('active');
-      }
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       document.getElementById('libraryPage').classList.add('active');
+      const sf = document.getElementById('shelfFilters'); if(sf) sf.style.display = 'none';
       const sortBtn = document.getElementById('headerSortBtn'); if(sortBtn) sortBtn.style.display = 'none';
       setFabMode('add');
       closeFabMenu();
@@ -9555,26 +9610,7 @@
     </div>
   </div>
 
-  <nav class="bottom-nav">
-    <button class="bottom-nav-btn active" data-type="all" onclick="bottomNavFilter('all')">
-      <span class="bottom-nav-icon">🏠</span>
-      <span class="bottom-nav-label">Shelf</span>
-    </button>
-    <button class="bottom-nav-btn" onclick="openSearchPage(this)">
-      <span class="bottom-nav-icon">🔍</span>
-      <span class="bottom-nav-label">Search</span>
-    </button>
-    <button class="bottom-nav-btn" onclick="openLibrary(this)">
-      <span class="bottom-nav-icon">📖</span>
-      <span class="bottom-nav-label">Library</span>
-    </button>
-    <button class="bottom-nav-btn" id="navGroupsBtn" style="position:relative;" onclick="switchToGroups(this)">
-      <span class="bottom-nav-icon">👥</span>
-      <span class="bottom-nav-label">Groups</span>
-      <span class="join-request-badge" id="joinBadge" style="display:none;"></span>
-      <span class="join-request-badge" id="newItemsBadge" style="display:none; right:6px; top:4px;"></span>
-    </button>
-  </nav>
+
   <!-- Quick Action Menu (Long-Press) -->
 
   <!-- Detail Card Overlay -->

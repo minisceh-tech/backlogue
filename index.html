@@ -3634,6 +3634,87 @@
       margin-top: 2rem;
     }
 
+    .profile-spotlight {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.5rem;
+      margin: 1rem 0 1.25rem;
+    }
+    .spotlight-tile {
+      position: relative;
+      border-radius: 10px;
+      overflow: hidden;
+      aspect-ratio: 2/3;
+      background: var(--bg-accent);
+      cursor: pointer;
+    }
+    .spotlight-tile img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .spotlight-tile-empty {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 0.3rem;
+      color: var(--text-tertiary);
+      font-size: 1.4rem;
+    }
+    .spotlight-tile-label {
+      font-size: 0.6rem;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .profile-bio {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      line-height: 1.5;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+    .profile-handle {
+      font-size: 0.82rem;
+      color: var(--accent-primary);
+      margin-bottom: 0.25rem;
+      text-align: center;
+    }
+    .follow-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.45rem 1.25rem;
+      border-radius: 20px;
+      border: 1.5px solid var(--accent-primary);
+      background: transparent;
+      color: var(--accent-primary);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-bottom: 1rem;
+    }
+    .follow-btn.following {
+      background: var(--accent-primary);
+      color: #050c0f;
+    }
+    .follow-btn:active { opacity: 0.7; }
+    .privacy-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+    .privacy-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--bg-accent);
+      border-radius: 8px;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+    }
+
     /* === EMPTY STATE IMPROVEMENTS === */
     .empty-state .btn {
       margin-top: 1rem;
@@ -4488,6 +4569,15 @@
         </div>
 
         <div class="form-group">
+          <label for="signupHandle">Username <span style="font-size:0.75rem;color:var(--text-tertiary);font-weight:400;">— letters, numbers, underscores only</span></label>
+          <div style="position:relative;">
+            <span style="position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);color:var(--text-tertiary);font-size:0.9rem;pointer-events:none;">@</span>
+            <input type="text" id="signupHandle" required placeholder="yourhandle" maxlength="20" pattern="[a-zA-Z0-9_]+" style="padding-left:1.75rem;" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_]/g,'')">
+          </div>
+          <div id="handleHint" style="font-size:0.72rem;color:var(--text-tertiary);margin-top:0.25rem;"></div>
+        </div>
+
+        <div class="form-group">
           <label for="signupPassword">Password</label>
           <input type="password" id="signupPassword" required minlength="6" placeholder="At least 6 characters">
         </div>
@@ -4568,6 +4658,18 @@
       <div style="margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border-light);">
       <div style="font-weight:600; font-size:0.9rem; margin-bottom:0.75rem;">Public Profile</div>
       <div class="form-group">
+        <label>Your Handle</label>
+        <div style="position:relative;">
+          <span style="position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);color:var(--text-tertiary);font-size:0.9rem;pointer-events:none;">@</span>
+          <input type="text" id="settingsHandle" maxlength="20" placeholder="yourhandle" style="padding-left:1.75rem;" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_]/g,'')">
+        </div>
+        <div id="settingsHandleHint" style="font-size:0.72rem;color:var(--text-tertiary);margin-top:0.25rem;"></div>
+      </div>
+      <div class="form-group">
+        <label for="profileBio">Bio <span style="font-size:0.75rem;font-weight:400;color:var(--text-tertiary);">160 chars max</span></label>
+        <textarea id="profileBio" maxlength="160" rows="2" placeholder="A sentence about your taste..." style="resize:none;"></textarea>
+      </div>
+      <div class="form-group">
         <label class="toggle-row">
           <span>Enable Public Profile</span>
           <input type="checkbox" id="profileEnabled" onchange="togglePublicProfile()">
@@ -4578,6 +4680,15 @@
         <div class="form-group">
           <label for="profileDisplayName">Display Name</label>
           <input type="text" id="profileDisplayName" class="form-control" placeholder="Your public name">
+        </div>
+        <div class="form-group">
+          <label style="margin-bottom:0.4rem;">Who can see each category?</label>
+          <div class="privacy-grid">
+            <div class="privacy-item"><span>🎥 Movies</span><select id="privacyMovie" style="background:var(--bg-primary);color:var(--text-primary);border:none;font-size:0.78rem;cursor:pointer;"><option value="public">Public</option><option value="friends">Followers</option><option value="private">Private</option></select></div>
+            <div class="privacy-item"><span>📺 TV</span><select id="privacyTv" style="background:var(--bg-primary);color:var(--text-primary);border:none;font-size:0.78rem;cursor:pointer;"><option value="public">Public</option><option value="friends">Followers</option><option value="private">Private</option></select></div>
+            <div class="privacy-item"><span>📚 Books</span><select id="privacyBook" style="background:var(--bg-primary);color:var(--text-primary);border:none;font-size:0.78rem;cursor:pointer;"><option value="public">Public</option><option value="friends">Followers</option><option value="private">Private</option></select></div>
+            <div class="privacy-item"><span>🎙️ Podcasts</span><select id="privacyPodcast" style="background:var(--bg-primary);color:var(--text-primary);border:none;font-size:0.78rem;cursor:pointer;"><option value="public">Public</option><option value="friends">Followers</option><option value="private">Private</option></select></div>
+          </div>
         </div>
         <div class="form-group">
           <label class="toggle-row">
@@ -4635,8 +4746,11 @@
     <div class="public-profile-header">
       <div style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 0.5rem;">CUED</div>
       <div class="public-profile-name" id="publicProfileName"></div>
-      <div class="public-profile-subtitle">Media Collection</div>
+      <div class="profile-handle" id="publicProfileHandle" style="display:none;"></div>
+      <div class="profile-bio" id="publicProfileBio" style="display:none;"></div>
+      <div id="publicProfileFollowBtn" style="display:none;text-align:center;"></div>
     </div>
+    <div class="profile-spotlight" id="publicProfileSpotlight" style="display:none;"></div>
     <div id="publicProfileStats" class="public-profile-stats"></div>
     <div class="public-profile-section">
       <div id="publicProfilePills" class="status-pills" style="justify-content: center; margin-bottom: 1rem;"></div>
@@ -5060,11 +5174,26 @@
         // Update display name
         await cred.user.updateProfile({ displayName: name });
 
+        // Validate and save handle
+        const handleInput = document.getElementById('signupHandle');
+        const handle = (handleInput ? handleInput.value.trim().toLowerCase() : '').replace(/[^a-z0-9_]/g, '');
+        if (handle.length >= 3) {
+          const handleCheck = await validateHandleAvailable(handle, cred.user.uid);
+          if (!handleCheck.ok) {
+            await cred.user.delete();
+            alert('Handle issue: ' + handleCheck.msg);
+            btn.disabled = false;
+            btn.textContent = 'Create Account';
+            return;
+          }
+          await db.collection('userHandles').doc(handle).set({ userId: cred.user.uid, createdAt: Date.now() });
+        }
         // Create Firestore user profile
         await db.collection('users').doc(cred.user.uid).set({
           name: name,
           email: email,
-          memberOf: []
+          memberOf: [],
+          handle: handle || null
         });
 
         // onAuthStateChanged will handle the rest
@@ -8845,10 +8974,11 @@
       return false;
     }
 
-    async function loadPublicProfile(userId) {
+    async function loadPublicProfile(profileParam) {
       try {
-        const doc = await db.collection('publicProfiles').doc(userId).get();
-        if (!doc.exists || !doc.data().enabled) {
+        const userId = await resolveProfileId(profileParam);
+        const doc = userId ? await db.collection('publicProfiles').doc(userId).get() : null;
+        if (!doc || !doc.exists || !doc.data().enabled) {
           document.getElementById('publicProfileView').style.display = 'block';
           document.getElementById('publicProfileView').innerHTML = `
             <div style="text-align:center;padding:4rem 2rem;color:var(--text-secondary);font-family:Inter,sans-serif;">
@@ -8864,7 +8994,7 @@
       }
     }
 
-    function renderPublicProfile(data) {
+    async function renderPublicProfile(data) {
       // Hide app UI
       const header = document.querySelector('.header');
       const container = document.querySelector('.container');
@@ -8886,20 +9016,73 @@
 
       document.getElementById('publicProfileName').textContent = data.displayName || 'A Cued User';
 
+      // Handle
+      const handleEl = document.getElementById('publicProfileHandle');
+      if (data.handle) {
+        handleEl.textContent = '@' + data.handle;
+        handleEl.style.display = 'block';
+      } else {
+        handleEl.style.display = 'none';
+      }
+
+      // Bio
+      const bioEl = document.getElementById('publicProfileBio');
+      if (data.bio) {
+        bioEl.textContent = data.bio;
+        bioEl.style.display = 'block';
+      } else {
+        bioEl.style.display = 'none';
+      }
+
+      // Follow button (only shown to logged-in users viewing someone else's profile)
+      const followBtnContainer = document.getElementById('publicProfileFollowBtn');
+      if (data.userId && currentUser && currentUser.id !== data.userId) {
+        const isFollowing = await checkFollowStatus(data.userId);
+        followBtnContainer.style.display = 'block';
+        followBtnContainer.innerHTML = `<button class="follow-btn ${isFollowing ? 'following' : ''}" onclick="toggleFollow('${data.userId}', {displayName:'${(data.displayName||'').replace(/'/g,"\\'")}',handle:'${data.handle||''}'}, this)">${isFollowing ? 'Following' : 'Follow'}</button>`;
+      } else {
+        followBtnContainer.style.display = 'none';
+      }
+
+      // Spotlight
+      const spotlightEl = document.getElementById('publicProfileSpotlight');
+      if (data.spotlight && data.spotlight.some(s => s)) {
+        const typeEmojis = { movie: '🎥', tv: '📺', podcast: '🎙️', book: '📚' };
+        const typeLabels = { movie: 'Film', tv: 'Show', podcast: 'Podcast', book: 'Book' };
+        const types = ['movie', 'tv', 'book', 'podcast'];
+        spotlightEl.style.display = 'grid';
+        spotlightEl.innerHTML = types.map((type, i) => {
+          const item = data.spotlight[i];
+          if (item && item.image) {
+            return `<div class="spotlight-tile" title="${item.title || ''}"><img src="${item.image}" alt="${item.title || ''}"><div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.7));padding:0.3rem 0.25rem 0.2rem;font-size:0.55rem;color:#fff;line-height:1.2;">${item.title || ''}</div></div>`;
+          }
+          return `<div class="spotlight-tile"><div class="spotlight-tile-empty"><span>${typeEmojis[type]}</span><span class="spotlight-tile-label">${typeLabels[type]}</span></div></div>`;
+        }).join('');
+      } else {
+        spotlightEl.style.display = 'none';
+      }
+
       // Stats
       if (data.showStats && data.stats) {
         const s = data.stats;
+        const tc = s.typeCounts || {};
         document.getElementById('publicProfileStats').innerHTML = `
           <div class="stats-grid">
-            <div class="stat-card"><div class="stat-value">${s.total || 0}</div><div class="stat-label">Total</div></div>
-            <div class="stat-card"><div class="stat-value">${s.completed || 0}</div><div class="stat-label">Completed</div></div>
-            <div class="stat-card"><div class="stat-value">${s.avgRating || '--'}</div><div class="stat-label">Avg Rating</div></div>
-            ${s.topGenre ? `<div class="stat-card"><div class="stat-value" style="font-size:1rem;">${s.topGenre}</div><div class="stat-label">Top Genre</div></div>` : ''}
+            ${tc.movie ? `<div class="stat-card"><div class="stat-value">${tc.movie}</div><div class="stat-label">Films</div></div>` : ''}
+            ${tc.tv ? `<div class="stat-card"><div class="stat-value">${tc.tv}</div><div class="stat-label">Shows</div></div>` : ''}
+            ${tc.book ? `<div class="stat-card"><div class="stat-value">${tc.book}</div><div class="stat-label">Books</div></div>` : ''}
+            ${tc.podcast ? `<div class="stat-card"><div class="stat-value">${tc.podcast}</div><div class="stat-label">Podcasts</div></div>` : ''}
+            ${s.avgRating ? `<div class="stat-card"><div class="stat-value">${s.avgRating}</div><div class="stat-label">Avg ★</div></div>` : ''}
           </div>`;
       }
 
-      // Items
-      if (data.items && data.items.length > 0) {
+      // Items — filter by privacy
+      let visibleItems = (data.items || []).filter(item => {
+        const privacySetting = (data.privacy || {})[item.type] || 'public';
+        return privacySetting === 'public';
+      });
+
+      if (visibleItems.length > 0) {
         const pills = document.getElementById('publicProfilePills');
         pills.innerHTML = `
           <button class="status-pill active" onclick="filterPublicProfile('all', this)">All</button>
@@ -8907,10 +9090,10 @@
           <button class="status-pill" onclick="filterPublicProfile('want', this)">Queued</button>
           <button class="status-pill" onclick="filterPublicProfile('done', this)">Finished</button>
         `;
-        window._publicItems = data.items;
+        window._publicItems = visibleItems;
         window._publicShowRatings = data.showRatings;
         window._publicShowReviews = data.showReviews;
-        renderPublicProfileGrid(data.items, data.showRatings, data.showReviews);
+        renderPublicProfileGrid(visibleItems, data.showRatings, data.showReviews);
       }
     }
 
@@ -9155,6 +9338,12 @@
 
     async function loadProfileSettings() {
       try {
+        // Load handle from user doc
+        const userDoc = await db.collection('users').doc(currentUser.id).get();
+        const userData = userDoc.exists ? userDoc.data() : {};
+        const handleEl = document.getElementById('settingsHandle');
+        if (handleEl) handleEl.value = userData.handle || currentUser.handle || '';
+
         const doc = await db.collection('publicProfiles').doc(currentUser.id).get();
         if (doc.exists) {
           const data = doc.data();
@@ -9163,6 +9352,13 @@
           document.getElementById('profileShowRatings').checked = data.showRatings !== false;
           document.getElementById('profileShowReviews').checked = data.showReviews || false;
           document.getElementById('profileShowStats').checked = data.showStats !== false;
+          const bioEl = document.getElementById('profileBio');
+          if (bioEl) bioEl.value = data.bio || '';
+          const privacy = data.privacy || {};
+          ['Movie','Tv','Book','Podcast'].forEach(t => {
+            const el = document.getElementById('privacy' + t);
+            if (el) el.value = privacy[t.toLowerCase()] || 'public';
+          });
         } else {
           document.getElementById('profileEnabled').checked = false;
           document.getElementById('profileDisplayName').value = currentUser.name;
@@ -9232,9 +9428,33 @@
           dateLogged: item.dateLogged || ''
         }));
 
+        // Save handle if changed
+        const handleInput = document.getElementById('settingsHandle');
+        const newHandle = handleInput ? handleInput.value.trim().toLowerCase().replace(/[^a-z0-9_]/g,'') : '';
+        if (newHandle && newHandle.length >= 3) {
+          const hintEl = document.getElementById('settingsHandleHint');
+          const check = await validateHandleAvailable(newHandle, currentUser.id);
+          if (!check.ok) {
+            if (hintEl) { hintEl.textContent = check.msg; hintEl.style.color = '#f87171'; }
+            return;
+          }
+          await saveHandle(newHandle, currentUser.id);
+        }
+        const bioEl = document.getElementById('profileBio');
+        const bio = bioEl ? bioEl.value.trim().slice(0, 160) : '';
+        const privacy = {};
+        ['movie','tv','book','podcast'].forEach(t => {
+          const el = document.getElementById('privacy' + t.charAt(0).toUpperCase() + t.slice(1));
+          privacy[t] = el ? el.value : 'public';
+        });
+
         const profileData = {
           enabled,
           displayName,
+          handle: currentUser.handle || newHandle || null,
+          bio: bio || null,
+          privacy,
+          userId: currentUser.id,
           showRatings,
           showReviews,
           showStats,
@@ -9261,6 +9481,89 @@
         console.error('Error saving public profile:', err);
         alert('Failed to save profile. Please try again.');
       }
+    }
+
+    // ========== HANDLE UTILITIES ==========
+
+    async function validateHandleAvailable(handle, currentUserId) {
+      if (!handle || handle.length < 3) return { ok: false, msg: 'At least 3 characters' };
+      if (!/^[a-z0-9_]+$/.test(handle)) return { ok: false, msg: 'Letters, numbers, underscores only' };
+      if (handle.length > 20) return { ok: false, msg: 'Max 20 characters' };
+      const doc = await db.collection('userHandles').doc(handle).get();
+      if (doc.exists && doc.data().userId !== currentUserId) return { ok: false, msg: 'Handle already taken' };
+      return { ok: true, msg: '' };
+    }
+
+    async function saveHandle(handle, userId) {
+      // Remove old handle doc if user had one
+      if (currentUser && currentUser.handle && currentUser.handle !== handle) {
+        await db.collection('userHandles').doc(currentUser.handle).delete();
+      }
+      await db.collection('userHandles').doc(handle).set({ userId, createdAt: Date.now() });
+      await db.collection('users').doc(userId).update({ handle });
+      currentUser.handle = handle;
+    }
+
+    // ========== FOLLOWING SYSTEM ==========
+
+    async function followUser(targetUserId, targetData) {
+      if (!currentUser) return;
+      const ts = Date.now();
+      const batch = db.batch();
+      batch.set(
+        db.collection('users').doc(currentUser.id).collection('following').doc(targetUserId),
+        { displayName: targetData.displayName, handle: targetData.handle || '', followedAt: ts }
+      );
+      batch.set(
+        db.collection('users').doc(targetUserId).collection('followers').doc(currentUser.id),
+        { displayName: currentUser.name, handle: currentUser.handle || '', followedAt: ts }
+      );
+      await batch.commit();
+    }
+
+    async function unfollowUser(targetUserId) {
+      if (!currentUser) return;
+      const batch = db.batch();
+      batch.delete(db.collection('users').doc(currentUser.id).collection('following').doc(targetUserId));
+      batch.delete(db.collection('users').doc(targetUserId).collection('followers').doc(currentUser.id));
+      await batch.commit();
+    }
+
+    async function checkFollowStatus(targetUserId) {
+      if (!currentUser) return false;
+      const doc = await db.collection('users').doc(currentUser.id).collection('following').doc(targetUserId).get();
+      return doc.exists;
+    }
+
+    async function toggleFollow(targetUserId, targetData, btn) {
+      btn.disabled = true;
+      const isFollowing = btn.classList.contains('following');
+      try {
+        if (isFollowing) {
+          await unfollowUser(targetUserId);
+          btn.classList.remove('following');
+          btn.textContent = 'Follow';
+        } else {
+          await followUser(targetUserId, targetData);
+          btn.classList.add('following');
+          btn.textContent = 'Following';
+        }
+      } catch(e) {
+        console.error('Follow toggle error:', e);
+      }
+      btn.disabled = false;
+    }
+
+    // ========== HANDLE LOOKUP ==========
+    // Resolve ?profile=handle or ?profile=userId → userId
+    async function resolveProfileId(profileParam) {
+      // Try as userId first (direct lookup)
+      const directDoc = await db.collection('publicProfiles').doc(profileParam).get();
+      if (directDoc.exists) return profileParam;
+      // Try as handle
+      const handleDoc = await db.collection('userHandles').doc(profileParam.toLowerCase()).get();
+      if (handleDoc.exists) return handleDoc.data().userId;
+      return null;
     }
 
     // ========== UX ENHANCEMENTS ==========

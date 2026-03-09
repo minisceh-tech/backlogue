@@ -637,8 +637,8 @@
     .container {
       max-width: 1400px;
       margin: 0 auto;
-      padding: 1rem 1rem 6rem;
-      padding-top: calc(52px + 1rem);
+      padding: 1rem 1rem 5rem;
+      padding-top: calc(52px + 54px + 0.75rem);
     }
 
     .tab {
@@ -866,7 +866,7 @@
         width: 50px;
         height: 50px;
         font-size: 1.5rem;
-        bottom: 72px;
+        bottom: 78px;
         right: 14px;
       }
 
@@ -2608,7 +2608,7 @@
     /* Floating Action Button */
     .fab {
       position: fixed;
-      bottom: 80px;
+      bottom: 78px;
       right: 20px;
       z-index: 101;
       width: 56px;
@@ -2969,22 +2969,22 @@
     /* ── New Filter Bar ── */
     .shelf-filters {
       position: fixed;
-      top: 52px;
+      bottom: 0;
       left: 0;
       right: 0;
       z-index: 199;
-      background: rgba(11,17,32,0.96);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      padding: 0.55rem 1rem 0.45rem;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+      background: rgba(9,9,11,0.92);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      padding: 0.45rem 1rem calc(0.45rem + env(safe-area-inset-bottom, 0px));
+      border-top: 1px solid rgba(255,255,255,0.08);
       display: flex;
       flex-direction: row;
       align-items: stretch;
     }
     body.light-mode .shelf-filters {
       background: rgba(250,250,249,0.94);
-      border-bottom: 1px solid rgba(0,0,0,0.06);
+      border-top: 1px solid rgba(0,0,0,0.06);
     }
     .filter-chips-row {
       display: flex;
@@ -3094,10 +3094,10 @@
     /* Bottom Navigation Bar */
     .bottom-nav {
       position: fixed;
-      bottom: 0;
+      top: 52px;
       left: 0;
       right: 0;
-      z-index: 100;
+      z-index: 198;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -3105,15 +3105,15 @@
       background: rgba(9,9,11,0.85);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
-      border-top: 1px solid rgba(255,255,255,0.08);
-      box-shadow: 0 -1px 0 rgba(255,255,255,0.05);
-      padding: 0.35rem 0 calc(0.35rem + env(safe-area-inset-bottom, 0px));
+      border-bottom: 1px solid rgba(255,255,255,0.08);
+      box-shadow: 0 1px 0 rgba(255,255,255,0.05);
+      padding: 0.35rem 0;
     }
 
     body.light-mode .bottom-nav {
       background: rgba(250,250,249,0.88);
-      border-top: 1px solid #e4e4e7;
-      box-shadow: 0 -1px 0 rgba(0,0,0,0.06);
+      border-bottom: 1px solid #e4e4e7;
+      box-shadow: 0 1px 0 rgba(0,0,0,0.06);
     }
 
     .bottom-nav-btn {
@@ -3819,7 +3819,8 @@
     /* === SWIPE TAB TRANSITION === */
     .shelf-sections {
       transition: opacity 0.15s ease;
-      padding-top: 62px;
+      padding-top: 0;
+      padding-bottom: 72px;
     }
 
   </style>
@@ -3924,6 +3925,18 @@
           <span class="type-nav-icon">📚</span>
           <span class="type-nav-label">Books</span>
         </button>
+        <button class="type-nav-btn" onclick="toggleSortPopover(this)" id="sortChipBtn">
+          <svg class="type-nav-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path d="M3 5h14M6 10h8M9 15h2" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+          <span class="type-nav-label">Sort</span>
+        </button>
+      </div>
+      <!-- Sort popover -->
+      <div class="sort-popover" id="sortPopover">
+        <button onclick="applySortFilter('default',this)">Default</button>
+        <button onclick="applySortFilter('dateAdded',this)">Date Added</button>
+        <button onclick="applySortFilter('dateLogged',this)">Date Logged</button>
+        <button onclick="applySortFilter('rating',this)">Rating</button>
+        <button onclick="applySortFilter('title',this)">A – Z</button>
       </div>
     </div>
     <div id="groupTabsContainer" style="display: none;"></div>
@@ -3941,7 +3954,7 @@
         </div>
       </div>
     </div>
-    <div id="filterBarSpacer" style="height:58px;"></div>
+    <div id="filterBarSpacer" style="height:0;"></div>
 
     <!-- Group Feeds Tab -->
     <div id="groupFeeds" class="tab-content">
@@ -9512,19 +9525,6 @@
     <div class="fab-menu-item" onclick="closeFabMenu(); openInviteModalForExisting();">
       <span class="fab-menu-icon">✉️</span> Invite to Group
     </div>
-  </div>
-
-  <button class="filter-fab" id="filterFab" onclick="toggleFilterPopup()">
-    <span id="filterFabIcon">🎯</span>
-  </button>
-
-  <div id="filterPopup" class="filter-popup">
-    <div class="quick-action-section">Filter by Type</div>
-    <button class="quick-action-item" onclick="applyMediaFilter('all')">🏠 All</button>
-    <button class="quick-action-item" onclick="applyMediaFilter('movie')">🎥 Movies</button>
-    <button class="quick-action-item" onclick="applyMediaFilter('tv')">📺 TV Shows</button>
-    <button class="quick-action-item" onclick="applyMediaFilter('book')">📚 Books</button>
-    <button class="quick-action-item" onclick="applyMediaFilter('podcast')">🎙️ Podcasts</button>
   </div>
 
   <nav class="bottom-nav">

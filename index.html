@@ -640,7 +640,7 @@
       max-width: 1400px;
       margin: 0 auto;
       padding: 1rem 1rem 5rem;
-      padding-top: var(--content-top, 135px);
+      padding-top: var(--content-top, 150px);
     }
 
     .tab {
@@ -4829,16 +4829,18 @@
 
     // Measure actual nav bottom and set content offset
     function updateContentOffset() {
-      const nav = document.querySelector('.bottom-nav');
-      if (!nav) return;
-      const navBottom = nav.getBoundingClientRect().bottom;
-      if (navBottom > 0) {
-        document.documentElement.style.setProperty('--content-top', (navBottom + 12) + 'px');
-      }
+      requestAnimationFrame(() => {
+        const nav = document.querySelector('.bottom-nav');
+        if (!nav) return;
+        const navBottom = nav.getBoundingClientRect().bottom;
+        if (navBottom > 20) {
+          document.documentElement.style.setProperty('--content-top', (navBottom + 20) + 'px');
+        }
+      });
     }
-    window.addEventListener('load', updateContentOffset);
+    window.addEventListener('load', () => { updateContentOffset(); setTimeout(updateContentOffset, 600); });
     window.addEventListener('resize', updateContentOffset);
-    window.addEventListener('orientationchange', () => setTimeout(updateContentOffset, 300));
+    window.addEventListener('orientationchange', () => setTimeout(updateContentOffset, 400));
 
     // Dismiss splash screen
     function dismissSplash() {
@@ -5020,6 +5022,7 @@
       currentStatusFilter = 'all';
 
       renderItems();
+      updateContentOffset();
       updateGroupSelects();
       setupAutocomplete();
       setupFormHandlers();

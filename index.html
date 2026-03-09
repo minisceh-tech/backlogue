@@ -105,6 +105,7 @@
       color: var(--text-primary);
       line-height: 1.6;
       overflow-x: hidden;
+      overscroll-behavior-y: none;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       min-height: 100vh;
@@ -639,7 +640,7 @@
       max-width: 1400px;
       margin: 0 auto;
       padding: 1rem 1rem 5rem;
-      padding-top: calc(54px + env(safe-area-inset-top, 0px) + 50px + 0.75rem);
+      padding-top: calc(54px + env(safe-area-inset-top, 0px) + 56px + 0.75rem);
     }
 
     .tab {
@@ -3098,6 +3099,7 @@
       top: calc(54px + env(safe-area-inset-top, 0px));
       left: 0;
       right: 0;
+      height: 56px;
       z-index: 198;
       display: flex;
       justify-content: center;
@@ -3108,7 +3110,7 @@
       -webkit-backdrop-filter: blur(20px);
       border-bottom: 1px solid rgba(255,255,255,0.08);
       box-shadow: 0 1px 0 rgba(255,255,255,0.05);
-      padding: 0.35rem 0;
+      padding: 0;
     }
 
     body.light-mode .bottom-nav {

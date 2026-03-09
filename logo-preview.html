@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Logo Preview</title>
+  <title>Logo Preview — A3</title>
   <style>
     body {
       margin: 0;
@@ -20,112 +20,129 @@
       flex-direction: column;
       align-items: center;
       gap: 0.75rem;
-      color: rgba(255,255,255,0.4);
-      font-size: 0.75rem;
+      color: rgba(255,255,255,0.35);
+      font-size: 0.72rem;
+      letter-spacing: 0.06em;
     }
-    .glow {
-      animation: splashGlow 2s ease-in-out infinite;
-    }
+    .glow { animation: splashGlow 2s ease-in-out infinite; }
     @keyframes splashGlow {
       0%, 100% { filter: drop-shadow(0 0 12px rgba(20,184,166,0.55)) drop-shadow(0 0 32px rgba(20,184,166,0.15)); }
-      50% { filter: drop-shadow(0 0 22px rgba(20,184,166,0.9)) drop-shadow(0 0 55px rgba(13,148,136,0.3)); }
+      50%       { filter: drop-shadow(0 0 22px rgba(20,184,166,0.9)) drop-shadow(0 0 55px rgba(13,148,136,0.3)); }
     }
   </style>
 </head>
 <body>
 
-  <!-- Small (48px) -->
+  <!-- 36px — notification/favicon size -->
   <div class="swatch">
-    <div class="glow">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="48" height="48">
-        <defs>
-          <linearGradient id="bg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#112a35"/><stop offset="100%" stop-color="#081419"/></linearGradient>
-          <linearGradient id="teal1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
-          <linearGradient id="bkm1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1ee5cc"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
-        </defs>
-        <rect width="96" height="96" rx="22" fill="url(#bg1)"/>
-        <rect width="96" height="96" rx="22" fill="none" stroke="#14b8a6" stroke-width="1.5" opacity="0.4"/>
-        <path d="M 37 33 L 59 33 L 59 90 L 48 80 L 37 90 Z" fill="url(#bkm1)"/>
-        <rect x="37" y="33" width="22" height="3" fill="#5eead4" opacity="0.35"/>
-        <polygon points="42,55 42,74 56,64.5" fill="#e2f0f2"/>
-        <path d="M 26 45 C 26 17 70 17 70 45" fill="none" stroke="url(#teal1)" stroke-width="6" stroke-linecap="round"/>
-        <rect x="13" y="41" width="14" height="22" rx="7" fill="url(#teal1)"/>
-        <rect x="16.5" y="45.5" width="7" height="13" rx="3.5" fill="#081419" opacity="0.35"/>
-        <rect x="69" y="41" width="14" height="22" rx="7" fill="url(#teal1)"/>
-        <rect x="72.5" y="45.5" width="7" height="13" rx="3.5" fill="#081419" opacity="0.35"/>
-      </svg>
-    </div>
-    48px
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="36" height="36">
+      <defs>
+        <radialGradient id="bg36" cx="50%" cy="55%" r="65%"><stop offset="0%" stop-color="#0e2530"/><stop offset="100%" stop-color="#050c0f"/></radialGradient>
+        <linearGradient id="hp36" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4fd8c4"/><stop offset="100%" stop-color="#0d7a70"/></linearGradient>
+        <linearGradient id="bkm36" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#99f5e8"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
+      </defs>
+      <rect width="96" height="96" rx="22" fill="url(#bg36)"/>
+      <path d="M 20 52 C 20 10 76 10 76 52" fill="none" stroke="url(#hp36)" stroke-width="7" stroke-linecap="round"/>
+      <rect x="11" y="46" width="14" height="26" rx="7" fill="url(#hp36)"/>
+      <rect x="71" y="46" width="14" height="26" rx="7" fill="url(#hp36)"/>
+      <path d="M 37 44 L 59 44 L 59 90 L 48 79 L 37 90 Z" fill="url(#bkm36)"/>
+      <polygon points="43,54 43,73 58,63.5" fill="#060e12" opacity="0.6"/>
+    </svg>
+    36px
   </div>
 
-  <!-- Medium (96px) -->
+  <!-- 60px — app icon size -->
+  <div class="swatch">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="60" height="60">
+      <defs>
+        <radialGradient id="bg60" cx="50%" cy="55%" r="65%"><stop offset="0%" stop-color="#0e2530"/><stop offset="100%" stop-color="#050c0f"/></radialGradient>
+        <linearGradient id="hp60" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4fd8c4"/><stop offset="100%" stop-color="#0d7a70"/></linearGradient>
+        <linearGradient id="bkm60" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#99f5e8"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
+      </defs>
+      <rect width="96" height="96" rx="22" fill="url(#bg60)"/>
+      <path d="M 20 52 C 20 10 76 10 76 52" fill="none" stroke="url(#hp60)" stroke-width="7" stroke-linecap="round"/>
+      <rect x="11" y="46" width="14" height="26" rx="7" fill="url(#hp60)"/>
+      <rect x="14" y="51" width="8" height="16" rx="4" fill="#050c0f" opacity="0.45"/>
+      <rect x="71" y="46" width="14" height="26" rx="7" fill="url(#hp60)"/>
+      <rect x="74" y="51" width="8" height="16" rx="4" fill="#050c0f" opacity="0.45"/>
+      <path d="M 37 44 L 59 44 L 59 90 L 48 79 L 37 90 Z" fill="url(#bkm60)"/>
+      <line x1="37" y1="44" x2="37" y2="90" stroke="#a7f3e8" stroke-width="1.5" opacity="0.4"/>
+      <polygon points="43,54 43,73 58,63.5" fill="#060e12" opacity="0.6"/>
+    </svg>
+    60px
+  </div>
+
+  <!-- 96px -->
   <div class="swatch">
     <div class="glow">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96">
         <defs>
-          <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#112a35"/><stop offset="100%" stop-color="#081419"/></linearGradient>
-          <linearGradient id="teal2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
-          <linearGradient id="bkm2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1ee5cc"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
+          <radialGradient id="bg96" cx="50%" cy="55%" r="65%"><stop offset="0%" stop-color="#0e2530"/><stop offset="100%" stop-color="#050c0f"/></radialGradient>
+          <radialGradient id="glow96" cx="50%" cy="30%" r="70%"><stop offset="0%" stop-color="#5eead4" stop-opacity="0.18"/><stop offset="100%" stop-color="#14b8a6" stop-opacity="0"/></radialGradient>
+          <linearGradient id="hp96" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4fd8c4"/><stop offset="100%" stop-color="#0d7a70"/></linearGradient>
+          <linearGradient id="bkm96" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#99f5e8"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
         </defs>
-        <rect width="96" height="96" rx="22" fill="url(#bg2)"/>
-        <rect width="96" height="96" rx="22" fill="none" stroke="#14b8a6" stroke-width="1.5" opacity="0.4"/>
-        <path d="M 37 33 L 59 33 L 59 90 L 48 80 L 37 90 Z" fill="url(#bkm2)"/>
-        <rect x="37" y="33" width="22" height="3" fill="#5eead4" opacity="0.35"/>
-        <polygon points="42,55 42,74 56,64.5" fill="#e2f0f2"/>
-        <path d="M 26 45 C 26 17 70 17 70 45" fill="none" stroke="url(#teal2)" stroke-width="6" stroke-linecap="round"/>
-        <rect x="13" y="41" width="14" height="22" rx="7" fill="url(#teal2)"/>
-        <rect x="16.5" y="45.5" width="7" height="13" rx="3.5" fill="#081419" opacity="0.35"/>
-        <rect x="69" y="41" width="14" height="22" rx="7" fill="url(#teal2)"/>
-        <rect x="72.5" y="45.5" width="7" height="13" rx="3.5" fill="#081419" opacity="0.35"/>
+        <rect width="96" height="96" rx="22" fill="url(#bg96)"/>
+        <rect x="30" y="30" width="36" height="55" rx="4" fill="url(#glow96)"/>
+        <rect width="96" height="96" rx="22" fill="none" stroke="#14b8a6" stroke-width="1" opacity="0.2"/>
+        <path d="M 20 52 C 20 10 76 10 76 52" fill="none" stroke="url(#hp96)" stroke-width="7" stroke-linecap="round"/>
+        <rect x="11" y="46" width="14" height="26" rx="7" fill="url(#hp96)"/>
+        <rect x="14" y="51" width="8" height="16" rx="4" fill="#050c0f" opacity="0.45"/>
+        <rect x="71" y="46" width="14" height="26" rx="7" fill="url(#hp96)"/>
+        <rect x="74" y="51" width="8" height="16" rx="4" fill="#050c0f" opacity="0.45"/>
+        <path d="M 37 44 L 59 44 L 59 90 L 48 79 L 37 90 Z" fill="url(#bkm96)"/>
+        <line x1="37" y1="44" x2="37" y2="90" stroke="#a7f3e8" stroke-width="1.5" opacity="0.4"/>
+        <polygon points="43,54 43,73 58,63.5" fill="#060e12" opacity="0.6"/>
       </svg>
     </div>
     96px
   </div>
 
-  <!-- Large (160px) -->
+  <!-- 160px — full splash size -->
   <div class="swatch">
     <div class="glow">
       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="160" height="160">
         <defs>
-          <linearGradient id="bg3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#112a35"/><stop offset="100%" stop-color="#081419"/></linearGradient>
-          <linearGradient id="teal3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
-          <linearGradient id="bkm3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1ee5cc"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
+          <radialGradient id="bg160" cx="50%" cy="55%" r="65%"><stop offset="0%" stop-color="#0e2530"/><stop offset="100%" stop-color="#050c0f"/></radialGradient>
+          <radialGradient id="glow160" cx="50%" cy="30%" r="70%"><stop offset="0%" stop-color="#5eead4" stop-opacity="0.18"/><stop offset="100%" stop-color="#14b8a6" stop-opacity="0"/></radialGradient>
+          <linearGradient id="hp160" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4fd8c4"/><stop offset="100%" stop-color="#0d7a70"/></linearGradient>
+          <linearGradient id="bkm160" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#99f5e8"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
         </defs>
-        <rect width="96" height="96" rx="22" fill="url(#bg3)"/>
-        <rect width="96" height="96" rx="22" fill="none" stroke="#14b8a6" stroke-width="1.5" opacity="0.4"/>
-        <path d="M 37 33 L 59 33 L 59 90 L 48 80 L 37 90 Z" fill="url(#bkm3)"/>
-        <rect x="37" y="33" width="22" height="3" fill="#5eead4" opacity="0.35"/>
-        <polygon points="42,55 42,74 56,64.5" fill="#e2f0f2"/>
-        <path d="M 26 45 C 26 17 70 17 70 45" fill="none" stroke="url(#teal3)" stroke-width="6" stroke-linecap="round"/>
-        <rect x="13" y="41" width="14" height="22" rx="7" fill="url(#teal3)"/>
-        <rect x="16.5" y="45.5" width="7" height="13" rx="3.5" fill="#081419" opacity="0.35"/>
-        <rect x="69" y="41" width="14" height="22" rx="7" fill="url(#teal3)"/>
-        <rect x="72.5" y="45.5" width="7" height="13" rx="3.5" fill="#081419" opacity="0.35"/>
+        <rect width="96" height="96" rx="22" fill="url(#bg160)"/>
+        <rect x="30" y="30" width="36" height="55" rx="4" fill="url(#glow160)"/>
+        <rect width="96" height="96" rx="22" fill="none" stroke="#14b8a6" stroke-width="1" opacity="0.2"/>
+        <path d="M 20 52 C 20 10 76 10 76 52" fill="none" stroke="url(#hp160)" stroke-width="7" stroke-linecap="round"/>
+        <rect x="11" y="46" width="14" height="26" rx="7" fill="url(#hp160)"/>
+        <rect x="14" y="51" width="8" height="16" rx="4" fill="#050c0f" opacity="0.45"/>
+        <rect x="71" y="46" width="14" height="26" rx="7" fill="url(#hp160)"/>
+        <rect x="74" y="51" width="8" height="16" rx="4" fill="#050c0f" opacity="0.45"/>
+        <path d="M 37 44 L 59 44 L 59 90 L 48 79 L 37 90 Z" fill="url(#bkm160)"/>
+        <line x1="37" y1="44" x2="37" y2="90" stroke="#a7f3e8" stroke-width="1.5" opacity="0.4"/>
+        <polygon points="43,54 43,73 58,63.5" fill="#060e12" opacity="0.6"/>
       </svg>
     </div>
     160px
   </div>
 
   <!-- Light background test -->
-  <div class="swatch" style="background:#f0f0f0; padding:1.5rem; border-radius:16px;">
+  <div class="swatch" style="background:#f0f4f5; padding:1.5rem; border-radius:16px;">
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96">
       <defs>
-        <linearGradient id="bg4" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#112a35"/><stop offset="100%" stop-color="#081419"/></linearGradient>
-        <linearGradient id="teal4" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
-        <linearGradient id="bkm4" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1ee5cc"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
+        <radialGradient id="bglt" cx="50%" cy="55%" r="65%"><stop offset="0%" stop-color="#0e2530"/><stop offset="100%" stop-color="#050c0f"/></radialGradient>
+        <linearGradient id="hplt" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4fd8c4"/><stop offset="100%" stop-color="#0d7a70"/></linearGradient>
+        <linearGradient id="bkmlt" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#99f5e8"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
       </defs>
-      <rect width="96" height="96" rx="22" fill="url(#bg4)"/>
-      <rect width="96" height="96" rx="22" fill="none" stroke="#14b8a6" stroke-width="1.5" opacity="0.4"/>
-      <path d="M 37 33 L 59 33 L 59 90 L 48 80 L 37 90 Z" fill="url(#bkm4)"/>
-      <rect x="37" y="33" width="22" height="3" fill="#5eead4" opacity="0.35"/>
-      <polygon points="42,55 42,74 56,64.5" fill="#e2f0f2"/>
-      <path d="M 26 45 C 26 17 70 17 70 45" fill="none" stroke="url(#teal4)" stroke-width="6" stroke-linecap="round"/>
-      <rect x="13" y="41" width="14" height="22" rx="7" fill="url(#teal4)"/>
-      <rect x="16.5" y="45.5" width="7" height="13" rx="3.5" fill="#081419" opacity="0.35"/>
-      <rect x="69" y="41" width="14" height="22" rx="7" fill="url(#teal4)"/>
-      <rect x="72.5" y="45.5" width="7" height="13" rx="3.5" fill="#081419" opacity="0.35"/>
+      <rect width="96" height="96" rx="22" fill="url(#bglt)"/>
+      <path d="M 20 52 C 20 10 76 10 76 52" fill="none" stroke="url(#hplt)" stroke-width="7" stroke-linecap="round"/>
+      <rect x="11" y="46" width="14" height="26" rx="7" fill="url(#hplt)"/>
+      <rect x="14" y="51" width="8" height="16" rx="4" fill="#050c0f" opacity="0.45"/>
+      <rect x="71" y="46" width="14" height="26" rx="7" fill="url(#hplt)"/>
+      <rect x="74" y="51" width="8" height="16" rx="4" fill="#050c0f" opacity="0.45"/>
+      <path d="M 37 44 L 59 44 L 59 90 L 48 79 L 37 90 Z" fill="url(#bkmlt)"/>
+      <line x1="37" y1="44" x2="37" y2="90" stroke="#a7f3e8" stroke-width="1.5" opacity="0.4"/>
+      <polygon points="43,54 43,73 58,63.5" fill="#060e12" opacity="0.6"/>
     </svg>
-    <span style="color:#555;">on light bg</span>
+    <span style="color:#888;">on light bg</span>
   </div>
 
 </body>

@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Backlogue — Your Media Tracker</title>
+  <title>Cued — Your Media Tracker</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
@@ -3903,8 +3903,8 @@
         <polygon points="42,71.5 42,82 54.5,76.75" fill="#e2f0f2"/>
       </svg>
     </div>
-    <div class="splash-wordmark">Backlogue</div>
-    <div class="splash-tagline">Your media, tracked</div>
+    <div class="splash-wordmark">Cued</div>
+    <div class="splash-tagline">Your media, cued up</div>
   </div>
   <div class="header">
     <div class="header-main">
@@ -3916,7 +3916,7 @@
           </svg>
         </button>
       </div>
-      <div class="brand-name">Backlogue</div>
+      <div class="brand-name">Cued</div>
       <div class="header-right" style="flex:1; justify-content:flex-end; gap:0.25rem;">
         <button class="header-icon-btn" id="headerSortBtn" onclick="toggleSortPopover(this)" title="Sort" aria-label="Sort" style="display:none;">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -3960,7 +3960,7 @@
   <!-- Slide-in nav drawer -->
   <div class="nav-drawer" id="navDrawer">
     <div class="drawer-header">
-      <div class="drawer-brand">Backlogue</div>
+      <div class="drawer-brand">Cued</div>
     </div>
     <div class="drawer-items">
       <button class="drawer-item" onclick="showTutorial(); closeDrawer()">
@@ -4435,7 +4435,7 @@
   <!-- Login Modal -->
   <div id="loginModal" class="modal">
     <div class="modal-content auth-modal">
-      <h2 class="modal-header">Welcome to Backlogue</h2>
+      <h2 class="modal-header">Welcome to Cued</h2>
       <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Log in to access your media library</p>
       
       <form id="loginForm" onsubmit="handleLogin(event)">
@@ -4639,7 +4639,7 @@
   <!-- Public Profile View (shown for ?profile= visitors) -->
   <div id="publicProfileView" style="display: none;">
     <div class="public-profile-header">
-      <div style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 0.5rem;">BACKLOGUE</div>
+      <div style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 0.5rem;">CUED</div>
       <div class="public-profile-name" id="publicProfileName"></div>
       <div class="public-profile-subtitle">Media Collection</div>
     </div>
@@ -4649,7 +4649,7 @@
       <div id="publicProfileGrid" class="grid"></div>
     </div>
     <div class="public-profile-footer">
-      <a class="btn" onclick="window.location.href=window.location.origin+window.location.pathname">Create Your Own Backlogue</a>
+      <a class="btn" onclick="window.location.href=window.location.origin+window.location.pathname">Create Your Own Cued</a>
     </div>
   </div>
 
@@ -4658,7 +4658,7 @@
     <div class="tutorial-container">
       <div class="tutorial-slide active" data-slide="0">
         <div class="tutorial-slide-icon">&#128218;</div>
-        <div class="tutorial-slide-title">Welcome to Backlogue</div>
+        <div class="tutorial-slide-title">Welcome to Cued</div>
         <div class="tutorial-slide-text">Your personal media shelf for everything you watch, read, and listen to. All in one beautiful place.</div>
       </div>
       <div class="tutorial-slide" data-slide="1">
@@ -7189,7 +7189,7 @@
       if (!group) return;
 
       const inviteLink = generateInviteLink(group.inviteCode);
-      const message = `Hi! ${currentUser.name} invited you to join "${group.name}" on Backlogue - a place to share and track movies, shows, books, and podcasts together.\n\nJoin here: ${inviteLink}\n\nOr use invite code: ${group.inviteCode}`;
+      const message = `Hi! ${currentUser.name} invited you to join "${group.name}" on Cued - a place to share and track movies, shows, books, and podcasts together.\n\nJoin here: ${inviteLink}\n\nOr use invite code: ${group.inviteCode}`;
       
       const preview = document.getElementById('messagePreview');
       preview.innerHTML = message.replace(inviteLink, `<a href="${inviteLink}" target="_blank">${inviteLink}</a>`);
@@ -7217,7 +7217,7 @@
       if (!group) return;
 
       const inviteLink = generateInviteLink(group.inviteCode);
-      const message = `Hi! ${currentUser.name} invited you to join "${group.name}" on Backlogue - a place to share and track movies, shows, books, and podcasts together.\n\nJoin here: ${inviteLink}\n\nOr use invite code: ${group.inviteCode}`;
+      const message = `Hi! ${currentUser.name} invited you to join "${group.name}" on Cued - a place to share and track movies, shows, books, and podcasts together.\n\nJoin here: ${inviteLink}\n\nOr use invite code: ${group.inviteCode}`;
 
       // Simulate sending SMS
       for (const phone of phoneNumbers) {
@@ -8365,7 +8365,7 @@
             ? `<div style="flex:1;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.3);font-size:0.85rem;">Nothing on the watchlist yet</div>`
             : `<div style="flex:1;">${listHtml}${overflow}</div>`
           }
-          <div style="font-family:'Bricolage Grotesque', sans-serif;font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.2);text-align:center;margin-top:0.75rem;">BACKLOGUE</div>
+          <div style="font-family:'Bricolage Grotesque', sans-serif;font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.2);text-align:center;margin-top:0.75rem;">CUED</div>
         </div>
       `;
     }
@@ -8678,7 +8678,7 @@
           <div style="font-size:0.72rem;color:rgba(255,255,255,0.5);margin-bottom:0.5rem;">${metaParts.join(' · ')}</div>
           ${starHtml}
           ${item.notes ? `<div style="font-size:0.75rem;color:rgba(255,255,255,0.65);font-style:italic;line-height:1.45;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;">"${item.notes}"</div>` : ''}
-          <div style="margin-top:0.75rem;font-family:'Bricolage Grotesque', sans-serif;font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.25);">BACKLOGUE</div>
+          <div style="margin-top:0.75rem;font-family:'Bricolage Grotesque', sans-serif;font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.25);">CUED</div>
         </div>
       `;
     }
@@ -8718,7 +8718,7 @@
         <div style="padding:1.75rem 1.75rem 1.5rem;height:calc(100% - 4px);box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;">
         <div style="text-align:center;margin-bottom:1.25rem;">
           <div style="font-family:'Bricolage Grotesque', sans-serif;font-size:1.4rem;font-weight:700;margin-bottom:0.25rem;">My Media Journey</div>
-          <div style="font-size:0.75rem;color:rgba(255,255,255,0.45);">${currentUser ? currentUser.name : 'A Backloguer'}</div>
+          <div style="font-size:0.75rem;color:rgba(255,255,255,0.45);">${currentUser ? currentUser.name : 'A Cued User'}</div>
         </div>
         <div class="share-card-stats-grid">
           <div class="share-card-stat"><div class="share-card-stat-value">${total}</div><div class="share-card-stat-label">Total Items</div></div>
@@ -8730,7 +8730,7 @@
         <div style="background:rgba(255,255,255,0.05);border-radius:10px;padding:0.75rem;">
           ${typeHtml}
         </div>
-        <div style="font-family:'Bricolage Grotesque', sans-serif;font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.25);text-align:center;padding-top:0.75rem;">BACKLOGUE</div>
+        <div style="font-family:'Bricolage Grotesque', sans-serif;font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.25);text-align:center;padding-top:0.75rem;">CUED</div>
         </div>
       `;
     }
@@ -8777,16 +8777,16 @@
           logging: false
         });
         canvas.toBlob(async (blob) => {
-          const file = new File([blob], 'backlogue-card.png', { type: 'image/png' });
+          const file = new File([blob], 'cued-card.png', { type: 'image/png' });
           if (navigator.canShare && navigator.canShare({ files: [file] })) {
             // Native share sheet (iOS/Android) — save to Photos, Instagram, etc.
             try {
-              await navigator.share({ files: [file], title: 'Backlogue' });
+              await navigator.share({ files: [file], title: 'Cued' });
             } catch (err) {
               if (err.name !== 'AbortError') {
                 // Share failed, fall back to download
                 const link = document.createElement('a');
-                link.download = 'backlogue-card.png';
+                link.download = 'cued-card.png';
                 link.href = canvas.toDataURL('image/png');
                 link.click();
               }
@@ -8794,7 +8794,7 @@
           } else {
             // Desktop fallback: trigger download
             const link = document.createElement('a');
-            link.download = 'backlogue-card.png';
+            link.download = 'cued-card.png';
             link.href = canvas.toDataURL('image/png');
             link.click();
           }
@@ -8854,7 +8854,7 @@
             <div style="text-align:center;padding:4rem 2rem;color:var(--text-secondary);font-family:Inter,sans-serif;">
               <h2 style="color:var(--text-primary);">Profile Not Found</h2>
               <p>This profile doesn't exist or is set to private.</p>
-              <a href="${window.location.origin + window.location.pathname}" style="color:var(--accent-primary);margin-top:1rem;display:inline-block;">Go to Backlogue</a>
+              <a href="${window.location.origin + window.location.pathname}" style="color:var(--accent-primary);margin-top:1rem;display:inline-block;">Go to Cued</a>
             </div>`;
           return;
         }
@@ -8884,7 +8884,7 @@
       const view = document.getElementById('publicProfileView');
       view.style.display = 'block';
 
-      document.getElementById('publicProfileName').textContent = data.displayName || 'A Backloguer';
+      document.getElementById('publicProfileName').textContent = data.displayName || 'A Cued User';
 
       // Stats
       if (data.showStats && data.stats) {
@@ -9147,7 +9147,7 @@
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `backlogue-export-${new Date().toISOString().slice(0,10)}.csv`;
+      a.download = `cued-export-${new Date().toISOString().slice(0,10)}.csv`;
       a.click();
       URL.revokeObjectURL(url);
       showToast(`Exported ${items.length} items`);

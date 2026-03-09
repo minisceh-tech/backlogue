@@ -513,6 +513,7 @@
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      pointer-events: none;
     }
 
     .header h1 {
@@ -6077,8 +6078,13 @@
       document.getElementById('myShelf').classList.add('active');
       const sf = document.getElementById('shelfFilters'); if (sf) sf.style.display = '';
       const sortBtn = document.getElementById('headerSortBtn'); if(sortBtn) sortBtn.style.display = '';
+      currentMediaFilter = 'all';
+      document.querySelectorAll('#typeChipsRow .type-nav-btn').forEach(c => c.classList.remove('active'));
+      const allBtn = document.querySelector('#typeChipsRow .type-nav-btn[data-value="all"]');
+      if (allBtn) allBtn.classList.add('active');
       setFabMode('add');
       closeFabMenu();
+      renderItems();
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 

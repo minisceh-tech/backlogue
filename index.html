@@ -3924,18 +3924,6 @@
           <span class="type-nav-icon">📚</span>
           <span class="type-nav-label">Books</span>
         </button>
-        <button class="type-nav-btn" onclick="toggleSortPopover(this)" id="sortChipBtn">
-          <svg class="type-nav-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path d="M3 5h14M6 10h8M9 15h2" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
-          <span class="type-nav-label">Sort</span>
-        </button>
-      </div>
-      <!-- Sort popover -->
-      <div class="sort-popover" id="sortPopover">
-        <button onclick="applySortFilter('default',this)">Default</button>
-        <button onclick="applySortFilter('dateAdded',this)">Date Added</button>
-        <button onclick="applySortFilter('dateLogged',this)">Date Logged</button>
-        <button onclick="applySortFilter('rating',this)">Rating</button>
-        <button onclick="applySortFilter('title',this)">A – Z</button>
       </div>
     </div>
     <div id="groupTabsContainer" style="display: none;"></div>
@@ -6370,7 +6358,7 @@
         html += `<section class="status-section" id="type-${type}">`;
         html += `
           <div class="status-section-header" onclick="filterByType('${type}')" style="cursor:pointer;">
-            <h2 class="status-section-title">${typeIconMap[type]} ${typeLabelMap[type]}</h2>
+            <h2 class="status-section-title">${typeLabelMap[type]}</h2>
             <div class="status-section-line"></div>
             <span class="status-section-count">${typeItems.length}</span>
             <span style="font-size:0.8rem; color:var(--text-tertiary); margin-left:0.25rem; flex-shrink:0;">›</span>

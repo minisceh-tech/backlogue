@@ -7547,10 +7547,8 @@
       return group ? group.name : 'Unknown';
     }
 
-    // Bottom nav filter
+    // Bottom nav filter (called by All button in type bar)
     function bottomNavFilter(type) {
-      document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
-      document.querySelector('.bottom-nav-btn[data-type="all"]').classList.add('active');
       const sortBtn = document.getElementById('headerSortBtn'); if(sortBtn) sortBtn.style.display = '';
 
       currentMediaFilter = 'all';
@@ -7840,8 +7838,7 @@
     // Open Search with pre-set filters (used by "View all" links on shelf)
     function openSearchWithFilters(type, status) {
       // Find the Search nav button and open search page
-      const searchBtn = document.querySelector('.bottom-nav-btn[onclick*="openSearchPage"]');
-      openSearchPage(searchBtn || document.querySelector('.bottom-nav-btn'));
+      openSearchPage();
       // Set filters
       if (type) document.getElementById('searchTypeFilter').value = type;
       if (status) document.getElementById('searchStatusFilter').value = status;

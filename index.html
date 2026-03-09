@@ -546,16 +546,12 @@
     }
 
     .splash-icon {
-      width: 72px;
-      height: 72px;
-      border-radius: 20px;
-      background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
+      width: 104px;
+      height: 104px;
       display: flex;
       align-items: center;
       justify-content: center;
-      box-shadow: 0 0 40px rgba(20,184,166,0.5), 0 0 80px rgba(20,184,166,0.15);
       animation: splashGlow 2s ease-in-out infinite;
-      font-size: 2rem;
     }
 
     .splash-wordmark {
@@ -583,8 +579,8 @@
     }
 
     @keyframes splashGlow {
-      0%, 100% { box-shadow: 0 0 30px rgba(20,184,166,0.4), 0 0 60px rgba(20,184,166,0.1); }
-      50% { box-shadow: 0 0 50px rgba(20,184,166,0.7), 0 0 100px rgba(13,148,136,0.25); }
+      0%, 100% { filter: drop-shadow(0 0 12px rgba(20,184,166,0.55)) drop-shadow(0 0 32px rgba(20,184,166,0.15)); }
+      50% { filter: drop-shadow(0 0 22px rgba(20,184,166,0.9)) drop-shadow(0 0 55px rgba(13,148,136,0.3)); }
     }
 
     .header-signout { display: none; }
@@ -3861,7 +3857,52 @@
 </head>
 <body>
   <div class="splash-screen" id="splashScreen">
-    <div class="splash-icon">📼</div>
+    <div class="splash-icon">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="104" height="104" style="display:block;">
+        <defs>
+          <linearGradient id="splBg" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#112a35"/>
+            <stop offset="100%" stop-color="#081419"/>
+          </linearGradient>
+          <linearGradient id="splTeal" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#5eead4"/>
+            <stop offset="100%" stop-color="#0d9488"/>
+          </linearGradient>
+          <linearGradient id="splBkm" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#1ee5cc"/>
+            <stop offset="100%" stop-color="#0d9488"/>
+          </linearGradient>
+        </defs>
+
+        <!-- Background rounded square -->
+        <rect width="96" height="96" rx="22" fill="url(#splBg)"/>
+        <!-- Subtle inner teal highlight ring -->
+        <rect width="96" height="96" rx="22" fill="none" stroke="#14b8a6" stroke-width="1.5" opacity="0.4"/>
+        <!-- Very subtle inner glow at top -->
+        <rect x="10" y="6" width="76" height="20" rx="10" fill="#14b8a6" opacity="0.05"/>
+
+        <!-- HEADPHONES -->
+        <!-- Headband arc: left ear-top to right ear-top -->
+        <path d="M 26 45 C 26 17 70 17 70 45"
+              fill="none" stroke="url(#splTeal)" stroke-width="6" stroke-linecap="round"/>
+        <!-- Left ear cup -->
+        <rect x="13" y="41" width="14" height="22" rx="7" fill="url(#splTeal)"/>
+        <!-- Left ear cup inner recess -->
+        <rect x="16.5" y="45.5" width="7" height="13" rx="3.5" fill="#081419" opacity="0.35"/>
+        <!-- Right ear cup -->
+        <rect x="69" y="41" width="14" height="22" rx="7" fill="url(#splTeal)"/>
+        <!-- Right ear cup inner recess -->
+        <rect x="72.5" y="45.5" width="7" height="13" rx="3.5" fill="#081419" opacity="0.35"/>
+
+        <!-- BOOKMARK with PLAY BUTTON (bottom-center) -->
+        <!-- Bookmark body -->
+        <path d="M 33 67 L 63 67 L 63 87 L 48 79 L 33 87 Z" fill="url(#splBkm)"/>
+        <!-- Bookmark top edge highlight -->
+        <rect x="33" y="67" width="30" height="3" rx="0" fill="#5eead4" opacity="0.3"/>
+        <!-- Play triangle (pointing right, centered in bookmark) -->
+        <polygon points="42,71.5 42,82 54.5,76.75" fill="#e2f0f2"/>
+      </svg>
+    </div>
     <div class="splash-wordmark">Backlogue</div>
     <div class="splash-tagline">Your media, tracked</div>
   </div>

@@ -1333,6 +1333,50 @@
       background: rgba(239,68,68,0.3);
     }
 
+    .friends-on-item {
+      margin: 0.5rem 0;
+      padding: 0.6rem 0.75rem;
+      background: var(--bg-accent);
+      border-radius: 10px;
+      font-size: 0.78rem;
+    }
+    .friends-on-item-header {
+      color: var(--text-tertiary);
+      font-size: 0.72rem;
+      margin-bottom: 0.4rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .friends-on-item-row {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      padding: 0.2rem 0;
+    }
+    .friends-on-item-avatar {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: var(--bg-primary);
+      border: 1px solid var(--border-light);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.6rem;
+      font-weight: 700;
+      color: var(--accent-primary);
+      flex-shrink: 0;
+    }
+    .friends-on-item-name {
+      color: var(--text-primary);
+      font-weight: 500;
+      flex: 1;
+    }
+    .friends-on-item-stars {
+      color: #f59e0b;
+      font-size: 0.7rem;
+    }
+
     .group-picker-item {
       display: flex;
       align-items: center;
@@ -2452,6 +2496,115 @@
       font-size: 0.75rem;
       color: var(--text-secondary);
     }
+
+    .social-tabs {
+      display: flex;
+      border-bottom: 1px solid var(--border-light);
+      margin-bottom: 1rem;
+    }
+    .social-tab-btn {
+      flex: 1;
+      padding: 0.65rem 0.5rem;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      color: var(--text-tertiary);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.82rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .social-tab-btn.active {
+      color: var(--accent-primary);
+      border-bottom-color: var(--accent-primary);
+    }
+    .following-feed-item {
+      display: flex;
+      gap: 0.75rem;
+      padding: 0.85rem 0;
+      border-bottom: 1px solid var(--border-light);
+      align-items: flex-start;
+    }
+    .following-feed-avatar {
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      background: var(--bg-accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--accent-primary);
+      flex-shrink: 0;
+      border: 1px solid var(--border-light);
+    }
+    .following-feed-poster {
+      width: 44px;
+      height: 66px;
+      border-radius: 6px;
+      object-fit: cover;
+      flex-shrink: 0;
+      background: var(--bg-accent);
+    }
+    .following-feed-poster-empty {
+      width: 44px;
+      height: 66px;
+      border-radius: 6px;
+      background: var(--bg-accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.3rem;
+      flex-shrink: 0;
+    }
+    .following-feed-body {
+      flex: 1;
+      min-width: 0;
+    }
+    .following-feed-name {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .following-feed-action {
+      font-size: 0.78rem;
+      color: var(--text-tertiary);
+      margin-bottom: 0.2rem;
+    }
+    .following-feed-title {
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .following-feed-meta {
+      font-size: 0.72rem;
+      color: var(--text-tertiary);
+      margin-top: 0.15rem;
+    }
+    .following-feed-stars {
+      font-size: 0.75rem;
+      color: #f59e0b;
+      margin-top: 0.15rem;
+    }
+    .following-feed-add-btn {
+      background: none;
+      border: 1px solid var(--border-medium);
+      border-radius: 12px;
+      padding: 0.25rem 0.6rem;
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      cursor: pointer;
+      white-space: nowrap;
+      flex-shrink: 0;
+      font-family: 'Outfit', sans-serif;
+      margin-top: 0.2rem;
+    }
+    .following-feed-add-btn:active { opacity: 0.6; }
 
     .feed-content {
       padding: 0;
@@ -3665,6 +3818,37 @@
       text-transform: uppercase;
       letter-spacing: 0.06em;
     }
+    .spotlight-pick-slot {
+      aspect-ratio: 2/3;
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      border: 1.5px dashed var(--border-medium);
+      position: relative;
+    }
+    .spotlight-pick-slot:active { opacity: 0.7; }
+    .spotlight-pick-empty {
+      width: 100%; height: 100%;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 0.2rem;
+      background: var(--bg-accent);
+    }
+    .spotlight-pick-filled {
+      width: 100%; height: 100%;
+      position: relative;
+    }
+    .spotlight-pick-filled img {
+      width: 100%; height: 100%; object-fit: cover;
+    }
+    .spotlight-pick-filled::after {
+      content: '✕';
+      position: absolute;
+      top: 2px; right: 4px;
+      font-size: 0.65rem;
+      color: rgba(255,255,255,0.8);
+      text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+    }
     .profile-bio {
       font-size: 0.85rem;
       color: var(--text-secondary);
@@ -4128,6 +4312,19 @@
         </button>
         <span style="font-family:'Bricolage Grotesque',sans-serif; font-weight:700; font-size:1rem;">Friends &amp; Groups</span>
       </div>
+      <div class="social-tabs">
+        <button class="social-tab-btn active" id="socialTabFollowing" onclick="switchSocialTab('following')">Following</button>
+        <button class="social-tab-btn" id="socialTabGroups" onclick="switchSocialTab('groups')">Groups</button>
+      </div>
+      <div id="followingFeedPanel">
+        <div id="followingFeedContainer"></div>
+        <div id="followingFeedEmpty" style="display:none; text-align:center; padding:3rem 1rem; color:var(--text-tertiary); font-size:0.9rem;">
+          <div style="font-size:2rem; margin-bottom:0.75rem;">👥</div>
+          <div style="font-weight:600; color:var(--text-primary); margin-bottom:0.4rem;">No activity yet</div>
+          <div>Follow people to see what they're watching, reading, and listening to.</div>
+        </div>
+      </div>
+      <div id="groupsFeedPanel" style="display:none;">
       <div class="feed-filters">
         <select id="feedGroupFilter" onchange="filterFeeds()" class="filter-dropdown filter-dropdown-blue" style="border-radius: 20px; padding: 0.3rem 0.6rem; font-size: 0.7rem; min-width: 0;">
           <option value="all">All Groups</option>
@@ -4155,6 +4352,7 @@
         <div class="empty-state-text">No group activity yet</div>
         <p>Join or create a group to see what others are adding</p>
       </div>
+      </div><!-- end groupsFeedPanel -->
     </div>
 
     <!-- Search Page Tab -->
@@ -4707,6 +4905,23 @@
             <span>Show Stats</span>
             <input type="checkbox" id="profileShowStats" checked>
           </label>
+        </div>
+        <div class="form-group">
+          <label style="margin-bottom:0.5rem;">Spotlight <span style="font-size:0.72rem;font-weight:400;color:var(--text-tertiary);">Pin one favorite per type</span></label>
+          <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.4rem;" id="spotlightPicker">
+            <div class="spotlight-pick-slot" data-type="movie" onclick="openSpotlightPicker('movie')">
+              <div id="spotlightSlot_movie" class="spotlight-pick-empty"><span style="font-size:1.1rem;">🎥</span><span style="font-size:0.6rem;color:var(--text-tertiary);">Film</span></div>
+            </div>
+            <div class="spotlight-pick-slot" data-type="tv" onclick="openSpotlightPicker('tv')">
+              <div id="spotlightSlot_tv" class="spotlight-pick-empty"><span style="font-size:1.1rem;">📺</span><span style="font-size:0.6rem;color:var(--text-tertiary);">Show</span></div>
+            </div>
+            <div class="spotlight-pick-slot" data-type="book" onclick="openSpotlightPicker('book')">
+              <div id="spotlightSlot_book" class="spotlight-pick-empty"><span style="font-size:1.1rem;">📚</span><span style="font-size:0.6rem;color:var(--text-tertiary);">Book</span></div>
+            </div>
+            <div class="spotlight-pick-slot" data-type="podcast" onclick="openSpotlightPicker('podcast')">
+              <div id="spotlightSlot_podcast" class="spotlight-pick-empty"><span style="font-size:1.1rem;">🎙️</span><span style="font-size:0.6rem;color:var(--text-tertiary);">Podcast</span></div>
+            </div>
+          </div>
         </div>
         <div class="form-group">
           <label>Your Profile Link</label>
@@ -7887,6 +8102,152 @@
       }
     });
 
+    // ========== FOLLOWING FEED ==========
+
+    let _currentSocialTab = 'following';
+    let _followingProfilesCache = null;
+
+    function switchSocialTab(tab) {
+      _currentSocialTab = tab;
+      document.getElementById('socialTabFollowing').classList.toggle('active', tab === 'following');
+      document.getElementById('socialTabGroups').classList.toggle('active', tab === 'groups');
+      document.getElementById('followingFeedPanel').style.display = tab === 'following' ? '' : 'none';
+      document.getElementById('groupsFeedPanel').style.display = tab === 'groups' ? '' : 'none';
+      if (tab === 'following') loadFollowingFeed();
+    }
+
+    async function loadFollowingFeed() {
+      const container = document.getElementById('followingFeedContainer');
+      const empty = document.getElementById('followingFeedEmpty');
+      if (!container || !currentUser) return;
+
+      container.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-tertiary);font-size:0.85rem;">Loading...</div>';
+      empty.style.display = 'none';
+
+      try {
+        // Load following list
+        const followingSnap = await db.collection('users').doc(currentUser.id).collection('following').get();
+        if (followingSnap.empty) {
+          container.innerHTML = '';
+          empty.style.display = 'block';
+          return;
+        }
+
+        const followingIds = followingSnap.docs.map(d => d.id);
+        const followingMap = {};
+        followingSnap.docs.forEach(d => { followingMap[d.id] = d.data(); });
+
+        // Load public profiles in batches of 10
+        const profiles = [];
+        for (let i = 0; i < followingIds.length; i += 10) {
+          const batch = followingIds.slice(i, i + 10);
+          const snaps = await Promise.all(batch.map(uid => db.collection('publicProfiles').doc(uid).get()));
+          snaps.forEach((snap, idx) => {
+            if (snap.exists && snap.data().enabled) {
+              profiles.push({ userId: batch[idx], ...snap.data(), followData: followingMap[batch[idx]] });
+            }
+          });
+        }
+
+        // Gather all public items from all profiles, sorted by dateLogged desc
+        const typeEmojis = { movie: '🎥', tv: '📺', podcast: '🎙️', book: '📚' };
+        const statusLabels = { done: 'finished', current: 'is watching', want: 'queued' };
+        const statusLabelsPodcast = { done: 'finished', current: 'is listening to', want: 'queued' };
+        const statusLabelsBook = { done: 'finished', current: 'is reading', want: 'queued' };
+
+        let allEntries = [];
+        profiles.forEach(profile => {
+          const privacy = profile.privacy || {};
+          const visibleItems = (profile.items || []).filter(item => {
+            const p = privacy[item.type] || 'public';
+            return p === 'public';
+          });
+          visibleItems.forEach(item => {
+            allEntries.push({
+              ...item,
+              ownerUserId: profile.userId,
+              ownerName: profile.displayName || profile.followData?.displayName || 'Someone',
+              ownerHandle: profile.handle || '',
+              loggedAt: item.dateLogged || ''
+            });
+          });
+        });
+
+        // Sort by dateLogged descending
+        allEntries.sort((a, b) => {
+          if (a.loggedAt && b.loggedAt) return b.loggedAt.localeCompare(a.loggedAt);
+          if (a.loggedAt) return -1;
+          if (b.loggedAt) return 1;
+          return 0;
+        });
+
+        // Take top 60
+        allEntries = allEntries.slice(0, 60);
+
+        if (allEntries.length === 0) {
+          container.innerHTML = '';
+          empty.style.display = 'block';
+          return;
+        }
+
+        // Render
+        container.innerHTML = allEntries.map(entry => {
+          const initials = (entry.ownerName || '?').split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+          const emoji = typeEmojis[entry.type] || '🎬';
+          let actionVerb;
+          if (entry.type === 'podcast') actionVerb = statusLabelsPodcast[entry.status] || 'logged';
+          else if (entry.type === 'book') actionVerb = statusLabelsBook[entry.status] || 'logged';
+          else actionVerb = statusLabels[entry.status] || 'logged';
+          const starsHtml = entry.rating ? '★'.repeat(Math.round(entry.rating)) : '';
+          const alreadyHave = items.some(i => i.title.toLowerCase() === entry.title.toLowerCase() && i.type === entry.type);
+          return `<div class="following-feed-item">
+            <div class="following-feed-avatar">${initials}</div>
+            ${entry.image
+              ? `<img class="following-feed-poster" src="${entry.image}" alt="${entry.title}" loading="lazy">`
+              : `<div class="following-feed-poster-empty">${emoji}</div>`}
+            <div class="following-feed-body">
+              <div class="following-feed-action"><span class="following-feed-name">${entry.ownerName}</span> ${actionVerb}</div>
+              <div class="following-feed-title">${entry.title}</div>
+              <div class="following-feed-meta">${emoji} ${entry.type.charAt(0).toUpperCase()+entry.type.slice(1)}${entry.genre ? ' · ' + entry.genre : ''}</div>
+              ${starsHtml ? `<div class="following-feed-stars">${starsHtml}</div>` : ''}
+              ${!alreadyHave ? `<button class="following-feed-add-btn" onclick="addFromFollowingFeed(${JSON.stringify(entry).replace(/"/g,'&quot;')})">+ Add to queue</button>` : '<div style="font-size:0.7rem;color:var(--text-tertiary);margin-top:0.2rem;">On your shelf</div>'}
+            </div>
+          </div>`;
+        }).join('');
+
+      } catch (err) {
+        console.error('Following feed error:', err);
+        container.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-tertiary);">Could not load feed.</div>';
+      }
+    }
+
+    function addFromFollowingFeed(entry) {
+      // Pre-fill the add modal with this item's data and open it
+      const newItem = {
+        id: Date.now().toString() + Math.random().toString(36).slice(2),
+        title: entry.title,
+        type: entry.type,
+        status: 'want',
+        image: entry.image || '',
+        genre: entry.genre || '',
+        rating: null,
+        notes: '',
+        streamingPlatform: '',
+        episode: '',
+        referral: '',
+        tags: [],
+        premiereDate: '',
+        dateLogged: '',
+        userId: currentUser.id,
+        watchSoon: false
+      };
+      items.push(newItem);
+      saveItemToFirestore(newItem);
+      renderItems();
+      showToast(`"${entry.title}" added to your queue`);
+      loadFollowingFeed(); // refresh to update "On your shelf" state
+    }
+
     // Switch to Groups tab and set FAB to green
     function switchToGroups(btn) {
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
@@ -7896,7 +8257,10 @@
       setFabMode('group');
       // Mark feed as seen
       localStorage.setItem('lastSeenGroupFeed', Date.now().toString());
-      document.getElementById('newItemsBadge').style.display = 'none';
+      const badge = document.getElementById('newItemsBadge');
+      if (badge) badge.style.display = 'none';
+      // Default to following tab
+      switchSocialTab(_currentSocialTab || 'following');
     }
 
     async function checkGroupFeedBadge() {
@@ -8570,6 +8934,60 @@
       `;
 
       document.getElementById('detailCardOverlay').classList.add('visible');
+      // Load friends who have this item (async, non-blocking)
+      loadFriendsOnItem(item.title, item.type);
+    }
+
+    async function loadFriendsOnItem(title, type) {
+      if (!currentUser) return;
+      try {
+        const followingSnap = await db.collection('users').doc(currentUser.id).collection('following').get();
+        if (followingSnap.empty) return;
+        const followingIds = followingSnap.docs.map(d => d.id);
+        const followingMap = {};
+        followingSnap.docs.forEach(d => { followingMap[d.id] = d.data(); });
+
+        // Load profiles in batches
+        const matches = [];
+        for (let i = 0; i < followingIds.length; i += 10) {
+          const batch = followingIds.slice(i, i + 10);
+          const snaps = await Promise.all(batch.map(uid => db.collection('publicProfiles').doc(uid).get()));
+          snaps.forEach((snap, idx) => {
+            if (!snap.exists || !snap.data().enabled) return;
+            const pd = snap.data();
+            const matched = (pd.items || []).find(it =>
+              it.type === type && it.title.toLowerCase() === title.toLowerCase()
+            );
+            if (matched) {
+              matches.push({
+                name: pd.displayName || followingMap[batch[idx]]?.displayName || 'Someone',
+                rating: matched.rating
+              });
+            }
+          });
+        }
+
+        if (matches.length === 0) return;
+
+        // Find the fieldsHtml section in the card and insert before actions
+        const actionsDiv = document.querySelector('#detailCard .detail-card-actions');
+        if (!actionsDiv) return;
+        const friendsDiv = document.createElement('div');
+        friendsDiv.className = 'friends-on-item';
+        friendsDiv.innerHTML = `<div class="friends-on-item-header">Also logged by</div>` +
+          matches.map(m => {
+            const initials = m.name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+            const stars = m.rating ? '★'.repeat(Math.round(m.rating)) : '';
+            return `<div class="friends-on-item-row">
+              <div class="friends-on-item-avatar">${initials}</div>
+              <span class="friends-on-item-name">${m.name}</span>
+              ${stars ? `<span class="friends-on-item-stars">${stars}</span>` : ''}
+            </div>`;
+          }).join('');
+        actionsDiv.parentNode.insertBefore(friendsDiv, actionsDiv);
+      } catch(e) {
+        console.error('loadFriendsOnItem error:', e);
+      }
     }
 
     async function loadDescription(itemId) {
@@ -9366,6 +9784,10 @@
           document.getElementById('profileShowReviews').checked = false;
           document.getElementById('profileShowStats').checked = true;
         }
+        // Load spotlight
+        if (doc.exists && doc.data().spotlight) {
+          loadSpotlightIntoUI(doc.data().spotlight);
+        }
         togglePublicProfile();
       } catch (err) {
         console.error('Error loading profile settings:', err);
@@ -9448,12 +9870,16 @@
           privacy[t] = el ? el.value : 'public';
         });
 
+        // Build spotlight array [movie, tv, book, podcast]
+        const spotlight = ['movie','tv','book','podcast'].map(t => _spotlightSelections[t] || null);
+
         const profileData = {
           enabled,
           displayName,
           handle: currentUser.handle || newHandle || null,
           bio: bio || null,
           privacy,
+          spotlight,
           userId: currentUser.id,
           showRatings,
           showReviews,
@@ -9481,6 +9907,103 @@
         console.error('Error saving public profile:', err);
         alert('Failed to save profile. Please try again.');
       }
+    }
+
+    // ========== SPOTLIGHT PICKER ==========
+
+    let _spotlightSelections = { movie: null, tv: null, book: null, podcast: null };
+    let _spotlightPickerType = null;
+
+    function openSpotlightPicker(type) {
+      _spotlightPickerType = type;
+      const labels = { movie: 'Film', tv: 'Show', book: 'Book', podcast: 'Podcast' };
+      document.getElementById('spotlightPickerTitle').textContent = 'Pick a ' + labels[type];
+      document.getElementById('spotlightPickerSearch').value = '';
+      renderSpotlightPickerList();
+      const modal = document.getElementById('spotlightPickerModal');
+      modal.style.display = 'flex';
+      modal.classList.add('active');
+      document.getElementById('spotlightPickerSearch').focus();
+    }
+
+    function closeSpotlightPicker() {
+      const modal = document.getElementById('spotlightPickerModal');
+      modal.style.display = 'none';
+      modal.classList.remove('active');
+    }
+
+    function renderSpotlightPickerList() {
+      const type = _spotlightPickerType;
+      const query = document.getElementById('spotlightPickerSearch').value.toLowerCase();
+      const typeItems = items.filter(i => i.type === type && (!query || i.title.toLowerCase().includes(query)));
+      const list = document.getElementById('spotlightPickerList');
+      if (typeItems.length === 0) {
+        list.innerHTML = `<div style="text-align:center;padding:2rem;color:var(--text-tertiary);font-size:0.85rem;">No ${type} items on your shelf</div>`;
+        return;
+      }
+      list.innerHTML = typeItems.map(item => `
+        <div onclick="selectSpotlightItem('${item.id}')" style="display:flex;align-items:center;gap:0.75rem;padding:0.6rem 0;border-bottom:1px solid var(--border-light);cursor:pointer;">
+          ${item.image
+            ? `<img src="${item.image}" style="width:36px;height:54px;object-fit:cover;border-radius:5px;flex-shrink:0;" loading="lazy">`
+            : `<div style="width:36px;height:54px;border-radius:5px;background:var(--bg-accent);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">${getTypeEmoji(type)}</div>`}
+          <div style="flex:1;min-width:0;">
+            <div style="font-weight:600;font-size:0.88rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${item.title}</div>
+            ${item.genre ? `<div style="font-size:0.72rem;color:var(--text-tertiary);">${item.genre}</div>` : ''}
+          </div>
+          ${_spotlightSelections[type] && _spotlightSelections[type].id === item.id ? '<span style="color:var(--accent-primary);font-size:1rem;">✓</span>' : ''}
+        </div>
+      `).join('');
+    }
+
+    function selectSpotlightItem(itemId) {
+      const item = items.find(i => i.id === itemId);
+      if (!item) return;
+      const type = _spotlightPickerType;
+      _spotlightSelections[type] = { id: item.id, title: item.title, image: item.image || '', type: item.type };
+      // Update the slot UI
+      const slot = document.getElementById('spotlightSlot_' + type);
+      if (slot) {
+        if (item.image) {
+          slot.className = 'spotlight-pick-filled';
+          slot.innerHTML = `<img src="${item.image}" alt="${item.title}" style="width:100%;height:100%;object-fit:cover;">`;
+        } else {
+          slot.className = 'spotlight-pick-empty';
+          const typeEmojis = { movie: '🎥', tv: '📺', book: '📚', podcast: '🎙️' };
+          slot.innerHTML = `<span style="font-size:0.7rem;color:var(--text-primary);text-align:center;padding:0.2rem;">${item.title.slice(0,15)}</span>`;
+        }
+      }
+      closeSpotlightPicker();
+    }
+
+    function clearSpotlightSlot(type) {
+      _spotlightSelections[type] = null;
+      const slot = document.getElementById('spotlightSlot_' + type);
+      if (slot) {
+        const typeEmojis = { movie: '🎥', tv: '📺', book: '📚', podcast: '🎙️' };
+        const typeLabels = { movie: 'Film', tv: 'Show', book: 'Book', podcast: 'Podcast' };
+        slot.className = 'spotlight-pick-empty';
+        slot.innerHTML = `<span style="font-size:1.1rem;">${typeEmojis[type]}</span><span style="font-size:0.6rem;color:var(--text-tertiary);">${typeLabels[type]}</span>`;
+      }
+    }
+
+    // Load existing spotlight into picker UI
+    function loadSpotlightIntoUI(spotlight) {
+      if (!spotlight) return;
+      const types = ['movie', 'tv', 'book', 'podcast'];
+      types.forEach((type, i) => {
+        const sp = spotlight[i];
+        if (!sp) return;
+        _spotlightSelections[type] = sp;
+        const slot = document.getElementById('spotlightSlot_' + type);
+        if (!slot) return;
+        if (sp.image) {
+          slot.className = 'spotlight-pick-filled';
+          slot.innerHTML = `<img src="${sp.image}" alt="${sp.title || ''}" style="width:100%;height:100%;object-fit:cover;">`;
+        } else if (sp.title) {
+          slot.className = 'spotlight-pick-empty';
+          slot.innerHTML = `<span style="font-size:0.7rem;color:var(--text-primary);text-align:center;padding:0.2rem;">${sp.title.slice(0,15)}</span>`;
+        }
+      });
     }
 
     // ========== HANDLE UTILITIES ==========
@@ -9998,6 +10521,16 @@
 
   <!-- Toast Notification -->
   <div id="toast" class="toast"></div>
+
+  <!-- Spotlight Picker Modal -->
+  <div id="spotlightPickerModal" class="modal" style="display:none;" onclick="if(event.target===this)closeSpotlightPicker()">
+    <div class="modal-content" style="max-height:80vh;overflow-y:auto;">
+      <button class="modal-close" onclick="closeSpotlightPicker()">&times;</button>
+      <h2 class="modal-header" id="spotlightPickerTitle">Pick a Film</h2>
+      <input type="text" id="spotlightPickerSearch" placeholder="Search..." oninput="renderSpotlightPickerList()" style="width:100%;padding:0.6rem 0.75rem;background:var(--bg-accent);border:1px solid var(--border-light);border-radius:8px;color:var(--text-primary);font-size:0.9rem;font-family:inherit;margin-bottom:0.75rem;box-sizing:border-box;">
+      <div id="spotlightPickerList"></div>
+    </div>
+  </div>
 
 </body>
 </html>

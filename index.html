@@ -3787,11 +3787,61 @@
       margin-top: 2rem;
     }
 
-    .profile-spotlight {
+    /* --- Profile stats bar --- */
+    .profile-stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 0;
+      margin: 1.25rem auto 0;
+      max-width: 480px;
+      padding: 0 1rem;
+    }
+    .profile-stat-item {
+      flex: 1;
+      text-align: center;
+      padding: 0.75rem 0.5rem;
+      position: relative;
+    }
+    .profile-stat-item + .profile-stat-item::before {
+      content: '';
+      position: absolute;
+      left: 0; top: 20%; bottom: 20%;
+      width: 1px;
+      background: var(--border-light);
+    }
+    .profile-stat-num {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+    .profile-stat-label {
+      font-size: 0.65rem;
+      color: var(--text-tertiary);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-top: 0.2rem;
+    }
+
+    /* --- Right Now spotlight --- */
+    .profile-right-now {
+      padding: 1.5rem 1rem 0;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    .profile-right-now-label {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--accent-primary);
+      margin-bottom: 0.75rem;
+      letter-spacing: -0.01em;
+    }
+    .profile-right-now-grid {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
-      gap: 0.5rem;
-      margin: 1rem 0 1.25rem;
+      gap: 0.6rem;
     }
     .spotlight-tile {
       position: relative;
@@ -3799,10 +3849,26 @@
       overflow: hidden;
       aspect-ratio: 2/3;
       background: var(--bg-accent);
-      cursor: pointer;
     }
     .spotlight-tile img {
       width: 100%; height: 100%; object-fit: cover;
+    }
+    .spotlight-tile-caption {
+      position: absolute;
+      bottom: 0; left: 0; right: 0;
+      background: linear-gradient(transparent, rgba(0,0,0,0.82));
+      padding: 1rem 0.4rem 0.4rem;
+      font-size: 0.6rem;
+      color: #fff;
+      line-height: 1.3;
+      font-weight: 500;
+    }
+    .spotlight-tile-type {
+      font-size: 0.55rem;
+      color: var(--accent-primary);
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      margin-bottom: 0.1rem;
     }
     .spotlight-tile-empty {
       width: 100%; height: 100%;
@@ -3811,12 +3877,45 @@
       gap: 0.3rem;
       color: var(--text-tertiary);
       font-size: 1.4rem;
+      opacity: 0.4;
     }
     .spotlight-tile-label {
       font-size: 0.6rem;
       color: var(--text-tertiary);
       text-transform: uppercase;
       letter-spacing: 0.06em;
+    }
+
+    /* --- Profile section/type headers --- */
+    .profile-type-header {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+      margin: 1.75rem 0 0.6rem;
+    }
+    .profile-type-header-text {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+    .profile-type-header-line {
+      flex: 1;
+      height: 1px;
+      background: var(--border-light);
+    }
+    .profile-status-label {
+      display: inline-block;
+      font-size: 0.65rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent-primary);
+      border: 1px solid var(--accent-primary);
+      border-radius: 20px;
+      padding: 0.15rem 0.55rem;
+      margin: 0.6rem 0 0.4rem;
+      opacity: 0.8;
     }
     .spotlight-pick-slot {
       aspect-ratio: 2/3;
@@ -9514,40 +9613,45 @@
         followBtnContainer.style.display = 'none';
       }
 
-      // Spotlight
+      // Stats bar
+      if (data.showStats && data.stats) {
+        const s = data.stats;
+        const tc = s.typeCounts || {};
+        const statItems = [
+          tc.movie  ? { num: tc.movie,     label: 'Films'    } : null,
+          tc.tv     ? { num: tc.tv,        label: 'Shows'    } : null,
+          tc.book   ? { num: tc.book,      label: 'Books'    } : null,
+          tc.podcast? { num: tc.podcast,   label: 'Podcasts' } : null,
+          s.avgRating ? { num: s.avgRating + '★', label: 'Avg Rating' } : null,
+        ].filter(Boolean);
+        document.getElementById('publicProfileStats').innerHTML = statItems.length
+          ? `<div class="profile-stats-bar">${statItems.map(si =>
+              `<div class="profile-stat-item"><div class="profile-stat-num">${si.num}</div><div class="profile-stat-label">${si.label}</div></div>`
+            ).join('')}</div>`
+          : '';
+      }
+
+      // Right Now spotlight
       const spotlightEl = document.getElementById('publicProfileSpotlight');
       if (data.spotlight && data.spotlight.some(s => s)) {
-        const typeEmojis = { movie: '🎥', tv: '📺', podcast: '🎙️', book: '📚' };
         const typeLabels = { movie: 'Film', tv: 'Show', podcast: 'Podcast', book: 'Book' };
+        const typeEmojis = { movie: '🎥', tv: '📺', podcast: '🎙️', book: '📚' };
         const types = ['movie', 'tv', 'book', 'podcast'];
+        spotlightEl.className = 'profile-right-now';
         spotlightEl.style.display = 'block';
         spotlightEl.innerHTML =
-          `<div style="font-size:0.68rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-tertiary);margin-bottom:0.5rem;">Currently</div>` +
-          `<div style="display:grid;grid-template-columns:repeat(4,1fr);gap:0.5rem;">` +
+          `<div class="profile-right-now-label">Right Now</div>` +
+          `<div class="profile-right-now-grid">` +
           types.map((type, i) => {
             const item = data.spotlight[i];
             if (item && item.image) {
-              return `<div class="spotlight-tile" title="${item.title || ''}"><img src="${item.image}" alt="${item.title || ''}"><div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.75));padding:0.3rem 0.25rem 0.2rem;font-size:0.55rem;color:#fff;line-height:1.2;">${item.title || ''}</div></div>`;
+              return `<div class="spotlight-tile"><img src="${item.image}" alt="${item.title||''}"><div class="spotlight-tile-caption"><div class="spotlight-tile-type">${typeLabels[type]}</div>${item.title||''}</div></div>`;
             }
             return `<div class="spotlight-tile"><div class="spotlight-tile-empty"><span>${typeEmojis[type]}</span><span class="spotlight-tile-label">${typeLabels[type]}</span></div></div>`;
           }).join('') +
           `</div>`;
       } else {
         spotlightEl.style.display = 'none';
-      }
-
-      // Stats
-      if (data.showStats && data.stats) {
-        const s = data.stats;
-        const tc = s.typeCounts || {};
-        document.getElementById('publicProfileStats').innerHTML = `
-          <div class="stats-grid">
-            ${tc.movie ? `<div class="stat-card"><div class="stat-value">${tc.movie}</div><div class="stat-label">Films</div></div>` : ''}
-            ${tc.tv ? `<div class="stat-card"><div class="stat-value">${tc.tv}</div><div class="stat-label">Shows</div></div>` : ''}
-            ${tc.book ? `<div class="stat-card"><div class="stat-value">${tc.book}</div><div class="stat-label">Books</div></div>` : ''}
-            ${tc.podcast ? `<div class="stat-card"><div class="stat-value">${tc.podcast}</div><div class="stat-label">Podcasts</div></div>` : ''}
-            ${s.avgRating ? `<div class="stat-card"><div class="stat-value">${s.avgRating}</div><div class="stat-label">Avg ★</div></div>` : ''}
-          </div>`;
       }
 
       // Items — filter by privacy
@@ -9559,7 +9663,7 @@
       if (visibleItems.length > 0) {
         // Build type pills — only for types that have items
         const presentTypes = [...new Set(visibleItems.map(i => i.type))];
-        const typeLabels = { movie: '🎥 Movies', tv: '📺 TV', book: '📚 Books', podcast: '🎙️ Podcasts' };
+        const typeLabels = { movie: 'Movies', tv: 'TV', book: 'Books', podcast: 'Podcasts' };
         const pills = document.getElementById('publicProfilePills');
         pills.innerHTML =
           `<button class="status-pill active" onclick="filterPublicProfileType('all', this)">All</button>` +
@@ -9598,14 +9702,14 @@
         if (!typeItems.length) return;
 
         if (!singleType) {
-          html += `<div style="font-size:0.72rem;text-transform:uppercase;letter-spacing:0.08em;color:var(--text-tertiary);margin:1.25rem 0 0.5rem;font-weight:600;">${typeEmojis[type]} ${typeHeadings[type]}</div>`;
+          html += `<div class="profile-type-header"><span class="profile-type-header-text">${typeHeadings[type]}</span><div class="profile-type-header-line"></div></div>`;
         }
 
         statusOrder.forEach(status => {
           const statusItems = typeItems.filter(i => i.status === status);
           if (!statusItems.length) return;
-          html += `<div style="font-size:0.7rem;color:var(--text-tertiary);margin:0.75rem 0 0.4rem;">${statusLabels[status]}</div>`;
-          html += `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:0.5rem;margin-bottom:0.5rem;">`;
+          html += `<div class="profile-status-label">${statusLabels[status]}</div>`;
+          html += `<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:0.5rem;margin-bottom:0.75rem;">`;
           statusItems.forEach(item => {
             html += `<div style="border-radius:8px;overflow:hidden;background:var(--bg-accent);position:relative;">
               <div style="aspect-ratio:2/3;width:100%;overflow:hidden;background:var(--bg-accent);display:flex;align-items:center;justify-content:center;">
@@ -9613,7 +9717,7 @@
                   ? `<img loading="lazy" src="${item.image}" alt="${item.title}" style="width:100%;height:100%;object-fit:cover;">`
                   : `<span style="font-size:1.6rem;">${typeEmojis[item.type]||''}</span>`}
               </div>
-              ${showRatings && item.rating ? `<div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.75));padding:0.3rem 0.25rem 0.2rem;font-size:0.6rem;color:#f59e0b;line-height:1;">${'★'.repeat(Math.round(item.rating))}</div>` : ''}
+              ${showRatings && item.rating ? `<div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.8));padding:0.8rem 0.35rem 0.3rem;font-size:0.62rem;color:#f59e0b;line-height:1;">${'★'.repeat(Math.round(item.rating))}</div>` : ''}
             </div>`;
           });
           html += `</div>`;

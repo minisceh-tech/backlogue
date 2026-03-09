@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Logo Preview</title>
+  <style>
+    body {
+      margin: 0;
+      background: #080f12;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: center;
+      gap: 3rem;
+      min-height: 100vh;
+      font-family: sans-serif;
+    }
+    .swatch {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.75rem;
+      color: rgba(255,255,255,0.4);
+      font-size: 0.75rem;
+    }
+    .glow {
+      animation: splashGlow 2s ease-in-out infinite;
+    }
+    @keyframes splashGlow {
+      0%, 100% { filter: drop-shadow(0 0 12px rgba(20,184,166,0.55)) drop-shadow(0 0 32px rgba(20,184,166,0.15)); }
+      50% { filter: drop-shadow(0 0 22px rgba(20,184,166,0.9)) drop-shadow(0 0 55px rgba(13,148,136,0.3)); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Small (48px) -->
+  <div class="swatch">
+    <div class="glow">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="48" height="48">
+        <defs>
+          <linearGradient id="bg1" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#112a35"/><stop offset="100%" stop-color="#081419"/></linearGradient>
+          <linearGradient id="teal1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
+          <linearGradient id="bkm1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1ee5cc"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
+        </defs>
+        <rect width="96" height="96" rx="22" fill="url(#bg1)"/>
+        <rect width="96" height="96" rx="22" fill="none" stroke="#14b8a6" stroke-width="1.5" opacity="0.4"/>
+        <path d="M 37 33 L 59 33 L 59 90 L 48 80 L 37 90 Z" fill="url(#bkm1)"/>
+        <rect x="37" y="33" width="22" height="3" fill="#5eead4" opacity="0.35"/>
+        <polygon points="42,55 42,74 56,64.5" fill="#e2f0f2"/>
+        <path d="M 26 45 C 26 17 70 17 70 45" fill="none" stroke="url(#teal1)" stroke-width="6" stroke-linecap="round"/>
+        <rect x="13" y="41" width="14" height="22" rx="7" fill="url(#teal1)"/>
+        <rect x="16.5" y="45.5" width="7" height="13" rx="3.5" fill="#081419" opacity="0.35"/>
+        <rect x="69" y="41" width="14" height="22" rx="7" fill="url(#teal1)"/>
+        <rect x="72.5" y="45.5" width="7" height="13" rx="3.5" fill="#081419" opacity="0.35"/>
+      </svg>
+    </div>
+    48px
+  </div>
+
+  <!-- Medium (96px) -->
+  <div class="swatch">
+    <div class="glow">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96">
+        <defs>
+          <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#112a35"/><stop offset="100%" stop-color="#081419"/></linearGradient>
+          <linearGradient id="teal2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
+          <linearGradient id="bkm2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1ee5cc"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
+        </defs>
+        <rect width="96" height="96" rx="22" fill="url(#bg2)"/>
+        <rect width="96" height="96" rx="22" fill="none" stroke="#14b8a6" stroke-width="1.5" opacity="0.4"/>
+        <path d="M 37 33 L 59 33 L 59 90 L 48 80 L 37 90 Z" fill="url(#bkm2)"/>
+        <rect x="37" y="33" width="22" height="3" fill="#5eead4" opacity="0.35"/>
+        <polygon points="42,55 42,74 56,64.5" fill="#e2f0f2"/>
+        <path d="M 26 45 C 26 17 70 17 70 45" fill="none" stroke="url(#teal2)" stroke-width="6" stroke-linecap="round"/>
+        <rect x="13" y="41" width="14" height="22" rx="7" fill="url(#teal2)"/>
+        <rect x="16.5" y="45.5" width="7" height="13" rx="3.5" fill="#081419" opacity="0.35"/>
+        <rect x="69" y="41" width="14" height="22" rx="7" fill="url(#teal2)"/>
+        <rect x="72.5" y="45.5" width="7" height="13" rx="3.5" fill="#081419" opacity="0.35"/>
+      </svg>
+    </div>
+    96px
+  </div>
+
+  <!-- Large (160px) -->
+  <div class="swatch">
+    <div class="glow">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="160" height="160">
+        <defs>
+          <linearGradient id="bg3" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#112a35"/><stop offset="100%" stop-color="#081419"/></linearGradient>
+          <linearGradient id="teal3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
+          <linearGradient id="bkm3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1ee5cc"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
+        </defs>
+        <rect width="96" height="96" rx="22" fill="url(#bg3)"/>
+        <rect width="96" height="96" rx="22" fill="none" stroke="#14b8a6" stroke-width="1.5" opacity="0.4"/>
+        <path d="M 37 33 L 59 33 L 59 90 L 48 80 L 37 90 Z" fill="url(#bkm3)"/>
+        <rect x="37" y="33" width="22" height="3" fill="#5eead4" opacity="0.35"/>
+        <polygon points="42,55 42,74 56,64.5" fill="#e2f0f2"/>
+        <path d="M 26 45 C 26 17 70 17 70 45" fill="none" stroke="url(#teal3)" stroke-width="6" stroke-linecap="round"/>
+        <rect x="13" y="41" width="14" height="22" rx="7" fill="url(#teal3)"/>
+        <rect x="16.5" y="45.5" width="7" height="13" rx="3.5" fill="#081419" opacity="0.35"/>
+        <rect x="69" y="41" width="14" height="22" rx="7" fill="url(#teal3)"/>
+        <rect x="72.5" y="45.5" width="7" height="13" rx="3.5" fill="#081419" opacity="0.35"/>
+      </svg>
+    </div>
+    160px
+  </div>
+
+  <!-- Light background test -->
+  <div class="swatch" style="background:#f0f0f0; padding:1.5rem; border-radius:16px;">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96">
+      <defs>
+        <linearGradient id="bg4" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#112a35"/><stop offset="100%" stop-color="#081419"/></linearGradient>
+        <linearGradient id="teal4" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
+        <linearGradient id="bkm4" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1ee5cc"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
+      </defs>
+      <rect width="96" height="96" rx="22" fill="url(#bg4)"/>
+      <rect width="96" height="96" rx="22" fill="none" stroke="#14b8a6" stroke-width="1.5" opacity="0.4"/>
+      <path d="M 37 33 L 59 33 L 59 90 L 48 80 L 37 90 Z" fill="url(#bkm4)"/>
+      <rect x="37" y="33" width="22" height="3" fill="#5eead4" opacity="0.35"/>
+      <polygon points="42,55 42,74 56,64.5" fill="#e2f0f2"/>
+      <path d="M 26 45 C 26 17 70 17 70 45" fill="none" stroke="url(#teal4)" stroke-width="6" stroke-linecap="round"/>
+      <rect x="13" y="41" width="14" height="22" rx="7" fill="url(#teal4)"/>
+      <rect x="16.5" y="45.5" width="7" height="13" rx="3.5" fill="#081419" opacity="0.35"/>
+      <rect x="69" y="41" width="14" height="22" rx="7" fill="url(#teal4)"/>
+      <rect x="72.5" y="45.5" width="7" height="13" rx="3.5" fill="#081419" opacity="0.35"/>
+    </svg>
+    <span style="color:#555;">on light bg</span>
+  </div>
+
+</body>
+</html>

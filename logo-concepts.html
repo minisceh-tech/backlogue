@@ -1,0 +1,400 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cued — Logo Concepts</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,700;12..96,800&family=Outfit:wght@300;400;500;600&display=swap');
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      background: #060d10;
+      color: #e2f0f2;
+      font-family: 'Outfit', sans-serif;
+      min-height: 100vh;
+      padding: 3rem 2rem 5rem;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 3.5rem;
+    }
+
+    header h1 {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.75rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(135deg, #fff 0%, #5eead4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    header p {
+      color: #5a8a92;
+      font-size: 0.875rem;
+      margin-top: 0.4rem;
+      font-weight: 400;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 2rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: #0d1c21;
+      border: 1px solid rgba(255,255,255,0.07);
+      border-radius: 20px;
+      padding: 2.5rem 2rem 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1.5rem;
+    }
+
+    .logo-showcase {
+      display: flex;
+      align-items: flex-end;
+      gap: 1.25rem;
+    }
+
+    .size-label {
+      font-size: 0.6rem;
+      color: #3a6a72;
+      text-align: center;
+      margin-top: 0.4rem;
+      letter-spacing: 0.08em;
+    }
+
+    .concept-name {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #e2f0f2;
+      text-align: center;
+    }
+
+    .concept-tag {
+      font-size: 0.7rem;
+      font-weight: 500;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #14b8a6;
+      margin-top: -1rem;
+    }
+
+    .concept-desc {
+      font-size: 0.8rem;
+      color: #5a8a92;
+      text-align: center;
+      line-height: 1.6;
+      max-width: 220px;
+    }
+
+    .glow {
+      animation: glow 2.2s ease-in-out infinite;
+    }
+
+    @keyframes glow {
+      0%, 100% { filter: drop-shadow(0 0 10px rgba(20,184,166,0.5)) drop-shadow(0 0 28px rgba(20,184,166,0.12)); }
+      50%       { filter: drop-shadow(0 0 20px rgba(20,184,166,0.85)) drop-shadow(0 0 48px rgba(13,148,136,0.28)); }
+    }
+
+    .divider {
+      width: 32px;
+      height: 2px;
+      background: linear-gradient(90deg, transparent, #14b8a6, transparent);
+      border-radius: 1px;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Cued — Logo Concepts</h1>
+  <p>Five directions. Each designed to work at app-icon size and beyond.</p>
+</header>
+
+<div class="grid">
+
+  <!-- ═══════════════════════════════════════════
+       CONCEPT 1 — REFINED CURRENT
+       Headphones + Bookmark + Play
+  ════════════════════════════════════════════ -->
+  <div class="card">
+    <div class="logo-showcase">
+      <div>
+        <div class="glow">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="120" height="120">
+            <defs>
+              <linearGradient id="c1bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#112a35"/><stop offset="100%" stop-color="#081419"/></linearGradient>
+              <linearGradient id="c1teal" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
+              <linearGradient id="c1bkm" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1ee5cc"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
+            </defs>
+            <rect width="96" height="96" rx="22" fill="url(#c1bg)"/>
+            <rect width="96" height="96" rx="22" fill="none" stroke="#14b8a6" stroke-width="1.5" opacity="0.4"/>
+            <!-- Bookmark behind headphones -->
+            <path d="M 37 40 L 59 40 L 59 90 L 48 80 L 37 90 Z" fill="url(#c1bkm)"/>
+            <rect x="37" y="40" width="22" height="3" fill="#5eead4" opacity="0.35"/>
+            <polygon points="42,58 42,76 56,67" fill="#e2f0f2"/>
+            <!-- Headphones on top -->
+            <path d="M 26 45 C 26 17 70 17 70 45" fill="none" stroke="url(#c1teal)" stroke-width="6" stroke-linecap="round"/>
+            <rect x="13" y="41" width="14" height="22" rx="7" fill="url(#c1teal)"/>
+            <rect x="16.5" y="45.5" width="7" height="13" rx="3.5" fill="#081419" opacity="0.35"/>
+            <rect x="69" y="41" width="14" height="22" rx="7" fill="url(#c1teal)"/>
+            <rect x="72.5" y="45.5" width="7" height="13" rx="3.5" fill="#081419" opacity="0.35"/>
+          </svg>
+        </div>
+        <div class="size-label">120px</div>
+      </div>
+      <div>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="52" height="52">
+          <defs>
+            <linearGradient id="c1bg-s" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#112a35"/><stop offset="100%" stop-color="#081419"/></linearGradient>
+            <linearGradient id="c1teal-s" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
+            <linearGradient id="c1bkm-s" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#1ee5cc"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
+          </defs>
+          <rect width="96" height="96" rx="22" fill="url(#c1bg-s)"/>
+          <rect width="96" height="96" rx="22" fill="none" stroke="#14b8a6" stroke-width="1.5" opacity="0.4"/>
+          <path d="M 37 40 L 59 40 L 59 90 L 48 80 L 37 90 Z" fill="url(#c1bkm-s)"/>
+          <polygon points="42,58 42,76 56,67" fill="#e2f0f2"/>
+          <path d="M 26 45 C 26 17 70 17 70 45" fill="none" stroke="url(#c1teal-s)" stroke-width="6" stroke-linecap="round"/>
+          <rect x="13" y="41" width="14" height="22" rx="7" fill="url(#c1teal-s)"/>
+          <rect x="69" y="41" width="14" height="22" rx="7" fill="url(#c1teal-s)"/>
+        </svg>
+        <div class="size-label">52px</div>
+      </div>
+    </div>
+    <div class="concept-name">A — Headphones + Bookmark</div>
+    <div class="concept-tag">Current Direction</div>
+    <div class="divider"></div>
+    <div class="concept-desc">Headphones (audio/all media) frame a bookmark with a play button. The bookmark rises through the arch. Familiar, warm, communicates both tracking and playback.</div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       CONCEPT 2 — THE STACK
+       Fanned media cards = your collection
+  ════════════════════════════════════════════ -->
+  <div class="card">
+    <div class="logo-showcase">
+      <div>
+        <div class="glow">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="120" height="120">
+            <defs>
+              <linearGradient id="c2bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#112a35"/><stop offset="100%" stop-color="#081419"/></linearGradient>
+              <linearGradient id="c2t1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0d6b60"/><stop offset="100%" stop-color="#084d44"/></linearGradient>
+              <linearGradient id="c2t2" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0d9488"/><stop offset="100%" stop-color="#0a7a70"/></linearGradient>
+              <linearGradient id="c2t3" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#14b8a6"/></linearGradient>
+            </defs>
+            <rect width="96" height="96" rx="22" fill="url(#c2bg)"/>
+            <!-- Back card -->
+            <g transform="rotate(-12, 48, 52)">
+              <rect x="20" y="18" width="56" height="60" rx="9" fill="url(#c2t1)"/>
+            </g>
+            <!-- Middle card -->
+            <g transform="rotate(-5, 48, 52)">
+              <rect x="20" y="18" width="56" height="60" rx="9" fill="url(#c2t2)"/>
+            </g>
+            <!-- Front card -->
+            <rect x="20" y="18" width="56" height="60" rx="9" fill="url(#c2t3)"/>
+            <!-- Play button on front card -->
+            <polygon points="38,36 38,60 62,48" fill="#081419" opacity="0.75"/>
+            <!-- Small dots at bottom (like media type indicators) -->
+            <circle cx="36" cy="70" r="3" fill="#081419" opacity="0.5"/>
+            <circle cx="48" cy="70" r="3" fill="#081419" opacity="0.5"/>
+            <circle cx="60" cy="70" r="3" fill="#081419" opacity="0.5"/>
+          </svg>
+        </div>
+        <div class="size-label">120px</div>
+      </div>
+      <div>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="52" height="52">
+          <defs>
+            <linearGradient id="c2bg-s" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#112a35"/><stop offset="100%" stop-color="#081419"/></linearGradient>
+            <linearGradient id="c2t1-s" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0d6b60"/><stop offset="100%" stop-color="#084d44"/></linearGradient>
+            <linearGradient id="c2t2-s" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#0d9488"/><stop offset="100%" stop-color="#0a7a70"/></linearGradient>
+            <linearGradient id="c2t3-s" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#14b8a6"/></linearGradient>
+          </defs>
+          <rect width="96" height="96" rx="22" fill="url(#c2bg-s)"/>
+          <g transform="rotate(-12, 48, 52)"><rect x="20" y="18" width="56" height="60" rx="9" fill="url(#c2t1-s)"/></g>
+          <g transform="rotate(-5, 48, 52)"><rect x="20" y="18" width="56" height="60" rx="9" fill="url(#c2t2-s)"/></g>
+          <rect x="20" y="18" width="56" height="60" rx="9" fill="url(#c2t3-s)"/>
+          <polygon points="38,36 38,60 62,48" fill="#081419" opacity="0.75"/>
+        </svg>
+        <div class="size-label">52px</div>
+      </div>
+    </div>
+    <div class="concept-name">B — The Stack</div>
+    <div class="concept-tag">Collection / Library</div>
+    <div class="divider"></div>
+    <div class="concept-desc">Three fanned cards = your media collection. Depth of content at a glance. The play button on the front card says "ready to go." Works universally across all media types.</div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       CONCEPT 3 — THE FOLD
+       Corner fold = play button (clever dual symbol)
+  ════════════════════════════════════════════ -->
+  <div class="card">
+    <div class="logo-showcase">
+      <div>
+        <div class="glow">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="120" height="120">
+            <defs>
+              <linearGradient id="c3bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#112a35"/><stop offset="100%" stop-color="#081419"/></linearGradient>
+              <linearGradient id="c3card" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#14b8a6"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
+              <linearGradient id="c3fold" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#2dd4bf"/></linearGradient>
+            </defs>
+            <rect width="96" height="96" rx="22" fill="url(#c3bg)"/>
+            <!-- Card body with top-right corner cut -->
+            <path d="M 16 24 Q 16 14 26 14 L 60 14 L 82 36 L 82 78 Q 82 86 74 86 L 26 86 Q 16 86 16 78 Z" fill="url(#c3card)"/>
+            <!-- Folded corner (bright) -->
+            <path d="M 60 14 L 82 36 L 60 36 Z" fill="url(#c3fold)"/>
+            <!-- Shadow line on fold -->
+            <line x1="60" y1="14" x2="60" y2="36" stroke="#0d9488" stroke-width="1.5" opacity="0.5"/>
+            <!-- Play triangle on card body -->
+            <polygon points="30,40 30,66 56,53" fill="#081419" opacity="0.6"/>
+          </svg>
+        </div>
+        <div class="size-label">120px</div>
+      </div>
+      <div>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="52" height="52">
+          <defs>
+            <linearGradient id="c3bg-s" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#112a35"/><stop offset="100%" stop-color="#081419"/></linearGradient>
+            <linearGradient id="c3card-s" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#14b8a6"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
+            <linearGradient id="c3fold-s" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#2dd4bf"/></linearGradient>
+          </defs>
+          <rect width="96" height="96" rx="22" fill="url(#c3bg-s)"/>
+          <path d="M 16 24 Q 16 14 26 14 L 60 14 L 82 36 L 82 78 Q 82 86 74 86 L 26 86 Q 16 86 16 78 Z" fill="url(#c3card-s)"/>
+          <path d="M 60 14 L 82 36 L 60 36 Z" fill="url(#c3fold-s)"/>
+          <polygon points="30,40 30,66 56,53" fill="#081419" opacity="0.6"/>
+        </svg>
+        <div class="size-label">52px</div>
+      </div>
+    </div>
+    <div class="concept-name">C — The Fold</div>
+    <div class="concept-tag">Clever / Minimal</div>
+    <div class="divider"></div>
+    <div class="concept-desc">A content card with its top-right corner folded down — that fold is a play button. One shape, two meanings: bookmarked content + ready to play. Clean and ownable.</div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       CONCEPT 4 — THE ARC + PLAY
+       Bold C-shape with integrated play triangle
+  ════════════════════════════════════════════ -->
+  <div class="card">
+    <div class="logo-showcase">
+      <div>
+        <div class="glow">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="120" height="120">
+            <defs>
+              <linearGradient id="c4bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#112a35"/><stop offset="100%" stop-color="#081419"/></linearGradient>
+              <linearGradient id="c4arc" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
+              <linearGradient id="c4tri" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#14b8a6"/></linearGradient>
+            </defs>
+            <rect width="96" height="96" rx="22" fill="url(#c4bg)"/>
+            <!-- Bold C arc — opens to the right -->
+            <path d="M 62 20 A 30 30 0 1 0 62 76" fill="none" stroke="url(#c4arc)" stroke-width="14" stroke-linecap="round"/>
+            <!-- Play triangle filling the gap -->
+            <polygon points="58,22 58,74 88,48" fill="url(#c4tri)"/>
+          </svg>
+        </div>
+        <div class="size-label">120px</div>
+      </div>
+      <div>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="52" height="52">
+          <defs>
+            <linearGradient id="c4bg-s" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#112a35"/><stop offset="100%" stop-color="#081419"/></linearGradient>
+            <linearGradient id="c4arc-s" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
+            <linearGradient id="c4tri-s" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#14b8a6"/></linearGradient>
+          </defs>
+          <rect width="96" height="96" rx="22" fill="url(#c4bg-s)"/>
+          <path d="M 62 20 A 30 30 0 1 0 62 76" fill="none" stroke="url(#c4arc-s)" stroke-width="14" stroke-linecap="round"/>
+          <polygon points="58,22 58,74 88,48" fill="url(#c4tri-s)"/>
+        </svg>
+        <div class="size-label">52px</div>
+      </div>
+    </div>
+    <div class="concept-name">D — The Arc</div>
+    <div class="concept-tag">Bold / Ownable</div>
+    <div class="divider"></div>
+    <div class="concept-desc">A bold C-arc (referencing "Cued") with a play triangle locked into the opening. Two shapes, one unified idea. Reads instantly at any size. The most brandable option.</div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════════
+       CONCEPT 5 — THE QUEUE
+       Three stacked pills = items in your queue
+  ════════════════════════════════════════════ -->
+  <div class="card">
+    <div class="logo-showcase">
+      <div>
+        <div class="glow">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="120" height="120">
+            <defs>
+              <linearGradient id="c5bg" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#112a35"/><stop offset="100%" stop-color="#081419"/></linearGradient>
+              <linearGradient id="c5p1" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#14b8a6"/></linearGradient>
+              <linearGradient id="c5p2" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#14b8a6"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
+              <linearGradient id="c5p3" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#0d9488"/><stop offset="100%" stop-color="#0a7a70"/></linearGradient>
+            </defs>
+            <rect width="96" height="96" rx="22" fill="url(#c5bg)"/>
+            <!-- Top pill — NOW PLAYING (brightest, full width) -->
+            <rect x="14" y="16" width="68" height="18" rx="9" fill="url(#c5p1)"/>
+            <!-- Play triangle inside top pill -->
+            <polygon points="24,20.5 24,29.5 34,25" fill="#081419" opacity="0.7"/>
+            <!-- Title lines in top pill -->
+            <rect x="39" y="21" width="28" height="3" rx="1.5" fill="#081419" opacity="0.4"/>
+            <rect x="39" y="27" width="18" height="2.5" rx="1.25" fill="#081419" opacity="0.25"/>
+            <!-- Middle pill — QUEUED -->
+            <rect x="14" y="42" width="68" height="16" rx="8" fill="url(#c5p2)" opacity="0.75"/>
+            <rect x="26" y="47" width="34" height="3" rx="1.5" fill="#081419" opacity="0.35"/>
+            <rect x="26" y="52" width="22" height="2.5" rx="1.25" fill="#081419" opacity="0.2"/>
+            <!-- Bottom pill — QUEUED (dimmest) -->
+            <rect x="14" y="64" width="68" height="16" rx="8" fill="url(#c5p3)" opacity="0.45"/>
+            <rect x="26" y="69" width="26" height="3" rx="1.5" fill="#081419" opacity="0.3"/>
+            <rect x="26" y="74" width="16" height="2.5" rx="1.25" fill="#081419" opacity="0.2"/>
+          </svg>
+        </div>
+        <div class="size-label">120px</div>
+      </div>
+      <div>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="52" height="52">
+          <defs>
+            <linearGradient id="c5bg-s" x1="0" y1="0" x2="1" y2="1"><stop offset="0%" stop-color="#112a35"/><stop offset="100%" stop-color="#081419"/></linearGradient>
+            <linearGradient id="c5p1-s" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#5eead4"/><stop offset="100%" stop-color="#14b8a6"/></linearGradient>
+            <linearGradient id="c5p2-s" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#14b8a6"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
+            <linearGradient id="c5p3-s" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="#0d9488"/><stop offset="100%" stop-color="#0a7a70"/></linearGradient>
+          </defs>
+          <rect width="96" height="96" rx="22" fill="url(#c5bg-s)"/>
+          <rect x="14" y="16" width="68" height="18" rx="9" fill="url(#c5p1-s)"/>
+          <polygon points="24,20.5 24,29.5 34,25" fill="#081419" opacity="0.7"/>
+          <rect x="14" y="42" width="68" height="16" rx="8" fill="url(#c5p2-s)" opacity="0.75"/>
+          <rect x="14" y="64" width="68" height="16" rx="8" fill="url(#c5p3-s)" opacity="0.45"/>
+        </svg>
+        <div class="size-label">52px</div>
+      </div>
+    </div>
+    <div class="concept-name">E — The Queue</div>
+    <div class="concept-tag">Literal / Modern</div>
+    <div class="divider"></div>
+    <div class="concept-desc">Three stacked rows fading down — now playing on top, two queued below. Literally shows what the app does. The gradient fade says "there's more coming." Very readable at icon size.</div>
+  </div>
+
+</div>
+
+<p style="text-align:center; color:#3a6a72; font-size:0.75rem; margin-top:3rem; letter-spacing:0.06em;">
+  CUED — LOGO CONCEPT REVIEW &nbsp;·&nbsp; 2026
+</p>
+
+</body>
+</html>

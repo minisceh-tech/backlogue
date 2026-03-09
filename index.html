@@ -105,7 +105,6 @@
       color: var(--text-primary);
       line-height: 1.6;
       overflow-x: hidden;
-      overscroll-behavior-y: none;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
       min-height: 100vh;
@@ -639,8 +638,7 @@
     .container {
       max-width: 1400px;
       margin: 0 auto;
-      padding: 1rem 1rem 5rem;
-      padding-top: var(--content-top, 80px);
+      padding: 0 1rem 5rem;
     }
 
     .tab {
@@ -770,7 +768,7 @@
       }
 
       .container {
-        padding: 0.75rem 0.5rem 5rem;
+        padding: 0 0.5rem 5rem;
       }
 
       /* Modal — tighter on mobile */
@@ -3941,6 +3939,7 @@
   </div>
 
   <div class="container" style="position:relative;">
+    <div id="headerSpacer" style="width:100%;"></div>
     <div id="pullToRefresh" class="pull-refresh-indicator">
       <div class="spinner"></div> Refreshing...
     </div>
@@ -4886,18 +4885,23 @@
 
     // ========== AUTHENTICATION FUNCTIONS ==========
 
-    // Measure actual header bottom and set content offset
+    // Measure actual header bottom and push content below it using a real DOM spacer
     function updateContentOffset() {
       requestAnimationFrame(() => {
         const header = document.querySelector('.header');
-        if (!header) return;
+        const spacer = document.getElementById('headerSpacer');
+        if (!header || !spacer) return;
         const headerBottom = header.getBoundingClientRect().bottom;
         if (headerBottom > 0) {
-          document.documentElement.style.setProperty('--content-top', (headerBottom + 16) + 'px');
+          spacer.style.height = (headerBottom + 12) + 'px';
         }
       });
     }
-    window.addEventListener('load', () => { updateContentOffset(); setTimeout(updateContentOffset, 600); });
+    window.addEventListener('load', () => {
+      updateContentOffset();
+      setTimeout(updateContentOffset, 300);
+      setTimeout(updateContentOffset, 800);
+    });
     window.addEventListener('resize', updateContentOffset);
     window.addEventListener('orientationchange', () => setTimeout(updateContentOffset, 400));
 

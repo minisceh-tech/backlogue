@@ -3840,13 +3840,25 @@
       <div class="header-left" style="flex:1;">
       </div>
       <div class="brand-name">Backlogue</div>
-      <div class="header-right" style="flex:1; justify-content:flex-end;">
+      <div class="header-right" style="flex:1; justify-content:flex-end; gap:0.25rem;">
+        <button class="header-icon-btn" id="headerSortBtn" onclick="toggleSortPopover(this)" title="Sort" aria-label="Sort" style="display:none;">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 4h12M4 8h8M6 12h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
         <button class="header-icon-btn" id="headerUserBtn" onclick="openProfileSettings()" title="Account" aria-label="Account">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="8" cy="5" r="3" fill="currentColor"/>
             <path d="M2 14c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
         </button>
+        <div class="sort-popover" id="sortPopover">
+          <button onclick="applySortFilter('default',this)">Default</button>
+          <button onclick="applySortFilter('dateAdded',this)">Date Added</button>
+          <button onclick="applySortFilter('dateLogged',this)">Date Logged</button>
+          <button onclick="applySortFilter('rating',this)">Rating</button>
+          <button onclick="applySortFilter('title',this)">A – Z</button>
+        </div>
       </div>
       <select id="typeFilter" style="display:none;"><option value="all"></option></select>
       <select id="statusFilter" style="display:none;">
@@ -3925,18 +3937,12 @@
           <span class="type-nav-icon">📚</span>
           <span class="type-nav-label">Books</span>
         </button>
-        <button class="type-nav-btn" onclick="toggleSortPopover(this)" id="sortChipBtn">
-          <svg class="type-nav-icon" width="20" height="20" viewBox="0 0 20 20" fill="currentColor"><path d="M3 5h14M6 10h8M9 15h2" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
-          <span class="type-nav-label">Sort</span>
+        <button class="type-nav-btn" id="typeNavGroupsBtn" onclick="switchToGroups(this)" style="position:relative;">
+          <span class="type-nav-icon">👥</span>
+          <span class="type-nav-label">Groups</span>
+          <span class="join-request-badge" id="joinBadge" style="display:none;"></span>
+          <span class="join-request-badge" id="newItemsBadge" style="display:none; right:2px; top:2px;"></span>
         </button>
-      </div>
-      <!-- Sort popover -->
-      <div class="sort-popover" id="sortPopover">
-        <button onclick="applySortFilter('default',this)">Default</button>
-        <button onclick="applySortFilter('dateAdded',this)">Date Added</button>
-        <button onclick="applySortFilter('dateLogged',this)">Date Logged</button>
-        <button onclick="applySortFilter('rating',this)">Rating</button>
-        <button onclick="applySortFilter('title',this)">A – Z</button>
       </div>
     </div>
     <div id="groupTabsContainer" style="display: none;"></div>
@@ -4454,6 +4460,7 @@
     <div class="modal-content">
       <button class="modal-close" onclick="closeModal('profileSettingsModal')" aria-label="Close">&times;</button>
       <h2 class="modal-header">Settings</h2>
+      <button class="btn" style="width:100%; margin-bottom:1rem;" onclick="openStatsModal(); closeModal('profileSettingsModal')">📊 My Stats</button>
       <div class="form-group">
         <label class="toggle-row">
           <span>Light Mode</span>
@@ -5951,6 +5958,14 @@
       currentMediaFilter = value;
       document.querySelectorAll('#typeChipsRow .type-nav-btn').forEach(c => c.classList.remove('active'));
       if (btn) btn.classList.add('active');
+      // Show sort button and switch to shelf
+      const sortBtn = document.getElementById('headerSortBtn'); if(sortBtn) sortBtn.style.display = '';
+      document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
+      const shelfBtn = document.querySelector('.bottom-nav-btn[data-type="all"]'); if(shelfBtn) shelfBtn.classList.add('active');
+      if (!document.getElementById('myShelf').classList.contains('active')) {
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.getElementById('myShelf').classList.add('active');
+      }
       renderItems();
     }
 
@@ -5972,8 +5987,8 @@
     }
     function closeSortPopoverOutside(e) {
       const pop = document.getElementById('sortPopover');
-      const btn = document.getElementById('sortChipBtn');
-      if (!pop.contains(e.target) && e.target !== btn) {
+      const btn = document.getElementById('headerSortBtn');
+      if (!pop.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
         pop.classList.remove('open');
         document.removeEventListener('click', closeSortPopoverOutside);
       }
@@ -7458,8 +7473,7 @@
     function bottomNavFilter(type) {
       document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
       document.querySelector('.bottom-nav-btn[data-type="all"]').classList.add('active');
-      const sf = document.getElementById('shelfFilters'); if (sf) sf.style.display = '';
-      const sp = document.getElementById('filterBarSpacer'); if (sp) sp.style.display = '';
+      const sortBtn = document.getElementById('headerSortBtn'); if(sortBtn) sortBtn.style.display = '';
 
       currentMediaFilter = 'all';
       currentStatusFilter = 'all';
@@ -7538,11 +7552,9 @@
 
     // Update filter fab icon based on active filter
     function updateFilterFabIcon(type) {
-      const iconEl = document.getElementById('filterFabIcon');
-      const fabEl = document.getElementById('filterFab');
-      const icons = { all: '🎯', movie: '🎥', tv: '📺', book: '📚', podcast: '🎙️' };
-      iconEl.textContent = icons[type] || '🎯';
-      fabEl.classList.toggle('active', type !== 'all');
+      // filter-fab removed; sort button is in header
+      const sortBtn = document.getElementById('headerSortBtn');
+      if (sortBtn) sortBtn.style.display = '';
     }
 
     // Shelf referral filter
@@ -7619,10 +7631,11 @@
 
     // Switch to Groups tab and set FAB to green
     function switchToGroups(btn) {
-      switchTab('groupFeeds', { target: btn || document.getElementById('navGroupsBtn') });
+      switchTab('groupFeeds', { target: btn || document.getElementById('typeNavGroupsBtn') });
       document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
-      if (btn) btn.classList.add('active'); else { const gb = document.getElementById('navGroupsBtn'); if(gb) gb.classList.add('active'); }
-      const _sf = document.getElementById('shelfFilters'); if(_sf) _sf.style.display = 'none'; const _sp = document.getElementById('filterBarSpacer'); if(_sp) _sp.style.display = 'none';
+      document.querySelectorAll('#typeChipsRow .type-nav-btn').forEach(b => b.classList.remove('active'));
+      const gb = btn || document.getElementById('typeNavGroupsBtn'); if(gb) gb.classList.add('active');
+      const sortBtn = document.getElementById('headerSortBtn'); if(sortBtn) sortBtn.style.display = 'none';
       setFabMode('group');
       // Mark feed as seen
       localStorage.setItem('lastSeenGroupFeed', Date.now().toString());
@@ -7648,10 +7661,11 @@
 
     function openSearchPage(btn) {
       document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
-      if (btn) btn.classList.add('active'); else { const gb = document.getElementById('navGroupsBtn'); if(gb) gb.classList.add('active'); }
+      document.querySelectorAll('#typeChipsRow .type-nav-btn').forEach(b => b.classList.remove('active'));
+      if (btn) btn.classList.add('active');
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       document.getElementById('searchPage').classList.add('active');
-      const _sf = document.getElementById('shelfFilters'); if(_sf) _sf.style.display = 'none'; const _sp = document.getElementById('filterBarSpacer'); if(_sp) _sp.style.display = 'none';
+      const sortBtn = document.getElementById('headerSortBtn'); if(sortBtn) sortBtn.style.display = 'none';
       setFabMode('add');
       closeFabMenu();
 
@@ -7761,15 +7775,16 @@
 
     function openLibrary(btn, presetType) {
       document.querySelectorAll('.bottom-nav-btn').forEach(b => b.classList.remove('active'));
+      document.querySelectorAll('#typeChipsRow .type-nav-btn').forEach(b => b.classList.remove('active'));
       if (btn) {
-        if (btn) btn.classList.add('active'); else { const gb = document.getElementById('navGroupsBtn'); if(gb) gb.classList.add('active'); }
+        btn.classList.add('active');
       } else {
         const libBtn = document.querySelector('.bottom-nav-btn[onclick="openLibrary(this)"]');
         if (libBtn) libBtn.classList.add('active');
       }
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       document.getElementById('libraryPage').classList.add('active');
-      const _sf = document.getElementById('shelfFilters'); if(_sf) _sf.style.display = 'none'; const _sp = document.getElementById('filterBarSpacer'); if(_sp) _sp.style.display = 'none';
+      const sortBtn = document.getElementById('headerSortBtn'); if(sortBtn) sortBtn.style.display = 'none';
       setFabMode('add');
       closeFabMenu();
 
@@ -9539,20 +9554,6 @@
     <button class="bottom-nav-btn" onclick="openLibrary(this)">
       <span class="bottom-nav-icon">📖</span>
       <span class="bottom-nav-label">Library</span>
-    </button>
-    <button class="bottom-nav-btn" id="navGroupsBtn" style="position:relative;" onclick="switchToGroups(this)">
-      <span class="bottom-nav-icon">👥</span>
-      <span class="bottom-nav-label">Groups</span>
-      <span class="join-request-badge" id="joinBadge" style="display:none;"></span>
-      <span class="join-request-badge" id="newItemsBadge" style="display:none; right:6px; top:4px;"></span>
-    </button>
-    <button class="bottom-nav-btn" onclick="openStatsModal()">
-      <span class="bottom-nav-icon">📊</span>
-      <span class="bottom-nav-label">Stats</span>
-    </button>
-    <button class="bottom-nav-btn" onclick="openProfileSettings()">
-      <span class="bottom-nav-icon">👤</span>
-      <span class="bottom-nav-label">Profile</span>
     </button>
   </nav>
   <!-- Quick Action Menu (Long-Press) -->

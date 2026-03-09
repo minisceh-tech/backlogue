@@ -3177,41 +3177,6 @@
       color: #fff;
       font-weight: 600;
     }
-    .filter-chip-sort {
-      margin-left: auto;
-      display: flex;
-      align-items: center;
-      gap: 0.3rem;
-      padding: 0.28rem 0.75rem;
-    }
-    .sort-popover {
-      position: absolute;
-      right: 1rem;
-      top: calc(100% + 4px);
-      background: var(--bg-accent);
-      border: 1px solid var(--border-light);
-      border-radius: 10px;
-      box-shadow: 0 8px 24px rgba(0,0,0,0.4);
-      z-index: 200;
-      min-width: 150px;
-      overflow: hidden;
-      display: none;
-    }
-    .sort-popover.open { display: block; }
-    .sort-popover button {
-      display: block;
-      width: 100%;
-      padding: 0.7rem 1rem;
-      text-align: left;
-      background: none;
-      border: none;
-      color: var(--text-secondary);
-      font-family: 'Outfit', sans-serif;
-      font-size: 0.85rem;
-      cursor: pointer;
-    }
-    .sort-popover button:hover { background: rgba(20,184,166,0.1); color: var(--text-primary); }
-    .sort-popover button.active { color: var(--accent-primary); font-weight: 600; }
 
     /* ── Type Nav (filter bar icon buttons) ── */
     .type-nav-btn {
@@ -3752,7 +3717,25 @@
     /* ===== Public Profile View ===== */
     .public-profile-header {
       text-align: center;
-      padding: 2rem 1rem 1rem;
+      padding: 2.5rem 1rem 1.5rem;
+      border-bottom: 1px solid var(--border-light);
+      margin-bottom: 1.75rem;
+    }
+    .public-profile-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 1.25rem;
+    }
+    .public-profile-brand-word {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(135deg, #ffffff 0%, #5eead4 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
     }
 
     .public-profile-name {
@@ -3824,67 +3807,6 @@
       margin-top: 0.2rem;
     }
 
-    /* --- Right Now spotlight --- */
-    .profile-right-now {
-      padding: 1.5rem 1rem 0;
-      max-width: 600px;
-      margin: 0 auto;
-    }
-    .profile-right-now-label {
-      font-family: 'Bricolage Grotesque', sans-serif;
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--accent-primary);
-      margin-bottom: 0.75rem;
-      letter-spacing: -0.01em;
-    }
-    .profile-right-now-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 0.6rem;
-    }
-    .spotlight-tile {
-      position: relative;
-      border-radius: 10px;
-      overflow: hidden;
-      aspect-ratio: 2/3;
-      background: var(--bg-accent);
-    }
-    .spotlight-tile img {
-      width: 100%; height: 100%; object-fit: cover;
-    }
-    .spotlight-tile-caption {
-      position: absolute;
-      bottom: 0; left: 0; right: 0;
-      background: linear-gradient(transparent, rgba(0,0,0,0.82));
-      padding: 1rem 0.4rem 0.4rem;
-      font-size: 0.6rem;
-      color: #fff;
-      line-height: 1.3;
-      font-weight: 500;
-    }
-    .spotlight-tile-type {
-      font-size: 0.55rem;
-      color: var(--accent-primary);
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      margin-bottom: 0.1rem;
-    }
-    .spotlight-tile-empty {
-      width: 100%; height: 100%;
-      display: flex; flex-direction: column;
-      align-items: center; justify-content: center;
-      gap: 0.3rem;
-      color: var(--text-tertiary);
-      font-size: 1.4rem;
-      opacity: 0.4;
-    }
-    .spotlight-tile-label {
-      font-size: 0.6rem;
-      color: var(--text-tertiary);
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-    }
 
     /* --- Profile section/type headers --- */
     .profile-type-header {
@@ -4279,11 +4201,6 @@
       </div>
       <button onclick="goToShelf()" style="background:none;border:none;padding:8px 6px;margin:-8px -6px;cursor:pointer;display:flex;align-items:center;"><div class="brand-name">Cued</div></button>
       <div class="header-right" style="flex:1; justify-content:flex-end; gap:0.25rem;">
-        <button class="header-icon-btn" id="headerSortBtn" onclick="toggleSortPopover(this)" title="Sort" aria-label="Sort" style="display:none;">
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M2 4h12M4 8h8M6 12h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-          </svg>
-        </button>
         <button class="header-icon-btn" id="headerActivityBtn" onclick="switchToGroups()" title="Friends &amp; Groups" aria-label="Friends and Groups" style="position:relative;">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="5.5" cy="5" r="2.5" stroke="currentColor" stroke-width="1.5"/>
@@ -4300,13 +4217,6 @@
             <path d="M2 14c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
         </button>
-        <div class="sort-popover" id="sortPopover">
-          <button onclick="applySortFilter('default',this)">Default</button>
-          <button onclick="applySortFilter('dateAdded',this)">Date Added</button>
-          <button onclick="applySortFilter('dateLogged',this)">Date Logged</button>
-          <button onclick="applySortFilter('rating',this)">Rating</button>
-          <button onclick="applySortFilter('title',this)">A – Z</button>
-        </div>
       </div>
       <select id="typeFilter" style="display:none;"><option value="all"></option></select>
       <select id="statusFilter" style="display:none;">
@@ -4417,10 +4327,55 @@
       </div>
       <div id="followingFeedPanel">
         <div id="followingFeedContainer"></div>
-        <div id="followingFeedEmpty" style="display:none; text-align:center; padding:3rem 1rem; color:var(--text-tertiary); font-size:0.9rem;">
-          <div style="font-size:2rem; margin-bottom:0.75rem;">👥</div>
-          <div style="font-weight:600; color:var(--text-primary); margin-bottom:0.4rem;">No activity yet</div>
-          <div>Follow people to see what they're watching, reading, and listening to.</div>
+        <div id="followingFeedEmpty" style="display:none;">
+          <div style="text-align:center; padding:2rem 1rem 1rem;">
+            <div style="font-size:0.78rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-tertiary); margin-bottom:0.3rem;">Preview</div>
+            <div style="font-size:0.9rem; font-weight:600; color:var(--text-primary); margin-bottom:0.25rem;">Here's what your feed could look like</div>
+            <div style="font-size:0.8rem; color:var(--text-tertiary);">Follow people to see what they're into.</div>
+          </div>
+          <div style="opacity:0.55; pointer-events:none;">
+            <div class="following-feed-item">
+              <div class="following-feed-avatar">SK</div>
+              <img class="following-feed-poster" src="https://image.tmdb.org/t/p/w200/q6y0Go1tsGEsmtFryDOJo3dEmqu.jpg" alt="The Shawshank Redemption">
+              <div class="following-feed-body">
+                <div class="following-feed-action"><span class="following-feed-name">Sara K.</span> finished</div>
+                <div class="following-feed-title">The Shawshank Redemption</div>
+                <div class="following-feed-meta">🎥 Movie · Drama</div>
+                <div class="following-feed-stars">★★★★★</div>
+              </div>
+            </div>
+            <div class="following-feed-item">
+              <div class="following-feed-avatar">JM</div>
+              <img class="following-feed-poster" src="https://image.tmdb.org/t/p/w200/clnyhPqj1SNgpAdeSS6a6fwE6Bo.jpg" alt="The Bear">
+              <div class="following-feed-body">
+                <div class="following-feed-action"><span class="following-feed-name">James M.</span> is watching</div>
+                <div class="following-feed-title">The Bear</div>
+                <div class="following-feed-meta">📺 TV · Drama</div>
+                <div style="font-size:0.7rem;color:var(--text-tertiary);margin-top:0.2rem;">On your shelf</div>
+              </div>
+            </div>
+            <div class="following-feed-item">
+              <div class="following-feed-avatar">AL</div>
+              <div class="following-feed-poster-empty">📚</div>
+              <div class="following-feed-body">
+                <div class="following-feed-action"><span class="following-feed-name">Alex L.</span> finished</div>
+                <div class="following-feed-title">Atomic Habits</div>
+                <div class="following-feed-meta">📚 Book · Self-Help</div>
+                <div class="following-feed-stars">★★★★</div>
+                <button class="following-feed-add-btn">+ Add to queue</button>
+              </div>
+            </div>
+            <div class="following-feed-item">
+              <div class="following-feed-avatar">MR</div>
+              <img class="following-feed-poster" src="https://image.tmdb.org/t/p/w200/aQPeznSu7XDTrrdCtT5eLiu52Yu.jpg" alt="Dune">
+              <div class="following-feed-body">
+                <div class="following-feed-action"><span class="following-feed-name">Maya R.</span> queued</div>
+                <div class="following-feed-title">Dune: Part Two</div>
+                <div class="following-feed-meta">🎥 Movie · Sci-Fi</div>
+                <button class="following-feed-add-btn">+ Add to queue</button>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div id="groupsFeedPanel" style="display:none;">
@@ -5043,14 +4998,29 @@
 
   <!-- Public Profile View (shown for ?profile= visitors) -->
   <div id="publicProfileView" style="display: none;">
+    <button id="publicProfileBackBtn" onclick="closePublicProfile()" style="display:none; position:fixed; top:1rem; left:1rem; z-index:999; background:var(--bg-accent); border:1px solid var(--border-light); border-radius:20px; padding:0.4rem 0.9rem; font-size:0.8rem; color:var(--text-primary); cursor:pointer; font-family:'Outfit',sans-serif;">← Back</button>
     <div class="public-profile-header">
-      <div style="font-family: 'Bricolage Grotesque', sans-serif; font-size: 0.7rem; letter-spacing: 0.15em; text-transform: uppercase; color: var(--text-tertiary); margin-bottom: 0.5rem;">CUED</div>
+      <div class="public-profile-brand">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="28" height="28">
+          <defs>
+            <radialGradient id="ppbg" cx="50%" cy="55%" r="65%"><stop offset="0%" stop-color="#0e2530"/><stop offset="100%" stop-color="#050c0f"/></radialGradient>
+            <linearGradient id="pphp" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4fd8c4"/><stop offset="100%" stop-color="#0d7a70"/></linearGradient>
+            <linearGradient id="ppbkm" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#99f5e8"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
+          </defs>
+          <rect width="96" height="96" rx="22" fill="url(#ppbg)"/>
+          <path d="M 20 52 C 20 10 76 10 76 52" fill="none" stroke="url(#pphp)" stroke-width="7" stroke-linecap="round"/>
+          <rect x="11" y="46" width="14" height="26" rx="7" fill="url(#pphp)"/>
+          <rect x="71" y="46" width="14" height="26" rx="7" fill="url(#pphp)"/>
+          <path d="M 37 44 L 59 44 L 59 90 L 48 79 L 37 90 Z" fill="url(#ppbkm)"/>
+          <polygon points="43,54 43,73 58,63.5" fill="#060e12" opacity="0.6"/>
+        </svg>
+        <span class="public-profile-brand-word">Cued</span>
+      </div>
       <div class="public-profile-name" id="publicProfileName"></div>
       <div class="profile-handle" id="publicProfileHandle" style="display:none;"></div>
       <div class="profile-bio" id="publicProfileBio" style="display:none;"></div>
       <div id="publicProfileFollowBtn" style="display:none;text-align:center;"></div>
     </div>
-    <div class="profile-spotlight" id="publicProfileSpotlight" style="display:none;"></div>
     <div id="publicProfileStats" class="public-profile-stats"></div>
     <div class="public-profile-section">
       <div id="publicProfilePills" class="status-pills" style="justify-content: center; margin-bottom: 1rem;"></div>
@@ -5151,7 +5121,6 @@
     let currentReferralFilter = 'all'; // My Shelf referral filter
     let currentGenreFilter = 'all'; // My Shelf genre filter
     let currentTagFilter = 'all'; // My Shelf tag filter
-    let currentSortOption = 'default'; // Sort option
     let currentTags = []; // Tags for current modal item
     let groupFilters = {}; // Track filters for each individual group {groupId: {media: 'all', referral: 'all'}}
     let items = [];
@@ -6555,12 +6524,6 @@
       document.getElementById('tagSuggestions').classList.remove('active');
     }
 
-    // --- Sort + Tag Filter ---
-    function sortFilter(value) {
-      currentSortOption = value;
-      renderItems();
-    }
-
     // ── New filter chip handlers ──
     function filterByType(type) {
       const btn = document.querySelector('#typeChipsRow .type-nav-btn[data-value="' + type + '"]');
@@ -6571,7 +6534,6 @@
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       document.getElementById('myShelf').classList.add('active');
       const sf = document.getElementById('shelfFilters'); if (sf) sf.style.display = '';
-      const sortBtn = document.getElementById('headerSortBtn'); if(sortBtn) sortBtn.style.display = '';
       currentMediaFilter = 'all';
       document.querySelectorAll('#typeChipsRow .type-nav-btn').forEach(c => c.classList.remove('active'));
       const allBtn = document.querySelector('#typeChipsRow .type-nav-btn[data-value="all"]');
@@ -6589,9 +6551,8 @@
       if (!document.getElementById('myShelf').classList.contains('active')) {
         goToShelf();
       } else {
-        const sortBtn = document.getElementById('headerSortBtn'); if(sortBtn) sortBtn.style.display = '';
+        renderItems();
       }
-      renderItems();
     }
 
     function setStatusFilter(value, btn) {
@@ -6602,32 +6563,6 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function toggleSortPopover(btn) {
-      const pop = document.getElementById('sortPopover');
-      pop.classList.toggle('open');
-      // Close on outside click
-      if (pop.classList.contains('open')) {
-        setTimeout(() => document.addEventListener('click', closeSortPopoverOutside), 0);
-      }
-    }
-    function closeSortPopoverOutside(e) {
-      const pop = document.getElementById('sortPopover');
-      const btn = document.getElementById('headerSortBtn');
-      if (!pop.contains(e.target) && e.target !== btn && !btn.contains(e.target)) {
-        pop.classList.remove('open');
-        document.removeEventListener('click', closeSortPopoverOutside);
-      }
-    }
-    function applySortFilter(value, btn) {
-      currentSortOption = value;
-      document.querySelectorAll('#sortPopover button').forEach(b => b.classList.remove('active'));
-      if (btn) btn.classList.add('active');
-      // Update sort chip label
-      const labels = { default:'↕ Sort', dateAdded:'↕ Added', dateLogged:'↕ Logged', rating:'↕ Rating', title:'↕ A–Z' };
-      document.getElementById('sortChipBtn').textContent = labels[value] || '↕ Sort';
-      document.getElementById('sortPopover').classList.remove('open');
-      renderItems();
-    }
 
     // ── Shelf Hero ──
     function updateShelfHero() {
@@ -6888,38 +6823,9 @@
         return matchesMedia && matchesReferral && matchesGenre && matchesTag;
       });
 
-      // Sort based on currentSortOption
+      // Default sort: status → rating
       const statusOrder = { 'current': 1, 'want': 2, 'done': 3 };
-
       filteredItems.sort((a, b) => {
-        if (currentSortOption === 'rating') {
-          const ra = legacyToStars(a.rating) || 0;
-          const rb = legacyToStars(b.rating) || 0;
-          if (rb !== ra) return rb - ra;
-          return (a.title || '').localeCompare(b.title || '');
-        }
-        if (currentSortOption === 'title') {
-          return (a.title || '').localeCompare(b.title || '');
-        }
-        if (currentSortOption === 'dateLogged') {
-          const da = a.dateLogged || '';
-          const db = b.dateLogged || '';
-          if (db !== da) return db.localeCompare(da);
-          return (a.title || '').localeCompare(b.title || '');
-        }
-        if (currentSortOption === 'premiereDate') {
-          const da = a.premiereDate || '';
-          const db = b.premiereDate || '';
-          // Items with premiere dates first, sorted ascending (soonest first)
-          if (da && !db) return -1;
-          if (!da && db) return 1;
-          if (da !== db) return da.localeCompare(db);
-          return (a.title || '').localeCompare(b.title || '');
-        }
-        if (currentSortOption === 'dateAdded') {
-          return (parseInt(b.id) || 0) - (parseInt(a.id) || 0);
-        }
-        // Default: status → rating
         const statusDiff = (statusOrder[a.status] || 999) - (statusOrder[b.status] || 999);
         if (statusDiff !== 0) return statusDiff;
         const ratingA = legacyToStars(a.rating) || 0;
@@ -8096,8 +8002,6 @@
 
     // Bottom nav filter (called by All button in type bar)
     function bottomNavFilter(type) {
-      const sortBtn = document.getElementById('headerSortBtn'); if(sortBtn) sortBtn.style.display = '';
-
       currentMediaFilter = 'all';
       currentStatusFilter = 'all';
       currentReferralFilter = 'all';
@@ -8117,9 +8021,6 @@
         document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         document.getElementById('myShelf').classList.add('active');
       }
-
-      // Reset filter fab icon
-      updateFilterFabIcon('all');
 
       // Reset FAB to add mode when switching to shelf/media tabs
       setFabMode('add');
@@ -8160,9 +8061,6 @@
         document.getElementById('myShelf').classList.add('active');
       }
 
-      // Update filter fab icon and state
-      updateFilterFabIcon(type);
-
       // Close popup
       document.getElementById('filterPopup').classList.remove('visible');
 
@@ -8173,12 +8071,6 @@
       renderItems();
     }
 
-    // Update filter fab icon based on active filter
-    function updateFilterFabIcon(type) {
-      // filter-fab removed; sort button is in header
-      const sortBtn = document.getElementById('headerSortBtn');
-      if (sortBtn) sortBtn.style.display = '';
-    }
 
     // Shelf referral filter
     function referralFilter(value) {
@@ -8194,7 +8086,7 @@
 
     // Status pill scroll anchor
     function statusPillScroll(status) {
-      document.querySelectorAll(`#statusChipsRow .filter-chip:not(.filter-chip-sort)`).forEach(pill => {
+      document.querySelectorAll(`#statusChipsRow .filter-chip`).forEach(pill => {
         pill.classList.toggle('active', pill.dataset.value === status);
       });
 
@@ -8350,13 +8242,14 @@
           else actionVerb = statusLabels[entry.status] || 'logged';
           const starsHtml = entry.rating ? '★'.repeat(Math.round(entry.rating)) : '';
           const alreadyHave = items.some(i => i.title.toLowerCase() === entry.title.toLowerCase() && i.type === entry.type);
+          const profileId = entry.ownerHandle || entry.ownerUserId;
           return `<div class="following-feed-item">
-            <div class="following-feed-avatar">${initials}</div>
+            <div class="following-feed-avatar" onclick="loadPublicProfile('${profileId}', true)" style="cursor:pointer;">${initials}</div>
             ${entry.image
               ? `<img class="following-feed-poster" src="${entry.image}" alt="${entry.title}" loading="lazy">`
               : `<div class="following-feed-poster-empty">${emoji}</div>`}
             <div class="following-feed-body">
-              <div class="following-feed-action"><span class="following-feed-name">${entry.ownerName}</span> ${actionVerb}</div>
+              <div class="following-feed-action"><span class="following-feed-name" onclick="loadPublicProfile('${profileId}', true)" style="cursor:pointer;">${entry.ownerName}</span> ${actionVerb}</div>
               <div class="following-feed-title">${entry.title}</div>
               <div class="following-feed-meta">${emoji} ${entry.type.charAt(0).toUpperCase()+entry.type.slice(1)}${entry.genre ? ' · ' + entry.genre : ''}</div>
               ${starsHtml ? `<div class="following-feed-stars">${starsHtml}</div>` : ''}
@@ -8403,7 +8296,6 @@
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       document.getElementById('groupFeeds').classList.add('active');
       const sf = document.getElementById('shelfFilters'); if(sf) sf.style.display = 'none';
-      const sortBtn = document.getElementById('headerSortBtn'); if(sortBtn) sortBtn.style.display = 'none';
       setFabMode('group');
       // Mark feed as seen
       localStorage.setItem('lastSeenGroupFeed', Date.now().toString());
@@ -8434,7 +8326,6 @@
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       document.getElementById('searchPage').classList.add('active');
       const sf = document.getElementById('shelfFilters'); if(sf) sf.style.display = 'none';
-      const sortBtn = document.getElementById('headerSortBtn'); if(sortBtn) sortBtn.style.display = 'none';
       setFabMode('add');
       closeFabMenu();
 
@@ -8545,7 +8436,6 @@
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       document.getElementById('libraryPage').classList.add('active');
       const sf = document.getElementById('shelfFilters'); if(sf) sf.style.display = 'none';
-      const sortBtn = document.getElementById('headerSortBtn'); if(sortBtn) sortBtn.style.display = 'none';
       setFabMode('add');
       closeFabMenu();
 
@@ -9542,7 +9432,20 @@
       return false;
     }
 
-    async function loadPublicProfile(profileParam) {
+    function closePublicProfile() {
+      document.getElementById('publicProfileView').style.display = 'none';
+      document.getElementById('publicProfileBackBtn').style.display = 'none';
+      const header = document.querySelector('.header');
+      const container = document.querySelector('.container');
+      const bottomNav = document.querySelector('.bottom-nav');
+      const fab = document.querySelector('.fab');
+      if (header) header.style.display = '';
+      if (container) container.style.display = '';
+      if (bottomNav) bottomNav.style.display = '';
+      if (fab) fab.style.display = '';
+    }
+
+    async function loadPublicProfile(profileParam, fromApp = false) {
       dismissSplash();
       try {
         const userId = await resolveProfileId(profileParam);
@@ -9557,13 +9460,13 @@
             </div>`;
           return;
         }
-        renderPublicProfile(doc.data());
+        renderPublicProfile(doc.data(), fromApp);
       } catch (err) {
         console.error('Error loading public profile:', err);
       }
     }
 
-    async function renderPublicProfile(data) {
+    async function renderPublicProfile(data, fromApp = false) {
       // Hide app UI
       const header = document.querySelector('.header');
       const container = document.querySelector('.container');
@@ -9573,6 +9476,8 @@
       if (container) container.style.display = 'none';
       if (bottomNav) bottomNav.style.display = 'none';
       if (fab) fab.style.display = 'none';
+      const backBtn = document.getElementById('publicProfileBackBtn');
+      if (backBtn) backBtn.style.display = fromApp ? 'block' : 'none';
 
       // Hide login/signup modals
       const loginModal = document.getElementById('loginModal');
@@ -9622,37 +9527,16 @@
           tc.tv     ? { num: tc.tv,        label: 'Shows'    } : null,
           tc.book   ? { num: tc.book,      label: 'Books'    } : null,
           tc.podcast? { num: tc.podcast,   label: 'Podcasts' } : null,
-          s.avgRating ? { num: s.avgRating + '★', label: 'Avg Rating' } : null,
         ].filter(Boolean);
+        const avgRating = s.avgRating;
         document.getElementById('publicProfileStats').innerHTML = statItems.length
           ? `<div class="profile-stats-bar">${statItems.map(si =>
               `<div class="profile-stat-item"><div class="profile-stat-num">${si.num}</div><div class="profile-stat-label">${si.label}</div></div>`
-            ).join('')}</div>`
+            ).join('')}</div>${avgRating ? `<div style="text-align:center;margin-top:0.6rem;font-size:0.78rem;color:var(--text-secondary);"><span style="color:var(--accent-primary);font-weight:700;">${avgRating}★</span> avg rating</div>` : ''}`
           : '';
       }
 
-      // Right Now spotlight
-      const spotlightEl = document.getElementById('publicProfileSpotlight');
-      if (data.spotlight && data.spotlight.some(s => s)) {
-        const typeLabels = { movie: 'Film', tv: 'Show', podcast: 'Podcast', book: 'Book' };
-        const typeEmojis = { movie: '🎥', tv: '📺', podcast: '🎙️', book: '📚' };
-        const types = ['movie', 'tv', 'book', 'podcast'];
-        spotlightEl.className = 'profile-right-now';
-        spotlightEl.style.display = 'block';
-        spotlightEl.innerHTML =
-          `<div class="profile-right-now-label">Right Now</div>` +
-          `<div class="profile-right-now-grid">` +
-          types.map((type, i) => {
-            const item = data.spotlight[i];
-            if (item && item.image) {
-              return `<div class="spotlight-tile"><img src="${item.image}" alt="${item.title||''}"><div class="spotlight-tile-caption"><div class="spotlight-tile-type">${typeLabels[type]}</div>${item.title||''}</div></div>`;
-            }
-            return `<div class="spotlight-tile"><div class="spotlight-tile-empty"><span>${typeEmojis[type]}</span><span class="spotlight-tile-label">${typeLabels[type]}</span></div></div>`;
-          }).join('') +
-          `</div>`;
-      } else {
-        spotlightEl.style.display = 'none';
-      }
+
 
       // Items — filter by privacy
       let visibleItems = (data.items || []).filter(item => {

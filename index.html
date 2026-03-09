@@ -640,7 +640,7 @@
       max-width: 1400px;
       margin: 0 auto;
       padding: 1rem 1rem 5rem;
-      padding-top: calc(54px + env(safe-area-inset-top, 0px) + 56px + 0.75rem);
+      padding-top: var(--content-top, 135px);
     }
 
     .tab {
@@ -4827,12 +4827,25 @@
 
     // ========== AUTHENTICATION FUNCTIONS ==========
 
+    // Measure actual nav bottom and set content offset
+    function updateContentOffset() {
+      const nav = document.querySelector('.bottom-nav');
+      if (!nav) return;
+      const navBottom = nav.getBoundingClientRect().bottom;
+      if (navBottom > 0) {
+        document.documentElement.style.setProperty('--content-top', (navBottom + 12) + 'px');
+      }
+    }
+    window.addEventListener('load', updateContentOffset);
+    window.addEventListener('resize', updateContentOffset);
+    window.addEventListener('orientationchange', () => setTimeout(updateContentOffset, 300));
+
     // Dismiss splash screen
     function dismissSplash() {
       const splash = document.getElementById('splashScreen');
       if (splash) {
         splash.classList.add('fade-out');
-        setTimeout(() => splash.remove(), 500);
+        setTimeout(() => { splash.remove(); updateContentOffset(); }, 500);
       }
     }
 

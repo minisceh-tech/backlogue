@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Backlogue — Your Media Tracker</title>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Outfit:wght@300;400;500;600;700;800&display=swap');
@@ -119,8 +119,8 @@
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border-bottom: none;
-      height: 54px;
-      padding: 0 1rem;
+      height: calc(54px + env(safe-area-inset-top, 0px));
+      padding: env(safe-area-inset-top, 0px) 1rem 0;
       box-shadow: 0 1px 0 rgba(255,255,255,0.06);
       position: fixed;
       top: 0;
@@ -639,7 +639,7 @@
       max-width: 1400px;
       margin: 0 auto;
       padding: 1rem 1rem 5rem;
-      padding-top: calc(54px + 50px + 0.75rem);
+      padding-top: calc(54px + env(safe-area-inset-top, 0px) + 50px + 0.75rem);
     }
 
     .tab {
@@ -3095,7 +3095,7 @@
     /* Bottom Navigation Bar */
     .bottom-nav {
       position: fixed;
-      top: 54px;
+      top: calc(54px + env(safe-area-inset-top, 0px));
       left: 0;
       right: 0;
       z-index: 198;

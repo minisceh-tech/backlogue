@@ -4811,11 +4811,6 @@
       
       <form id="signupForm" onsubmit="handleSignup(event)">
         <div class="form-group">
-          <label for="signupName">Name</label>
-          <input type="text" id="signupName" required placeholder="Your name">
-        </div>
-
-        <div class="form-group">
           <label for="signupEmail">Email</label>
           <input type="email" id="signupEmail" required placeholder="your@email.com">
         </div>
@@ -4827,6 +4822,7 @@
             <input type="text" id="signupHandle" required placeholder="yourhandle" maxlength="20" pattern="[a-zA-Z0-9_]+" style="padding-left:1.75rem;" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_]/g,'')">
           </div>
           <div id="handleHint" style="font-size:0.72rem;color:var(--text-tertiary);margin-top:0.25rem;"></div>
+          <div style="font-size:0.72rem;color:var(--text-tertiary);margin-top:0.4rem;">Choose carefully — your handle is permanent. Life happens — reach out if you ever need a change.</div>
         </div>
 
         <div class="form-group">
@@ -4911,11 +4907,11 @@
       <div style="font-weight:600; font-size:0.9rem; margin-bottom:0.75rem;">Public Profile</div>
       <div class="form-group">
         <label>Your Handle</label>
-        <div style="position:relative;">
-          <span style="position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);color:var(--text-tertiary);font-size:0.9rem;pointer-events:none;">@</span>
-          <input type="text" id="settingsHandle" maxlength="20" placeholder="yourhandle" style="padding-left:1.75rem;" oninput="this.value=this.value.toLowerCase().replace(/[^a-z0-9_]/g,'')">
+        <div style="display:flex;align-items:center;gap:0.5rem;padding:0.55rem 0.75rem;background:var(--bg-accent);border:1px solid var(--border-light);border-radius:10px;">
+          <span style="color:var(--text-tertiary);font-size:0.9rem;">@</span>
+          <span id="settingsHandle" style="color:var(--text-primary);font-size:0.95rem;font-weight:500;"></span>
         </div>
-        <div id="settingsHandleHint" style="font-size:0.72rem;color:var(--text-tertiary);margin-top:0.25rem;"></div>
+        <div style="font-size:0.72rem;color:var(--text-tertiary);margin-top:0.4rem;">Handles are permanent. Life happens — <a id="handleChangeLink" href="#" style="color:var(--accent-primary);text-decoration:none;">reach out if you need a change.</a></div>
       </div>
       <div class="form-group">
         <label for="profileBio">Bio <span style="font-size:0.75rem;font-weight:400;color:var(--text-tertiary);">160 chars max</span></label>
@@ -4929,10 +4925,6 @@
         <div style="font-size: 0.7rem; color: var(--text-tertiary); margin-top: 0.3rem;">When enabled, anyone with your link can see your shelf</div>
       </div>
       <div id="profileOptions" style="display: none;">
-        <div class="form-group">
-          <label for="profileDisplayName">Display Name</label>
-          <input type="text" id="profileDisplayName" class="form-control" placeholder="Your public name">
-        </div>
         <div class="form-group">
           <label style="margin-bottom:0.4rem;">Who can see each category?</label>
           <div class="privacy-grid">
@@ -5152,7 +5144,7 @@
           // Create user profile from Firebase Auth data
           user = {
             id: uid,
-            name: firebaseUser.displayName || firebaseUser.email.split('@')[0],
+            name: firebaseUser.email.split('@')[0],
             email: firebaseUser.email,
             memberOf: []
           };
@@ -5479,7 +5471,6 @@
     // Handle signup with Firebase Auth
     async function handleSignup(event) {
       event.preventDefault();
-      const name = document.getElementById('signupName').value.trim();
       const email = document.getElementById('signupEmail').value.toLowerCase().trim();
       const password = document.getElementById('signupPassword').value;
       const passwordConfirm = document.getElementById('signupPasswordConfirm').value;
@@ -5500,9 +5491,6 @@
 
         const cred = await auth.createUserWithEmailAndPassword(email, password);
 
-        // Update display name
-        await cred.user.updateProfile({ displayName: name });
-
         // Validate and save handle
         const handleInput = document.getElementById('signupHandle');
         const handle = (handleInput ? handleInput.value.trim().toLowerCase() : '').replace(/[^a-z0-9_]/g, '');
@@ -5519,7 +5507,7 @@
         }
         // Create Firestore user profile
         await db.collection('users').doc(cred.user.uid).set({
-          name: name,
+          name: handle || email.split('@')[0],
           email: email,
           memberOf: [],
           handle: handle || null
@@ -5550,7 +5538,7 @@
         const userDoc = await db.collection('users').doc(result.user.uid).get();
         if (!userDoc.exists) {
           await db.collection('users').doc(result.user.uid).set({
-            name: result.user.displayName || result.user.email.split('@')[0],
+            name: result.user.email.split('@')[0],
             email: result.user.email,
             memberOf: []
           });
@@ -6584,7 +6572,7 @@
       // Greeting
       const hour = new Date().getHours();
       const greet = hour < 12 ? 'Good morning' : hour < 18 ? 'Good afternoon' : 'Good evening';
-      const name = currentUser && currentUser.displayName ? `, ${currentUser.displayName.split(' ')[0]}` : '';
+      const name = currentUser && currentUser.handle ? `, @${currentUser.handle}` : '';
       document.getElementById('shelfHeroGreeting').textContent = greet + name;
 
       const total = items.length;
@@ -8208,7 +8196,7 @@
             allEntries.push({
               ...item,
               ownerUserId: profile.userId,
-              ownerName: profile.displayName || profile.followData?.displayName || 'Someone',
+              ownerName: profile.handle ? '@' + profile.handle : (profile.followData?.handle ? '@' + profile.followData.handle : 'Someone'),
               ownerHandle: profile.handle || '',
               loggedAt: item.dateLogged || ''
             });
@@ -9000,7 +8988,7 @@
             );
             if (matched) {
               matches.push({
-                name: pd.displayName || followingMap[batch[idx]]?.displayName || 'Someone',
+                name: pd.handle ? '@' + pd.handle : 'Someone',
                 rating: matched.rating
               });
             }
@@ -9488,7 +9476,7 @@
       const view = document.getElementById('publicProfileView');
       view.style.display = 'block';
 
-      document.getElementById('publicProfileName').textContent = data.displayName || 'A Cued User';
+      document.getElementById('publicProfileName').textContent = data.handle ? '@' + data.handle : 'A Cued User';
 
       // Handle
       const handleEl = document.getElementById('publicProfileHandle');
@@ -9513,7 +9501,7 @@
       if (data.userId && currentUser && currentUser.id !== data.userId) {
         const isFollowing = await checkFollowStatus(data.userId);
         followBtnContainer.style.display = 'block';
-        followBtnContainer.innerHTML = `<button class="follow-btn ${isFollowing ? 'following' : ''}" onclick="toggleFollow('${data.userId}', {displayName:'${(data.displayName||'').replace(/'/g,"\\'")}',handle:'${data.handle||''}'}, this)">${isFollowing ? 'Following' : 'Follow'}</button>`;
+        followBtnContainer.innerHTML = `<button class="follow-btn ${isFollowing ? 'following' : ''}" onclick="toggleFollow('${data.userId}', {handle:'${data.handle||''}'}, this)">${isFollowing ? 'Following' : 'Follow'}</button>`;
       } else {
         followBtnContainer.style.display = 'none';
       }
@@ -9828,13 +9816,17 @@
         const userDoc = await db.collection('users').doc(currentUser.id).get();
         const userData = userDoc.exists ? userDoc.data() : {};
         const handleEl = document.getElementById('settingsHandle');
-        if (handleEl) handleEl.value = userData.handle || currentUser.handle || '';
+        const handle = userData.handle || currentUser.handle || '';
+        if (handleEl) handleEl.textContent = handle;
+        const handleLink = document.getElementById('handleChangeLink');
+        if (handleLink && handle) {
+          handleLink.href = `mailto:support@cued.app?subject=Handle Change Request&body=Current handle: @${handle}%0ARequested handle: %0AReason: `;
+        }
 
         const doc = await db.collection('publicProfiles').doc(currentUser.id).get();
         if (doc.exists) {
           const data = doc.data();
           document.getElementById('profileEnabled').checked = data.enabled || false;
-          document.getElementById('profileDisplayName').value = data.displayName || currentUser.name;
           document.getElementById('profileShowRatings').checked = data.showRatings !== false;
           document.getElementById('profileShowReviews').checked = data.showReviews || false;
           document.getElementById('profileShowStats').checked = data.showStats !== false;
@@ -9847,7 +9839,6 @@
           });
         } else {
           document.getElementById('profileEnabled').checked = false;
-          document.getElementById('profileDisplayName').value = currentUser.name;
           document.getElementById('profileShowRatings').checked = true;
           document.getElementById('profileShowReviews').checked = false;
           document.getElementById('profileShowStats').checked = true;
@@ -9889,7 +9880,6 @@
     async function savePublicProfile() {
       try {
         const enabled = document.getElementById('profileEnabled').checked;
-        const displayName = document.getElementById('profileDisplayName').value.trim() || currentUser.name;
         const showRatings = document.getElementById('profileShowRatings').checked;
         const showReviews = document.getElementById('profileShowReviews').checked;
         const showStats = document.getElementById('profileShowStats').checked;
@@ -9918,18 +9908,6 @@
           dateLogged: item.dateLogged || ''
         }));
 
-        // Save handle if changed
-        const handleInput = document.getElementById('settingsHandle');
-        const newHandle = handleInput ? handleInput.value.trim().toLowerCase().replace(/[^a-z0-9_]/g,'') : '';
-        if (newHandle && newHandle.length >= 3) {
-          const hintEl = document.getElementById('settingsHandleHint');
-          const check = await validateHandleAvailable(newHandle, currentUser.id);
-          if (!check.ok) {
-            if (hintEl) { hintEl.textContent = check.msg; hintEl.style.color = '#f87171'; }
-            return;
-          }
-          await saveHandle(newHandle, currentUser.id);
-        }
         const bioEl = document.getElementById('profileBio');
         const bio = bioEl ? bioEl.value.trim().slice(0, 160) : '';
         const privacy = {};
@@ -9950,7 +9928,6 @@
 
         const profileData = {
           enabled,
-          displayName,
           handle: currentUser.handle || newHandle || null,
           bio: bio || null,
           privacy,
@@ -10111,11 +10088,11 @@
       const batch = db.batch();
       batch.set(
         db.collection('users').doc(currentUser.id).collection('following').doc(targetUserId),
-        { displayName: targetData.displayName, handle: targetData.handle || '', followedAt: ts }
+        { handle: targetData.handle || '', followedAt: ts }
       );
       batch.set(
         db.collection('users').doc(targetUserId).collection('followers').doc(currentUser.id),
-        { displayName: currentUser.name, handle: currentUser.handle || '', followedAt: ts }
+        { handle: currentUser.handle || '', followedAt: ts }
       );
       await batch.commit();
     }

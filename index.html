@@ -7179,8 +7179,11 @@
       // Single-type drill-down: vertical grid
       if (currentFeedMediaFilter !== 'all') {
         const typeItems = filteredItems.filter(i => i.type === currentFeedMediaFilter);
-        html += `<div style="padding:0 0 0.5rem;">
-          <button onclick="feedDrillBack()" style="background:none;border:none;color:var(--accent-primary);font-size:0.82rem;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;padding:0.5rem 0;">← All types</button>
+        html += `<div class="overlay-back-bar" style="margin:0 -0.75rem 0.75rem;">
+          <button onclick="feedDrillBack()" class="overlay-back-btn">
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 3L5 8l5 5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            All types
+          </button>
         </div>`;
         if (typeItems.length === 0) {
           html += `<div style="text-align:center;padding:3rem 1rem;color:var(--text-tertiary);">Nothing here yet</div>`;
@@ -7208,7 +7211,7 @@
             <h2 class="status-section-title">${typeLabels[type] || type}</h2>
             <div class="status-section-line"></div>
             <span class="status-section-count">${typeItems.length}</span>
-            <span style="font-size:0.8rem;color:var(--text-tertiary);margin-left:0.25rem;flex-shrink:0;">›</span>
+            <span style="font-size:0.8rem;color:var(--text-tertiary);margin-left:0.25rem;flex-shrink:0;opacity:0.7;">›</span>
           </div>
           <div class="scroll-row" data-type="${type}"><div class="scroll-row-track">`;
 

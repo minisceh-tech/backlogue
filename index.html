@@ -3904,6 +3904,60 @@
       color: #050c0f;
     }
     .follow-btn:active { opacity: 0.7; }
+    .follow-search-card {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      padding: 0.7rem 0;
+      border-bottom: 1px solid var(--border-light);
+    }
+    .follow-search-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--bg-accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: var(--accent-primary);
+      flex-shrink: 0;
+      border: 1px solid var(--border-light);
+    }
+    .follow-search-info {
+      flex: 1;
+      min-width: 0;
+    }
+    .follow-search-handle {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+    .follow-search-sub {
+      font-size: 0.72rem;
+      color: var(--text-tertiary);
+      margin-top: 0.1rem;
+    }
+    .follow-action-btn {
+      background: var(--accent-primary);
+      color: #000;
+      border: none;
+      border-radius: 16px;
+      padding: 0.3rem 0.85rem;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Outfit', sans-serif;
+      flex-shrink: 0;
+      white-space: nowrap;
+    }
+    .follow-action-btn.secondary {
+      background: none;
+      color: var(--text-secondary);
+      border: 1px solid var(--border-medium);
+    }
+    .follow-action-btn:disabled { opacity: 0.5; }
     .privacy-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -4211,11 +4265,12 @@
           <span class="join-request-badge" id="joinBadge" style="display:none;"></span>
           <span class="join-request-badge" id="newItemsBadge" style="display:none; right:0px; top:0px;"></span>
         </button>
-        <button class="header-icon-btn" id="headerUserBtn" onclick="openProfileSettings()" title="Account" aria-label="Account">
+        <button class="header-icon-btn" id="headerUserBtn" onclick="openProfileSettings()" title="Account" aria-label="Account" style="position:relative;">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="8" cy="5" r="3" fill="currentColor"/>
             <path d="M2 14c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
           </svg>
+          <span id="headerUserBadge" style="display:none;position:absolute;top:2px;right:2px;width:8px;height:8px;border-radius:50%;background:var(--accent-primary);"></span>
         </button>
       </div>
       <select id="typeFilter" style="display:none;"><option value="all"></option></select>
@@ -4326,7 +4381,17 @@
         <button class="social-tab-btn" id="socialTabGroups" onclick="switchSocialTab('groups')">Groups</button>
       </div>
       <div id="followingFeedPanel">
-        <div id="followingFeedContainer"></div>
+  <div style="padding:0.75rem 1rem 0.5rem;">
+    <div style="position:relative;">
+      <span style="position:absolute;left:0.75rem;top:50%;transform:translateY(-50%);color:var(--text-tertiary);font-size:0.85rem;pointer-events:none;">@</span>
+      <input id="followSearchInput" type="text" placeholder="Search by handle..."
+             style="width:100%;box-sizing:border-box;padding:0.55rem 0.75rem 0.55rem 1.75rem;background:var(--bg-accent);border:1px solid var(--border-light);border-radius:10px;color:var(--text-primary);font-family:'Outfit',sans-serif;font-size:0.85rem;"
+             oninput="onFollowSearch(this.value)">
+    </div>
+  </div>
+  <div id="followSearchResults" style="display:none; padding:0 1rem;"></div>
+  <div id="groupSuggestions" style="display:none; padding:0 1rem;"></div>
+  <div id="followingFeedContainer"></div>
         <div id="followingFeedEmpty" style="display:none;">
           <div style="text-align:center; padding:2rem 1rem 1rem;">
             <div style="font-size:0.78rem; font-weight:700; letter-spacing:0.08em; text-transform:uppercase; color:var(--text-tertiary); margin-bottom:0.3rem;">Preview</div>
@@ -4964,6 +5029,14 @@
       </div>
       </div><!-- end public profile section -->
 
+      <div id="followRequestsSection" style="display:none; margin-top:1rem; padding-top:1rem; border-top:1px solid var(--border-light);">
+        <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:0.75rem;">
+          <div style="font-weight:600; font-size:0.9rem;">Follow Requests</div>
+          <span id="followRequestsBadge" style="background:var(--accent-primary);color:#000;border-radius:10px;padding:0.1rem 0.5rem;font-size:0.72rem;font-weight:700;"></span>
+        </div>
+        <div id="followRequestsList"></div>
+      </div>
+
       <!-- Import Section -->
       <div style="margin-top:1.5rem; padding-top:1.5rem; border-top:1px solid var(--border-light);">
         <div style="display:flex; align-items:center; gap:0.5rem; margin-bottom:0.25rem;">
@@ -5583,6 +5656,7 @@
       hideAuthModals();
       await checkJoinRequestsBadge();
       await checkGroupFeedBadge();
+      loadFollowRequests();
 
       // Check for localStorage migration on first login
       await checkLocalStorageMigration(firebaseUser);
@@ -8176,7 +8250,7 @@
       document.getElementById('socialTabGroups').classList.toggle('active', tab === 'groups');
       document.getElementById('followingFeedPanel').style.display = tab === 'following' ? '' : 'none';
       document.getElementById('groupsFeedPanel').style.display = tab === 'groups' ? '' : 'none';
-      if (tab === 'following') loadFollowingFeed();
+      if (tab === 'following') { loadFollowingFeed(); loadGroupSuggestions(); }
     }
 
     async function loadFollowingFeed() {
@@ -9753,6 +9827,7 @@
       // Sync light mode toggle state
       document.getElementById('lightModeToggle').checked = document.body.classList.contains('light-mode');
       document.getElementById('profileSettingsModal').classList.add('active');
+      loadFollowRequests();
     }
 
     // ========== CSV IMPORT ==========
@@ -10578,6 +10653,261 @@
         showLogin();
       }
     });
+
+    // ── People Search ──
+    let _followSearchTimer = null;
+    function onFollowSearch(val) {
+      clearTimeout(_followSearchTimer);
+      const q = val.trim().toLowerCase().replace(/^@/, '');
+      const searchPanel = document.getElementById('followSearchResults');
+      const suggestPanel = document.getElementById('groupSuggestions');
+      const feedContainer = document.getElementById('followingFeedContainer');
+      const feedEmpty = document.getElementById('followingFeedEmpty');
+
+      if (!q) {
+        searchPanel.style.display = 'none';
+        searchPanel.innerHTML = '';
+        feedContainer.style.display = '';
+        feedEmpty.style.display = feedContainer.innerHTML ? 'none' : '';
+        loadGroupSuggestions();
+        return;
+      }
+
+      feedContainer.style.display = 'none';
+      feedEmpty.style.display = 'none';
+      suggestPanel.style.display = 'none';
+      searchPanel.style.display = 'block';
+      searchPanel.innerHTML = '<div style="padding:1rem 0;color:var(--text-tertiary);font-size:0.85rem;">Searching...</div>';
+
+      _followSearchTimer = setTimeout(() => searchUsers(q), 400);
+    }
+
+    async function searchUsers(q) {
+      const searchPanel = document.getElementById('followSearchResults');
+      try {
+        // Prefix match on handle field in users collection
+        const snap = await db.collection('users')
+          .where('handle', '>=', q)
+          .where('handle', '<=', q + '\uf8ff')
+          .limit(10)
+          .get();
+
+        if (snap.empty) {
+          searchPanel.innerHTML = '<div style="padding:1rem 0;color:var(--text-tertiary);font-size:0.85rem;">No users found for @' + q + '</div>';
+          return;
+        }
+
+        // Check follow status for each result
+        const results = [];
+        for (const doc of snap.docs) {
+          if (doc.id === currentUser.id) continue; // skip self
+          const data = doc.data();
+          const followDoc = await db.collection('users').doc(currentUser.id).collection('following').doc(doc.id).get();
+          const requestDoc = await db.collection('users').doc(doc.id).collection('followRequests').doc(currentUser.id).get();
+          results.push({
+            userId: doc.id,
+            handle: data.handle || '',
+            isFollowing: followDoc.exists,
+            isRequested: requestDoc.exists,
+          });
+        }
+
+        if (results.length === 0) {
+          searchPanel.innerHTML = '<div style="padding:1rem 0;color:var(--text-tertiary);font-size:0.85rem;">No users found for @' + q + '</div>';
+          return;
+        }
+
+        searchPanel.innerHTML = results.map(r => renderFollowCard(r)).join('');
+      } catch (err) {
+        console.error('Search error:', err);
+        searchPanel.innerHTML = '<div style="padding:1rem 0;color:var(--text-tertiary);font-size:0.85rem;">Search failed. Try again.</div>';
+      }
+    }
+
+    function renderFollowCard(r) {
+      const initials = r.handle.slice(0, 2).toUpperCase();
+      let btnHtml;
+      if (r.isFollowing) {
+        btnHtml = `<button class="follow-action-btn secondary" onclick="unfollowFromSearch('${r.userId}', this)">Following</button>`;
+      } else if (r.isRequested) {
+        btnHtml = `<button class="follow-action-btn secondary" onclick="cancelRequest('${r.userId}', this)">Requested</button>`;
+      } else {
+        btnHtml = `<button class="follow-action-btn" onclick="followFromSearch('${r.userId}', '${r.handle}', this)">Follow</button>`;
+      }
+      return `<div class="follow-search-card">
+        <div class="follow-search-avatar">${initials}</div>
+        <div class="follow-search-info">
+          <div class="follow-search-handle">@${r.handle}</div>
+        </div>
+        ${btnHtml}
+      </div>`;
+    }
+
+    async function followFromSearch(targetUserId, handle, btn) {
+      btn.disabled = true;
+      try {
+        // Check if target has a public profile
+        const profileDoc = await db.collection('publicProfiles').doc(targetUserId).get();
+        const isPublic = profileDoc.exists && profileDoc.data().enabled;
+        if (isPublic) {
+          await followUser(targetUserId, { handle });
+          btn.textContent = 'Following';
+          btn.classList.add('secondary');
+          btn.onclick = () => unfollowFromSearch(targetUserId, btn);
+        } else {
+          await sendFollowRequest(targetUserId, handle);
+          btn.textContent = 'Requested';
+          btn.classList.add('secondary');
+          btn.onclick = () => cancelRequest(targetUserId, btn);
+        }
+      } catch(e) { console.error(e); }
+      btn.disabled = false;
+    }
+
+    async function unfollowFromSearch(targetUserId, btn) {
+      btn.disabled = true;
+      try {
+        await unfollowUser(targetUserId);
+        btn.textContent = 'Follow';
+        btn.classList.remove('secondary');
+        btn.onclick = () => followFromSearch(targetUserId, '', btn);
+      } catch(e) { console.error(e); }
+      btn.disabled = false;
+    }
+
+    async function sendFollowRequest(targetUserId, handle) {
+      await db.collection('users').doc(targetUserId).collection('followRequests').doc(currentUser.id).set({
+        handle: currentUser.handle || '',
+        requestedAt: Date.now()
+      });
+    }
+
+    async function cancelRequest(targetUserId, btn) {
+      btn.disabled = true;
+      try {
+        await db.collection('users').doc(targetUserId).collection('followRequests').doc(currentUser.id).delete();
+        btn.textContent = 'Follow';
+        btn.classList.remove('secondary');
+        btn.onclick = () => followFromSearch(targetUserId, '', btn);
+      } catch(e) { console.error(e); }
+      btn.disabled = false;
+    }
+
+    // ── Group Suggestions ──
+    async function loadGroupSuggestions() {
+      const panel = document.getElementById('groupSuggestions');
+      if (!panel || !currentUser) return;
+      panel.style.display = 'none';
+      panel.innerHTML = '';
+
+      try {
+        if (!currentUser.memberOf || currentUser.memberOf.length === 0) return;
+
+        // Load group members from all groups user is in
+        const memberIds = new Set();
+        for (const groupId of currentUser.memberOf.slice(0, 5)) {
+          const snap = await db.collection('groups').doc(groupId).get();
+          if (snap.exists) {
+            (snap.data().members || []).forEach(m => { if (m.id !== currentUser.id) memberIds.add(m.id); });
+          }
+        }
+        if (memberIds.size === 0) return;
+
+        // Filter out people already following
+        const suggestions = [];
+        for (const uid of memberIds) {
+          const followDoc = await db.collection('users').doc(currentUser.id).collection('following').doc(uid).get();
+          if (followDoc.exists) continue;
+          const userDoc = await db.collection('users').doc(uid).get();
+          if (!userDoc.exists) continue;
+          const data = userDoc.data();
+          if (!data.handle) continue;
+          const requestDoc = await db.collection('users').doc(uid).collection('followRequests').doc(currentUser.id).get();
+          suggestions.push({ userId: uid, handle: data.handle, isRequested: requestDoc.exists });
+          if (suggestions.length >= 5) break;
+        }
+
+        if (suggestions.length === 0) return;
+
+        panel.style.display = 'block';
+        panel.innerHTML = `
+          <div style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.07em;color:var(--text-tertiary);margin:0.75rem 0 0.25rem;">People in your groups</div>
+          ${suggestions.map(r => renderFollowCard(r)).join('')}
+          <div style="height:1px;background:var(--border-light);margin:0.5rem 0 0.75rem;"></div>
+        `;
+      } catch(err) { console.error('Suggestions error:', err); }
+    }
+
+    // ── Follow Requests (received) ──
+    async function loadFollowRequests() {
+      if (!currentUser) return;
+      try {
+        const snap = await db.collection('users').doc(currentUser.id).collection('followRequests').get();
+        const section = document.getElementById('followRequestsSection');
+        const list = document.getElementById('followRequestsList');
+        const badge = document.getElementById('followRequestsBadge');
+
+        // Update profile icon badge
+        const headerBadge = document.getElementById('headerUserBadge');
+
+        if (snap.empty) {
+          if (section) section.style.display = 'none';
+          if (headerBadge) headerBadge.style.display = 'none';
+          return;
+        }
+
+        const requests = snap.docs.map(d => ({ requesterId: d.id, ...d.data() }));
+        if (section) section.style.display = 'block';
+        if (badge) badge.textContent = requests.length;
+        if (headerBadge) { headerBadge.style.display = ''; headerBadge.textContent = requests.length; }
+
+        if (list) {
+          list.innerHTML = requests.map(r => `
+            <div class="follow-search-card" id="req-${r.requesterId}">
+              <div class="follow-search-avatar">${(r.handle || '?').slice(0,2).toUpperCase()}</div>
+              <div class="follow-search-info">
+                <div class="follow-search-handle">@${r.handle || r.requesterId}</div>
+              </div>
+              <div style="display:flex;gap:0.4rem;">
+                <button class="follow-action-btn" onclick="approveFollowRequest('${r.requesterId}', '${r.handle || ''}', this)">Accept</button>
+                <button class="follow-action-btn secondary" onclick="denyFollowRequest('${r.requesterId}', this)">Decline</button>
+              </div>
+            </div>
+          `).join('');
+        }
+      } catch(err) { console.error('Load requests error:', err); }
+    }
+
+    async function approveFollowRequest(requesterId, handle, btn) {
+      btn.disabled = true;
+      try {
+        const batch = db.batch();
+        // Add to my followers
+        batch.set(db.collection('users').doc(currentUser.id).collection('followers').doc(requesterId),
+          { handle, followedAt: Date.now() });
+        // Add me to their following
+        batch.set(db.collection('users').doc(requesterId).collection('following').doc(currentUser.id),
+          { handle: currentUser.handle || '', followedAt: Date.now() });
+        // Delete request
+        batch.delete(db.collection('users').doc(currentUser.id).collection('followRequests').doc(requesterId));
+        await batch.commit();
+        const card = document.getElementById('req-' + requesterId);
+        if (card) card.remove();
+        // Refresh count
+        loadFollowRequests();
+      } catch(e) { console.error(e); btn.disabled = false; }
+    }
+
+    async function denyFollowRequest(requesterId, btn) {
+      btn.disabled = true;
+      try {
+        await db.collection('users').doc(currentUser.id).collection('followRequests').doc(requesterId).delete();
+        const card = document.getElementById('req-' + requesterId);
+        if (card) card.remove();
+        loadFollowRequests();
+      } catch(e) { console.error(e); btn.disabled = false; }
+    }
+
   </script>
 
   <button class="fab" id="fabButton" onclick="handleFabClick()" title="Add Item">+</button>

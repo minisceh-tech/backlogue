@@ -2791,7 +2791,7 @@
       position: fixed;
       bottom: 78px;
       right: 20px;
-      z-index: 101;
+      z-index: 195;
       width: 56px;
       height: 56px;
       border-radius: 50%;
@@ -2831,7 +2831,7 @@
       position: fixed;
       bottom: 200px;
       right: 20px;
-      z-index: 102;
+      z-index: 196;
       display: none;
       flex-direction: column;
       gap: 0.5rem;
@@ -4489,7 +4489,7 @@
               <option value="podcast">Podcasts</option>
               <option value="book">Books</option>
             </select>
-            <select id="feedReferralFilter" style="display:none;"><option value="all">All Recommendations</option></select>
+            <select id="feedReferralFilter" onchange="filterFeeds()" class="filter-dropdown filter-dropdown-blue" style="border-radius: 20px; padding: 0.3rem 0.6rem; font-size: 0.7rem; min-width: 0;"><option value="all">All Recommendations</option></select>
             <select id="feedAddedByFilter" style="display:none;"><option value="all">Added By</option></select>
           </div>
           <div id="feedsContainer"></div>
@@ -4785,29 +4785,22 @@
   <div id="groupModal" class="modal">
     <div class="modal-content">
       <button class="modal-close" onclick="closeModal('groupModal')" aria-label="Close">&times;</button>
-      <h2 class="modal-header">Add/Edit Groups</h2>
-      
+      <h2 class="modal-header">Groups</h2>
+
       <div class="form-group">
         <label for="newGroupName">Create New Group</label>
         <div style="display: flex; gap: 0.5rem;">
           <input type="text" id="newGroupName" placeholder="Enter group name" onkeypress="if(event.key==='Enter'){event.preventDefault();openInviteModal();}">
-          <button class="btn" onclick="openInviteModal()">Create & Invite</button>
+          <button class="btn" onclick="openInviteModal()">Create</button>
         </div>
-        <div class="helper-text">Create a group and optionally invite people</div>
       </div>
 
       <div class="form-group">
-        <label for="joinCode">Join Existing Group</label>
+        <label for="joinCode">Join a Group</label>
         <div class="join-code-input">
           <input type="text" id="joinCode" placeholder="Enter invite code">
           <button class="btn" onclick="joinGroup()">Join</button>
         </div>
-      </div>
-
-      <div class="form-group" style="margin-top: 1.5rem;">
-        <label for="groupSearchInput">Find Groups</label>
-        <input type="text" id="groupSearchInput" placeholder="Search groups by name..." oninput="handleGroupSearch(this.value)">
-        <div id="groupSearchResults" class="group-search-results"></div>
       </div>
 
       <div id="pendingRequestsSection" style="display: none; margin-top: 1.5rem;">
@@ -5474,10 +5467,13 @@
       requestAnimationFrame(() => {
         const header = document.querySelector('.header');
         const spacer = document.getElementById('headerSpacer');
+        const shelfFilters = document.getElementById('shelfFilters');
         if (!header || !spacer) return;
         const headerBottom = header.getBoundingClientRect().bottom;
+        const filtersH = (shelfFilters && shelfFilters.style.display !== 'none')
+          ? shelfFilters.getBoundingClientRect().height : 0;
         if (headerBottom > 0) {
-          spacer.style.height = (headerBottom + 12) + 'px';
+          spacer.style.height = (headerBottom + filtersH + 12) + 'px';
         }
       });
     }
@@ -5501,6 +5497,12 @@
     // Show login modal
     function showLogin() {
       dismissSplash();
+      // Preserve ?join= code across auth for new users
+      const joinCode = new URLSearchParams(window.location.search).get('join');
+      if (joinCode) {
+        sessionStorage.setItem('pendingJoinCode', joinCode.trim().toUpperCase());
+        history.replaceState({}, '', window.location.pathname);
+      }
       document.getElementById('loginModal').classList.add('active');
       document.getElementById('signupModal').classList.remove('active');
       // Hide main app content
@@ -5697,6 +5699,15 @@
 
       // Check for localStorage migration on first login
       await checkLocalStorageMigration(firebaseUser);
+
+      // Handle ?join= invite link (direct URL or stored from pre-auth)
+      const joinCode = new URLSearchParams(window.location.search).get('join')
+        || sessionStorage.getItem('pendingJoinCode');
+      sessionStorage.removeItem('pendingJoinCode');
+      if (joinCode) {
+        history.replaceState({}, '', window.location.pathname);
+        await joinViaLink(joinCode.trim().toUpperCase());
+      }
 
       // Show tutorial on first visit
       if (!localStorage.getItem('backlogue-tutorial-seen')) {
@@ -7173,12 +7184,17 @@
         typeItems.forEach(item => {
           const feedIdx = feedItemsCache.length;
           feedItemsCache.push(item);
+          const alreadyHave = items.some(i => i.title === item.title && i.type === item.type);
 
           html += `
-            <div class="card feed-card" data-feed-idx="${feedIdx}" data-type="${item.type}" style="animation-delay: ${Math.min(cardIndex * 0.05, 0.5)}s">
+            <div class="card feed-card" data-feed-idx="${feedIdx}" data-type="${item.type}" style="animation-delay: ${Math.min(cardIndex * 0.05, 0.5)}s;position:relative;">
               <div class="card-image">
                 ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : `<div class="card-placeholder">${getTypeEmoji(item.type)}<div class="card-placeholder-title">${item.title}</div></div>`}
               </div>
+              ${alreadyHave
+                ? `<div style="position:absolute;bottom:0;left:0;right:0;background:#0d9488;text-align:center;font-size:0.58rem;font-weight:700;color:#fff;padding:0.25rem 0;pointer-events:none;letter-spacing:0.06em;">✓ ON SHELF</div>`
+                : `<button onclick="event.stopPropagation();addFromGroupFeed(${feedIdx})" style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.7);border:none;color:#fff;font-size:0.65rem;font-weight:700;padding:0.25rem 0;cursor:pointer;font-family:'Outfit',sans-serif;letter-spacing:0.04em;">＋ Queue</button>`
+              }
             </div>
           `;
           cardIndex++;
@@ -7395,8 +7411,6 @@
     function openGroupModal() {
       renderGroupsList();
       renderJoinRequests();
-      document.getElementById('groupSearchInput').value = '';
-      document.getElementById('groupSearchResults').innerHTML = '';
       document.getElementById('groupModal').classList.add('active');
     }
 
@@ -7819,6 +7833,29 @@
       }
     }
 
+    async function joinViaLink(code) {
+      try {
+        const snap = await db.collection('groups').where('inviteCode', '==', code).limit(1).get();
+        if (snap.empty) return;
+        const groupDoc = snap.docs[0];
+        const group = { id: groupDoc.id, ...groupDoc.data() };
+        if (currentUser.memberOf.includes(group.id)) {
+          showToast(`You're already in "${group.name}"`);
+          return;
+        }
+        if (!group.members) group.members = [];
+        group.members.push({ id: currentUser.id, name: currentUser.name });
+        const localIdx = groups.findIndex(g => g.id === group.id);
+        if (localIdx >= 0) groups[localIdx] = group; else groups.push(group);
+        currentUser.memberOf.push(group.id);
+        await saveGroupsAndUser(groups, currentUser);
+        updateGroupSelects();
+        showToast(`Joined "${group.name}"! 🎉`);
+      } catch (e) {
+        console.error('joinViaLink error:', e);
+      }
+    }
+
     // Delete group
     async function deleteGroup(id) {
       try {
@@ -7852,57 +7889,144 @@
     // Render groups list
     function renderGroupsList() {
       const list = document.getElementById('groupsList');
-      
       const userGroups = groups.filter(g => currentUser.memberOf.includes(g.id));
-      
       if (userGroups.length === 0) {
         list.innerHTML = '<p style="color: var(--text-secondary); font-style: italic; margin-top: 1rem;">No groups yet</p>';
         return;
       }
-
+      const isOwner = g => g.createdBy === currentUser.id;
       list.innerHTML = userGroups.map(group => `
         <div class="group-card">
           <div class="group-header">
             <div class="group-name">${group.name}</div>
-            ${group.createdBy === currentUser.id ? `
-              <button class="card-action-btn delete-btn" style="flex: none; width: auto; padding: 0.4rem 1rem;" onclick="deleteGroup('${group.id}')">Delete</button>
-            ` : ''}
+            <div style="display:flex;gap:0.4rem;flex-shrink:0;">
+              ${isOwner(group) ? `
+                <button class="card-action-btn" style="width:auto;padding:0.4rem 0.75rem;font-size:0.75rem;" onclick="openRenameGroupSheet('${group.id}','${group.name.replace(/'/g,"\\'")}')">Rename</button>
+                <button class="card-action-btn delete-btn" style="width:auto;padding:0.4rem 0.75rem;font-size:0.75rem;" onclick="deleteGroup('${group.id}')">Delete</button>
+              ` : ''}
+            </div>
           </div>
           <div class="group-members">
             ${group.members ? group.members.length : 1} member${(group.members && group.members.length !== 1) ? 's' : ''}
             <div class="member-list">
-              ${group.members ? group.members.map(m => `<div class="member-chip">${m.name}</div>`).join('') : ''}
+              ${group.members ? group.members.map(m => `
+                <div class="member-chip" style="display:inline-flex;align-items:center;gap:0.3rem;">
+                  ${m.name}
+                  ${isOwner(group) && m.id !== currentUser.id ? `<button onclick="removeMemberFromGroup('${group.id}','${m.id}')" title="Remove" style="background:none;border:none;color:var(--text-secondary);cursor:pointer;font-size:0.8rem;padding:0;line-height:1;">×</button>` : ''}
+                </div>`).join('') : ''}
             </div>
           </div>
-          <div style="margin-top: 1rem;">
-            <strong style="font-size: 0.85rem; color: var(--text-secondary);">Invite Code:</strong>
-            <div class="invite-code">
-              <span>${group.inviteCode}</span>
-              <button class="copy-btn" onclick="copyInviteCode('${group.inviteCode}')">Copy</button>
-            </div>
-          </div>
+          <button onclick="openSendInviteSheet(${JSON.stringify({id:group.id,name:group.name,inviteCode:group.inviteCode})})"
+            style="margin-top:0.85rem;width:100%;display:flex;align-items:center;justify-content:center;gap:0.5rem;background:var(--accent-primary);color:#000;border:none;border-radius:12px;padding:0.65rem 1rem;font-size:0.88rem;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;">
+            ✉️ Invite Someone
+          </button>
         </div>
       `).join('');
     }
 
-    // Copy invite code
-    function copyInviteCode(code) {
+    function openRenameGroupSheet(groupId, currentName) {
+      const existing = document.getElementById('renameGroupSheet');
+      if (existing) existing.remove();
+      const sheet = document.createElement('div');
+      sheet.id = 'renameGroupSheet';
+      sheet.style.cssText = 'position:fixed;inset:0;z-index:1300;background:rgba(0,0,0,0.6);';
+      sheet.innerHTML = `
+        <div style="position:absolute;bottom:0;left:0;right:0;background:var(--bg-secondary);border-radius:20px 20px 0 0;padding:1.25rem 1rem calc(1.75rem + env(safe-area-inset-bottom,0px));">
+          <div style="width:36px;height:4px;background:var(--border-light);border-radius:2px;margin:0 auto 1.25rem;"></div>
+          <div style="font-size:1rem;font-weight:700;color:var(--text-primary);margin-bottom:1rem;font-family:'Outfit',sans-serif;">Rename Group</div>
+          <input id="renameGroupInput" type="text" value="${currentName}"
+            style="width:100%;box-sizing:border-box;background:var(--bg-accent);border:1px solid var(--border-light);border-radius:12px;padding:0.75rem 1rem;color:var(--text-primary);font-size:0.95rem;font-family:'Outfit',sans-serif;outline:none;margin-bottom:0.75rem;"
+            onkeypress="if(event.key==='Enter')submitRenameGroup('${groupId}')">
+          <div style="display:flex;gap:0.6rem;">
+            <button onclick="submitRenameGroup('${groupId}')"
+              style="flex:1;background:var(--accent-primary);color:#000;border:none;border-radius:12px;padding:0.75rem;font-size:0.88rem;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;">
+              Save
+            </button>
+            <button onclick="document.getElementById('renameGroupSheet').remove()"
+              style="flex:1;background:var(--bg-accent);color:var(--text-secondary);border:1px solid var(--border-light);border-radius:12px;padding:0.75rem;font-size:0.88rem;cursor:pointer;font-family:'Outfit',sans-serif;">
+              Cancel
+            </button>
+          </div>
+        </div>`;
+      sheet.addEventListener('click', e => { if (e.target === sheet) sheet.remove(); });
+      document.body.appendChild(sheet);
+      setTimeout(() => { const i = document.getElementById('renameGroupInput'); if(i){i.focus();i.select();} }, 100);
+    }
+
+    async function submitRenameGroup(groupId) {
+      const newName = document.getElementById('renameGroupInput')?.value.trim();
+      if (!newName) return;
+      const group = groups.find(g => g.id === groupId);
+      if (!group) return;
+      group.name = newName;
       try {
-        if (navigator.clipboard && navigator.clipboard.writeText) {
-          navigator.clipboard.writeText(code).then(() => {
-            alert('Invite code copied to clipboard!');
-          }).catch(() => {
-            // Fallback if clipboard fails
-            prompt('Copy this invite code:', code);
-          });
-        } else {
-          // Fallback for browsers without clipboard API
-          prompt('Copy this invite code:', code);
-        }
-      } catch (error) {
-        console.error('Error copying invite code:', error);
-        prompt('Copy this invite code:', code);
+        await saveGroupsAndUser(groups, currentUser);
+        document.getElementById('renameGroupSheet')?.remove();
+        renderGroupsList();
+        updateGroupSelects();
+        showToast('Group renamed');
+      } catch(e) {
+        console.error('Rename error:', e);
+        showToast('Failed to rename — try again');
       }
+    }
+
+    async function removeMemberFromGroup(groupId, memberId) {
+      const group = groups.find(g => g.id === groupId);
+      if (!group) return;
+      const member = group.members?.find(m => m.id === memberId);
+      if (!member) return;
+      if (!confirm(`Remove ${member.name} from "${group.name}"?`)) return;
+      group.members = group.members.filter(m => m.id !== memberId);
+      try {
+        await saveGroupsAndUser(groups, currentUser);
+        renderGroupsList();
+        showToast(`${member.name} removed from group`);
+      } catch(e) {
+        console.error('Remove member error:', e);
+        showToast('Failed to remove member — try again');
+      }
+    }
+
+    function openSendInviteSheet(group) {
+      const existing = document.getElementById('sendInviteSheet');
+      if (existing) existing.remove();
+      const joinLink = window.location.origin + window.location.pathname + '?join=' + group.inviteCode;
+      const sheet = document.createElement('div');
+      sheet.id = 'sendInviteSheet';
+      sheet.style.cssText = 'position:fixed;inset:0;z-index:1300;background:rgba(0,0,0,0.6);';
+      sheet.innerHTML = `
+        <div style="position:absolute;bottom:0;left:0;right:0;background:var(--bg-secondary);border-radius:20px 20px 0 0;padding:1.25rem 1rem calc(1.75rem + env(safe-area-inset-bottom,0px));">
+          <div style="width:36px;height:4px;background:var(--border-light);border-radius:2px;margin:0 auto 1.25rem;"></div>
+          <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:0.25rem;font-family:'Outfit',sans-serif;">Invite to</div>
+          <div style="font-size:1.1rem;font-weight:800;color:var(--text-primary);margin-bottom:1.25rem;font-family:'Outfit',sans-serif;">${group.name}</div>
+          <div style="font-size:0.8rem;color:var(--text-secondary);margin-bottom:0.6rem;font-family:'Outfit',sans-serif;">Enter their phone number and we'll open a pre-written text for you to send.</div>
+          <div style="display:flex;gap:0.6rem;margin-bottom:1rem;">
+            <input id="invitePhoneInput" type="tel" placeholder="Phone number"
+              style="flex:1;background:var(--bg-accent);border:1px solid var(--border-light);border-radius:12px;padding:0.7rem 1rem;color:var(--text-primary);font-size:0.95rem;font-family:'Outfit',sans-serif;outline:none;"
+              onkeypress="if(event.key==='Enter')sendTextInvite('${group.name}','${group.inviteCode}','${joinLink}')">
+            <button onclick="sendTextInvite('${group.name}','${group.inviteCode}','${joinLink}')"
+              style="background:var(--accent-primary);color:#000;border:none;border-radius:12px;padding:0.7rem 1.2rem;font-size:0.88rem;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap;">
+              Send ✉️
+            </button>
+          </div>
+          <button onclick="document.getElementById('sendInviteSheet').remove()"
+            style="width:100%;background:none;border:none;padding:0.5rem 0;color:var(--text-secondary);font-size:0.85rem;cursor:pointer;font-family:'Outfit',sans-serif;">
+            Cancel
+          </button>
+        </div>`;
+      sheet.addEventListener('click', e => { if (e.target === sheet) sheet.remove(); });
+      document.body.appendChild(sheet);
+      setTimeout(() => document.getElementById('invitePhoneInput')?.focus(), 100);
+    }
+
+    function sendTextInvite(groupName, inviteCode, joinLink) {
+      const phone = (document.getElementById('invitePhoneInput')?.value || '').trim();
+      const senderName = currentUser?.name || currentUser?.handle || 'A friend';
+      const msg = `${senderName} invited you to join "${groupName}" on Cued — track movies, TV & books together!\n\nTap to join: ${joinLink}\n\nNew to Cued? The link will walk you through signing up and joining automatically.`;
+      const smsUrl = `sms:${phone ? encodeURIComponent(phone) : ''}${/iPhone|iPad|iPod/i.test(navigator.userAgent) ? '&' : '?'}body=${encodeURIComponent(msg)}`;
+      window.open(smsUrl, '_blank');
+      document.getElementById('sendInviteSheet')?.remove();
     }
 
     // Update group selects
@@ -8554,30 +8678,13 @@
     }
 
     function openGroupFabSheet() {
-      const existing = document.getElementById('groupFabSheet');
-      if (existing) { existing.remove(); return; }
-      const sheet = document.createElement('div');
-      sheet.id = 'groupFabSheet';
-      sheet.style.cssText = 'position:fixed;inset:0;z-index:1200;background:rgba(0,0,0,0.5);display:flex;align-items:flex-end;';
-      sheet.innerHTML = `
-        <div style="background:var(--bg-secondary);border-radius:20px 20px 0 0;width:100%;padding:1.25rem 1rem calc(1.25rem + env(safe-area-inset-bottom,0px));">
-          <div style="width:36px;height:4px;background:var(--border-light);border-radius:2px;margin:0 auto 1.25rem;"></div>
-          <button onclick="closeFabSheet();openGroupModal();" style="display:flex;align-items:center;gap:0.85rem;width:100%;background:none;border:none;padding:0.85rem 0;border-bottom:1px solid var(--border-light);cursor:pointer;text-align:left;">
-            <span style="font-size:1.3rem;">👥</span>
-            <div><div style="font-size:0.9rem;font-weight:600;color:var(--text-primary);font-family:'Outfit',sans-serif;">Create a Group</div><div style="font-size:0.75rem;color:var(--text-tertiary);font-family:'Outfit',sans-serif;">Start a new group with friends</div></div>
-          </button>
-          <button onclick="closeFabSheet();openInviteModalForExisting();" style="display:flex;align-items:center;gap:0.85rem;width:100%;background:none;border:none;padding:0.85rem 0;cursor:pointer;text-align:left;">
-            <span style="font-size:1.3rem;">✉️</span>
-            <div><div style="font-size:0.9rem;font-weight:600;color:var(--text-primary);font-family:'Outfit',sans-serif;">Invite to Group</div><div style="font-size:0.75rem;color:var(--text-tertiary);font-family:'Outfit',sans-serif;">Send an invite to an existing group</div></div>
-          </button>
-        </div>`;
-      sheet.addEventListener('click', e => { if (e.target === sheet) closeFabSheet(); });
-      document.body.appendChild(sheet);
+      const sheet = document.getElementById('groupFabSheet');
+      if (sheet) sheet.style.display = 'block';
     }
 
     function closeFabSheet() {
-      const s = document.getElementById('groupFabSheet');
-      if (s) s.remove();
+      const sheet = document.getElementById('groupFabSheet');
+      if (sheet) sheet.style.display = 'none';
     }
 
     function openNewWatchTogetherList() {
@@ -8633,6 +8740,7 @@
       document.getElementById('followingFeedPanel').style.display = tab === 'following' ? '' : 'none';
       document.getElementById('groupsFeedPanel').style.display = tab === 'groups' ? '' : 'none';
       if (tab === 'following') { loadFollowingFeed(); loadGroupSuggestions(); }
+      if (tab === 'groups') { setFabMode('group'); switchGroupsSubTab('activity'); }
     }
 
     function switchGroupsSubTab(tab) {
@@ -8826,6 +8934,38 @@
       renderItems();
       showToast(`"${entry.title}" added to your queue`);
       loadFollowingFeed(); // refresh to update "On your shelf" state
+    }
+
+    function addFromGroupFeed(feedIdx) {
+      const item = feedItemsCache[feedIdx];
+      if (!item) return;
+      if (items.some(i => i.title === item.title && i.type === item.type)) {
+        showToast('Already on your shelf');
+        return;
+      }
+      const newItem = {
+        id: Date.now().toString() + Math.random().toString(36).slice(2),
+        title: item.title,
+        type: item.type,
+        status: 'want',
+        image: item.image || '',
+        genre: item.genre || '',
+        rating: null,
+        notes: '',
+        streamingPlatform: item.streamingPlatform || '',
+        episode: '',
+        referral: '',
+        tags: [],
+        premiereDate: item.premiereDate || '',
+        dateLogged: '',
+        userId: currentUser.id,
+        watchSoon: false
+      };
+      items.push(newItem);
+      saveItemToFirestore(newItem);
+      renderItems();
+      renderFeeds(); // refresh "ON SHELF" badges
+      showToast(`"${item.title}" added to your queue`);
     }
 
     // Switch to Groups tab and set FAB to green
@@ -9054,31 +9194,80 @@
     function openInviteModalForExisting() {
       const userGroups = groups.filter(g => currentUser.memberOf.includes(g.id));
       if (userGroups.length === 0) {
-        alert('You don\'t have any groups yet. Create one first!');
+        showInviteSheet(null);
         return;
       }
       if (userGroups.length === 1) {
-        // Only one group, open invite directly
-        pendingGroupId = userGroups[0].id;
-        document.getElementById('inviteGroupName').textContent = userGroups[0].name;
-        document.getElementById('inviteCodeDisplay').textContent = userGroups[0].inviteCode;
-        updateMessagePreview();
-        document.getElementById('inviteModal').classList.add('active');
+        showInviteSheet(userGroups[0]);
         return;
       }
-      // Multiple groups - let user pick
-      const groupName = prompt('Which group? Enter the name:\n' + userGroups.map(g => '- ' + g.name).join('\n'));
-      if (!groupName) return;
-      const match = userGroups.find(g => g.name.toLowerCase() === groupName.trim().toLowerCase());
-      if (!match) {
-        alert('Group not found. Please enter the exact name.');
-        return;
-      }
-      pendingGroupId = match.id;
-      document.getElementById('inviteGroupName').textContent = match.name;
-      document.getElementById('inviteCodeDisplay').textContent = match.inviteCode;
-      updateMessagePreview();
-      document.getElementById('inviteModal').classList.add('active');
+      // Multiple groups — show styled group picker first
+      showInviteGroupPicker(userGroups);
+    }
+
+    function showInviteGroupPicker(userGroups) {
+      const existing = document.getElementById('invitePickerSheet');
+      if (existing) existing.remove();
+      const sheet = document.createElement('div');
+      sheet.id = 'invitePickerSheet';
+      sheet.style.cssText = 'position:fixed;inset:0;z-index:1300;background:rgba(0,0,0,0.6);';
+      sheet.innerHTML = `
+        <div style="position:absolute;bottom:0;left:0;right:0;background:var(--bg-secondary);border-radius:20px 20px 0 0;padding:1.25rem 1rem calc(1.5rem + env(safe-area-inset-bottom,0px));">
+          <div style="width:36px;height:4px;background:var(--border-light);border-radius:2px;margin:0 auto 1.25rem;"></div>
+          <div style="font-size:0.9rem;font-weight:700;color:var(--text-primary);margin-bottom:1rem;font-family:'Outfit',sans-serif;">Which group?</div>
+          ${userGroups.map(g => `
+            <button onclick="document.getElementById('invitePickerSheet').remove();showInviteSheet(${JSON.stringify({id:g.id,name:g.name,inviteCode:g.inviteCode})})"
+              style="display:flex;align-items:center;gap:0.85rem;width:100%;background:none;border:none;padding:0.85rem 0;border-bottom:1px solid var(--border-light);cursor:pointer;text-align:left;">
+              <span style="font-size:1.3rem;">👥</span>
+              <span style="font-size:0.9rem;font-weight:600;color:var(--text-primary);font-family:'Outfit',sans-serif;">${g.name}</span>
+            </button>`).join('')}
+          <button onclick="document.getElementById('invitePickerSheet').remove()"
+            style="width:100%;background:none;border:none;padding:0.85rem 0;color:var(--text-secondary);font-size:0.88rem;cursor:pointer;font-family:'Outfit',sans-serif;margin-top:0.25rem;">
+            Cancel
+          </button>
+        </div>`;
+      sheet.addEventListener('click', e => { if (e.target === sheet) sheet.remove(); });
+      document.body.appendChild(sheet);
+    }
+
+    function showInviteSheet(group) {
+      const existing = document.getElementById('inviteCodeSheet');
+      if (existing) existing.remove();
+      const sheet = document.createElement('div');
+      sheet.id = 'inviteCodeSheet';
+      sheet.style.cssText = 'position:fixed;inset:0;z-index:1300;background:rgba(0,0,0,0.6);';
+      const code = group ? group.inviteCode : '';
+      const name = group ? group.name : '';
+      sheet.innerHTML = `
+        <div style="position:absolute;bottom:0;left:0;right:0;background:var(--bg-secondary);border-radius:20px 20px 0 0;padding:1.25rem 1rem calc(1.75rem + env(safe-area-inset-bottom,0px));">
+          <div style="width:36px;height:4px;background:var(--border-light);border-radius:2px;margin:0 auto 1.25rem;"></div>
+          ${group ? `
+            <div style="font-size:0.75rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:0.3rem;font-family:'Outfit',sans-serif;">Invite to</div>
+            <div style="font-size:1.1rem;font-weight:800;color:var(--text-primary);margin-bottom:1.25rem;font-family:'Outfit',sans-serif;">${name}</div>
+            <div style="background:var(--bg-accent);border:1px solid var(--border-light);border-radius:14px;padding:1rem 1rem 0.9rem;margin-bottom:1rem;">
+              <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-secondary);margin-bottom:0.5rem;font-family:'Outfit',sans-serif;">Invite Code</div>
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:0.75rem;">
+                <span style="font-family:'Courier New',monospace;font-size:1.4rem;font-weight:700;letter-spacing:0.15em;color:var(--accent-primary);">${code}</span>
+                <button onclick="navigator.clipboard.writeText('${code}').then(()=>showToast('Copied!'))"
+                  style="background:var(--accent-primary);color:#000;border:none;border-radius:20px;padding:0.4rem 1rem;font-size:0.78rem;font-weight:700;cursor:pointer;font-family:'Outfit',sans-serif;white-space:nowrap;">Copy</button>
+              </div>
+            </div>
+            <button onclick="if(navigator.share){navigator.share({title:'Join '+${JSON.stringify(name)}+' on Cued',text:'Join my group on Cued! Use invite code: ${code}'})}"
+              style="display:flex;align-items:center;justify-content:center;gap:0.5rem;width:100%;background:none;border:1px solid var(--border-light);border-radius:14px;padding:0.85rem;cursor:pointer;color:var(--text-primary);font-size:0.88rem;font-weight:600;font-family:'Outfit',sans-serif;margin-bottom:0.5rem;">
+              <span>📤</span> Share Invite
+            </button>` : `
+            <div style="text-align:center;padding:1.5rem 0;color:var(--text-secondary);font-family:'Outfit',sans-serif;">
+              <div style="font-size:2rem;margin-bottom:0.75rem;">👥</div>
+              <div style="font-size:0.95rem;font-weight:600;color:var(--text-primary);margin-bottom:0.5rem;">No groups yet</div>
+              <div style="font-size:0.82rem;">Create a group first to invite people</div>
+            </div>`}
+          <button onclick="document.getElementById('inviteCodeSheet').remove()"
+            style="width:100%;background:none;border:none;padding:0.75rem 0 0;color:var(--text-secondary);font-size:0.88rem;cursor:pointer;font-family:'Outfit',sans-serif;">
+            Done
+          </button>
+        </div>`;
+      sheet.addEventListener('click', e => { if (e.target === sheet) sheet.remove(); });
+      document.body.appendChild(sheet);
     }
 
     // === GROUP DIRECTORY & SEARCH ===
@@ -11282,7 +11471,7 @@
         <div class="detail-card-actions">
           ${alreadyAdded
             ? `<button class="detail-card-action-btn" disabled style="opacity:0.5; cursor:default;">✓ On Shelf</button>`
-            : `<button class="detail-card-action-btn" onclick="addFromFeed('${escapedItem}'); closeDetailCard();" title="Add to my list">+ Add</button>`
+            : `<button class="detail-card-action-btn" onclick="addFromGroupFeed(${feedItemsCache.indexOf(item)}); closeDetailCard();" title="Add to queue">+ Queue</button>`
           }
         </div>
       `;
@@ -11614,10 +11803,21 @@
 
   <div class="fab-menu" id="fabMenu">
     <div class="fab-menu-item" onclick="closeFabMenu(); openGroupModal();">
-      <span class="fab-menu-icon">👥</span> Create Group
+      <span class="fab-menu-icon">👥</span> Create / Invite to a Group
     </div>
-    <div class="fab-menu-item" onclick="closeFabMenu(); openInviteModalForExisting();">
-      <span class="fab-menu-icon">✉️</span> Invite to Group
+  </div>
+
+  <!-- Group FAB bottom sheet (pre-defined for reliable click handling) -->
+  <div id="groupFabSheet" style="display:none;position:fixed;inset:0;z-index:1200;background:rgba(0,0,0,0.5);" onclick="if(event.target===this)closeFabSheet();">
+    <div style="position:absolute;bottom:0;left:0;right:0;background:var(--bg-secondary);border-radius:20px 20px 0 0;padding:1.25rem 1rem calc(1.5rem + env(safe-area-inset-bottom,0px));">
+      <div style="width:36px;height:4px;background:var(--border-light);border-radius:2px;margin:0 auto 1.25rem;"></div>
+      <button onclick="closeFabSheet();openGroupModal();" style="display:flex;align-items:center;gap:0.85rem;width:100%;background:none;border:none;padding:0.85rem 0;cursor:pointer;text-align:left;">
+        <span style="font-size:1.3rem;">👥</span>
+        <div>
+          <div style="font-size:0.9rem;font-weight:600;color:var(--text-primary);font-family:'Outfit',sans-serif;">Create / Invite to a Group</div>
+          <div style="font-size:0.75rem;color:var(--text-tertiary);font-family:'Outfit',sans-serif;">Create a new group or invite friends to an existing one</div>
+        </div>
+      </button>
     </div>
   </div>
 

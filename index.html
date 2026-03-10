@@ -4929,7 +4929,10 @@
       <button class="modal-close" id="statsModalClose" onclick="closeModal('statsModal')" aria-label="Close">&times;</button>
       <h2 class="modal-header">Your Stats</h2>
       <div class="stats-modal-body" id="statsBody"></div>
-      <button class="btn btn-secondary" onclick="openShareCardForStats()" style="margin-top: 1rem; width: 100%; font-size: 0.8rem;">📤 Create Share Card</button>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-top:1rem;">
+        <button class="btn btn-secondary" onclick="openShareCardForStats()" style="font-size:0.8rem;">📤 Share Stats</button>
+        <button class="btn" onclick="openWrapped()" style="font-size:0.8rem; background:linear-gradient(135deg,#14b8a6,#818cf8);">🎁 Wrapped</button>
+      </div>
     </div>
   </div>
 
@@ -7684,7 +7687,7 @@
       if (!group) return;
 
       const inviteLink = generateInviteLink(group.inviteCode);
-      const message = `Hi! ${currentUser.name} invited you to join "${group.name}" on Cued - a place to share and track movies, shows, books, and podcasts together.\n\nJoin here: ${inviteLink}\n\nOr use invite code: ${group.inviteCode}`;
+      const message = `Hi! ${currentUser.handle ? '@' + currentUser.handle : currentUser.name} invited you to join "${group.name}" on Cued - a place to share and track movies, shows, books, and podcasts together.\n\nJoin here: ${inviteLink}\n\nOr use invite code: ${group.inviteCode}`;
       
       const preview = document.getElementById('messagePreview');
       preview.innerHTML = message.replace(inviteLink, `<a href="${inviteLink}" target="_blank">${inviteLink}</a>`);
@@ -7712,7 +7715,7 @@
       if (!group) return;
 
       const inviteLink = generateInviteLink(group.inviteCode);
-      const message = `Hi! ${currentUser.name} invited you to join "${group.name}" on Cued - a place to share and track movies, shows, books, and podcasts together.\n\nJoin here: ${inviteLink}\n\nOr use invite code: ${group.inviteCode}`;
+      const message = `Hi! ${currentUser.handle ? '@' + currentUser.handle : currentUser.name} invited you to join "${group.name}" on Cued - a place to share and track movies, shows, books, and podcasts together.\n\nJoin here: ${inviteLink}\n\nOr use invite code: ${group.inviteCode}`;
 
       // Simulate sending SMS
       for (const phone of phoneNumbers) {
@@ -9020,6 +9023,145 @@
       document.getElementById('shareCardModal').classList.add('active');
     }
 
+    function openWrapped() {
+      renderWrappedCard();
+      document.getElementById('shareCardTypes').style.display = 'none';
+      document.getElementById('shareCardModal').classList.add('active');
+    }
+
+    function renderWrappedCard() {
+      const thisYear = new Date().getFullYear().toString();
+
+      // This year's completed items
+      const yearItems = items.filter(i => i.status === 'done' && i.dateLogged && i.dateLogged.startsWith(thisYear));
+      const totalYear = yearItems.length;
+
+      // Type counts for this year
+      const typeCounts = {};
+      yearItems.forEach(i => { typeCounts[i.type] = (typeCounts[i.type] || 0) + 1; });
+
+      // Top type
+      const topType = Object.entries(typeCounts).sort((a,b) => b[1]-a[1])[0];
+      const typeLabels = { movie: 'Movies', tv: 'TV Shows', book: 'Books', podcast: 'Podcasts' };
+      const typeColors = { movie: '#14b8a6', tv: '#818cf8', podcast: '#f59e0b', book: '#34d399' };
+
+      // Top genre this year
+      const genreCounts = {};
+      yearItems.forEach(i => { if (i.genre) genreCounts[i.genre] = (genreCounts[i.genre] || 0) + 1; });
+      const topGenres = Object.entries(genreCounts).sort((a,b) => b[1]-a[1]).slice(0,3);
+
+      // Top rated this year
+      const topRated = yearItems
+        .filter(i => legacyToStars(i.rating) !== null)
+        .sort((a,b) => legacyToStars(b.rating) - legacyToStars(a.rating))
+        .slice(0,3);
+
+      // Avg rating this year
+      const ratedYear = yearItems.filter(i => legacyToStars(i.rating) !== null);
+      const avgRating = ratedYear.length > 0
+        ? (ratedYear.reduce((s,i) => s + legacyToStars(i.rating), 0) / ratedYear.length).toFixed(1) : null;
+
+      // Estimated hours
+      const hoursMap = { movie: 2, tv: 0.75, podcast: 1, book: 8 };
+      const totalHours = yearItems.reduce((sum,i) => sum + (hoursMap[i.type] || 1), 0);
+      const hoursDisplay = totalHours >= 1000 ? (totalHours/1000).toFixed(1)+'k' : Math.round(totalHours).toString();
+
+      // Most active month
+      const monthCounts = {};
+      yearItems.forEach(i => {
+        if (i.dateLogged) {
+          const m = i.dateLogged.substring(5,7);
+          monthCounts[m] = (monthCounts[m] || 0) + 1;
+        }
+      });
+      const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+      const topMonth = Object.entries(monthCounts).sort((a,b)=>b[1]-a[1])[0];
+      const topMonthName = topMonth ? monthNames[parseInt(topMonth[0])-1] : null;
+
+      // Cover art: top rated items with images
+      const coverItems = [...topRated.filter(i=>i.image), ...yearItems.filter(i=>i.image && !topRated.find(r=>r.id===i.id))].slice(0,6);
+
+      const handle = currentUser && currentUser.handle ? '@' + currentUser.handle : '';
+
+      const container = document.getElementById('shareCardRender');
+
+      if (totalYear === 0) {
+        container.innerHTML = `
+          <div style="height:5px;background:linear-gradient(90deg,#14b8a6,#818cf8,#f59e0b);"></div>
+          <div style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:calc(100% - 5px);padding:2rem;text-align:center;">
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.5rem;font-weight:800;margin-bottom:0.5rem;">${thisYear} Wrapped</div>
+            <div style="color:rgba(255,255,255,0.45);font-size:0.85rem;">No completed items logged this year yet.<br>Start finishing things!</div>
+            <div style="margin-top:2rem;font-size:0.6rem;letter-spacing:0.15em;text-transform:uppercase;color:rgba(255,255,255,0.2);">CUED</div>
+          </div>`;
+        return;
+      }
+
+      container.innerHTML = `
+        <div style="height:5px;background:linear-gradient(90deg,#14b8a6,#818cf8,#f59e0b);"></div>
+        <div style="padding:1.1rem 1.4rem 0; display:flex; align-items:center; justify-content:space-between;">
+          <div>
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.05rem;font-weight:800;background:linear-gradient(135deg,#fff 0%,#5eead4 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Cued</div>
+            <div style="font-size:0.6rem;color:rgba(255,255,255,0.35);margin-top:-2px;letter-spacing:0.05em;">${thisYear} WRAPPED</div>
+          </div>
+          ${handle ? `<div style="font-size:0.72rem;color:rgba(255,255,255,0.4);">${handle}</div>` : ''}
+        </div>
+
+        <div style="padding:0.9rem 1.4rem 0.6rem;">
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:3rem;font-weight:800;color:#fff;line-height:1;">${totalYear}</div>
+          <div style="font-size:0.72rem;color:rgba(255,255,255,0.5);letter-spacing:0.05em;text-transform:uppercase;">things finished · ~${hoursDisplay} hrs</div>
+        </div>
+
+        ${coverItems.length > 0 ? `
+        <div style="padding:0 1.4rem 0.75rem;">
+          <div style="display:grid;grid-template-columns:repeat(6,1fr);gap:4px;border-radius:8px;overflow:hidden;">
+            ${coverItems.map(i=>`<img src="${i.image}" style="width:100%;aspect-ratio:2/3;object-fit:cover;" crossorigin="anonymous">`).join('')}
+          </div>
+        </div>` : ''}
+
+        <div style="padding:0 1.4rem; display:grid; grid-template-columns:1fr 1fr; gap:0.5rem; margin-bottom:0.6rem;">
+          ${topType ? `
+          <div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:0.65rem 0.75rem;">
+            <div style="font-size:0.58rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.2rem;">Most watched</div>
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1rem;font-weight:700;color:${typeColors[topType[0]] || '#14b8a6'};">${typeLabels[topType[0]]}</div>
+            <div style="font-size:0.68rem;color:rgba(255,255,255,0.45);">${topType[1]} titles</div>
+          </div>` : ''}
+
+          ${topGenres.length > 0 ? `
+          <div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:0.65rem 0.75rem;">
+            <div style="font-size:0.58rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.2rem;">Top genres</div>
+            ${topGenres.map((g,idx)=>`<div style="font-size:${idx===0?'0.85rem':'0.7rem'};font-weight:${idx===0?'700':'500'};color:${idx===0?'#fff':'rgba(255,255,255,0.5)'};">${g[0]}</div>`).join('')}
+          </div>` : ''}
+
+          ${avgRating ? `
+          <div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:0.65rem 0.75rem;">
+            <div style="font-size:0.58rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.2rem;">Avg rating</div>
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.3rem;font-weight:800;color:#f59e0b;">${avgRating}★</div>
+            <div style="font-size:0.68rem;color:rgba(255,255,255,0.45);">${ratedYear.length} rated</div>
+          </div>` : ''}
+
+          ${topMonthName ? `
+          <div style="background:rgba(255,255,255,0.06);border-radius:10px;padding:0.65rem 0.75rem;">
+            <div style="font-size:0.58rem;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.2rem;">Peak month</div>
+            <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1rem;font-weight:700;color:#fff;">${topMonthName}</div>
+            <div style="font-size:0.68rem;color:rgba(255,255,255,0.45);">${topMonth[1]} finished</div>
+          </div>` : ''}
+        </div>
+
+        ${topRated.length > 0 ? `
+        <div style="padding:0 1.4rem;">
+          <div style="font-size:0.6rem;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:0.35rem;">Top rated this year</div>
+          ${topRated.slice(0,2).map(i=>`
+            <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.3rem;">
+              ${i.image ? `<img src="${i.image}" style="width:22px;height:33px;object-fit:cover;border-radius:3px;flex-shrink:0;" crossorigin="anonymous">` : ''}
+              <div style="font-size:0.75rem;font-weight:600;color:rgba(255,255,255,0.85);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${i.title}</div>
+              <div style="font-size:0.7rem;color:#f59e0b;flex-shrink:0;">${'★'.repeat(legacyToStars(i.rating))}</div>
+            </div>`).join('')}
+        </div>` : ''}
+
+        <div style="position:absolute;bottom:0.6rem;right:1.4rem;font-size:0.55rem;color:rgba(255,255,255,0.2);letter-spacing:0.12em;text-transform:uppercase;">CUED</div>
+      `;
+    }
+
     function switchShareCardType(type) {
       document.querySelectorAll('.share-type-btn').forEach(btn => {
         btn.classList.toggle('active', btn.textContent.toLowerCase().includes(type));
@@ -9058,7 +9200,7 @@
         <div style="padding:1.5rem 1.5rem 1.25rem;height:calc(100% - 4px);box-sizing:border-box;display:flex;flex-direction:column;">
           <div style="margin-bottom:1rem;">
             <div style="font-family:'Bricolage Grotesque', sans-serif;font-size:1.25rem;font-weight:700;">Queued</div>
-            <div style="font-size:0.7rem;color:rgba(255,255,255,0.4);">${currentUser ? currentUser.name : ''} · ${watchlist.length} item${watchlist.length !== 1 ? 's' : ''}</div>
+            <div style="font-size:0.7rem;color:rgba(255,255,255,0.4);">${currentUser && currentUser.handle ? '@' + currentUser.handle : ''} · ${watchlist.length} item${watchlist.length !== 1 ? 's' : ''}</div>
           </div>
           ${watchlist.length === 0
             ? `<div style="flex:1;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.3);font-size:0.85rem;">Nothing on the watchlist yet</div>`
@@ -9471,7 +9613,7 @@
         <div style="padding:1.75rem 1.75rem 1.5rem;height:calc(100% - 4px);box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;">
         <div style="text-align:center;margin-bottom:1.25rem;">
           <div style="font-family:'Bricolage Grotesque', sans-serif;font-size:1.4rem;font-weight:700;margin-bottom:0.25rem;">My Media Journey</div>
-          <div style="font-size:0.75rem;color:rgba(255,255,255,0.45);">${currentUser ? currentUser.name : 'A Cued User'}</div>
+          <div style="font-size:0.75rem;color:rgba(255,255,255,0.45);">${currentUser && currentUser.handle ? '@' + currentUser.handle : 'A Cued User'}</div>
         </div>
         <div class="share-card-stats-grid">
           <div class="share-card-stat"><div class="share-card-stat-value">${total}</div><div class="share-card-stat-label">Total Items</div></div>

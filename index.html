@@ -9934,15 +9934,18 @@
         ? `<div style="width:28px;height:42px;border-radius:4px;background:var(--bg-accent);display:flex;align-items:center;justify-content:center;font-size:0.6rem;font-weight:700;color:var(--text-secondary);flex-shrink:0;">+${totalCount - previewMax}</div>`
         : '';
 
-      let html = `<div style="border-bottom:1px solid var(--border-light);margin-bottom:1rem;">
-        <button onclick="toggleExperienceTogether(this)" style="width:100%;background:none;border:none;padding:0.65rem 1rem 0.5rem;cursor:pointer;text-align:left;">
-          <div style="display:flex;align-items:center;margin-bottom:0.45rem;">
-            <div style="flex:1;font-size:0.78rem;color:var(--text-secondary);">${totalCount} things you & ${theirHandle} have in common</div>
-            <svg id="etChevron" width="14" height="14" viewBox="0 0 14 14" fill="none" style="color:var(--text-tertiary);transition:transform 0.2s;flex-shrink:0;"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      let html = `<div style="margin:0 1rem 1rem;border:1px solid rgba(20,184,166,0.2);border-radius:12px;background:rgba(20,184,166,0.05);overflow:hidden;">
+        <button onclick="toggleExperienceTogether(this)" style="width:100%;background:none;border:none;padding:0.7rem 0.85rem 0.6rem;cursor:pointer;text-align:left;">
+          <div style="display:flex;align-items:center;margin-bottom:0.5rem;">
+            <div style="flex:1;">
+              <span style="font-size:1rem;font-weight:800;color:var(--accent-primary);">${totalCount}</span>
+              <span style="font-size:0.78rem;color:var(--text-secondary);margin-left:0.3rem;">things you & ${theirHandle} have in common</span>
+            </div>
+            <svg id="etChevron" width="14" height="14" viewBox="0 0 14 14" fill="none" style="color:var(--accent-primary);opacity:0.6;transition:transform 0.2s;flex-shrink:0;"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </div>
           <div style="display:flex;gap:0.25rem;align-items:center;">${previewImgs}${overflow}</div>
         </button>
-        <div id="etBody" style="display:none;padding:0 1rem 0.75rem;">`;
+        <div id="etBody" style="display:none;padding:0 0.85rem 0.75rem;border-top:1px solid rgba(20,184,166,0.15);">`;
 
       groupOrder.forEach(gk => {
         if (!byGroup[gk]) return;
@@ -9974,6 +9977,7 @@
       html += `</div></div>`;
       section.innerHTML = html;
       section.style.display = 'block';
+      section.style.marginBottom = '1rem';
     }
 
     function toggleExperienceTogether(btn) {

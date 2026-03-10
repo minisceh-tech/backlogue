@@ -9921,16 +9921,29 @@
       const typeIcons = { movie: '🎬', tv: '📺', book: '📚', podcast: '🎙️' };
 
       const theirHandle = document.getElementById('publicProfileName') ? document.getElementById('publicProfileName').textContent : 'them';
-      let html = `<div style="padding:0 1rem 0.5rem; border-bottom:1px solid var(--border-light); margin-bottom:1rem;">
-        <div style="font-size:0.85rem;font-weight:700;color:var(--text-primary);margin-bottom:0.2rem;">You & ${theirHandle} have taste in common</div>
-        <div style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:0.85rem;">Titles you've both got on your shelves</div>`;
+      const totalCount = matched.length;
+      const previewImgs = matched.slice(0, 5).map(({ mine, theirs }) => {
+        const img = theirs.image || mine.image || '';
+        const icon = typeIcons[theirs.type] || '🎬';
+        return img
+          ? `<img src="${img}" style="width:28px;height:42px;object-fit:cover;border-radius:4px;flex-shrink:0;" title="${theirs.title}">`
+          : `<div style="width:28px;height:42px;border-radius:4px;background:var(--bg-accent);display:flex;align-items:center;justify-content:center;font-size:0.8rem;flex-shrink:0;">${icon}</div>`;
+      }).join('');
+
+      let html = `<div style="border-bottom:1px solid var(--border-light);margin-bottom:1rem;">
+        <button onclick="toggleExperienceTogether(this)" style="width:100%;background:none;border:none;padding:0.65rem 1rem;display:flex;align-items:center;gap:0.6rem;cursor:pointer;text-align:left;">
+          <div style="display:flex;gap:0.25rem;align-items:center;">${previewImgs}</div>
+          <div style="flex:1;font-size:0.78rem;color:var(--text-secondary);">${totalCount} in common</div>
+          <svg id="etChevron" width="14" height="14" viewBox="0 0 14 14" fill="none" style="color:var(--text-tertiary);transition:transform 0.2s;flex-shrink:0;"><path d="M3 5l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+        <div id="etBody" style="display:none;padding:0 1rem 0.75rem;">`;
 
       groupOrder.forEach(gk => {
         if (!byGroup[gk]) return;
         const { label, items: gItems } = byGroup[gk];
-        html += `<div style="margin-bottom:0.9rem;">
-          <div style="font-size:0.75rem;color:var(--text-secondary);margin-bottom:0.5rem;font-weight:600;">${label}</div>
-          <div style="display:flex;gap:0.6rem;overflow-x:auto;padding-bottom:0.35rem;scrollbar-width:none;">`;
+        html += `<div style="margin-bottom:0.85rem;">
+          <div style="font-size:0.72rem;color:var(--text-secondary);margin-bottom:0.4rem;font-weight:600;">${label}</div>
+          <div style="display:flex;gap:0.5rem;overflow-x:auto;padding-bottom:0.25rem;scrollbar-width:none;">`;
 
         gItems.forEach(({ mine, theirs }) => {
           const img = theirs.image || mine.image || '';
@@ -9938,13 +9951,13 @@
           const icon = typeIcons[theirs.type] || '';
           const ratingMine = mine.rating ? `<span style="color:var(--accent-primary);font-size:0.65rem;">★${mine.rating}</span>` : '';
           const ratingTheirs = theirs.rating ? `<span style="color:#818cf8;font-size:0.65rem;">★${theirs.rating}</span>` : '';
-          html += `<div style="flex:0 0 auto;width:72px;position:relative;border-radius:8px;overflow:hidden;" title="${title}">
+          html += `<div style="flex:0 0 auto;width:64px;position:relative;border-radius:7px;overflow:hidden;" title="${title}">
             ${img
-              ? `<img src="${img}" alt="${title}" style="width:72px;height:108px;object-fit:cover;display:block;">`
-              : `<div style="width:72px;height:108px;background:var(--bg-accent);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">${icon}</div>`
+              ? `<img src="${img}" alt="${title}" style="width:64px;height:96px;object-fit:cover;display:block;">`
+              : `<div style="width:64px;height:96px;background:var(--bg-accent);display:flex;align-items:center;justify-content:center;font-size:1.3rem;">${icon}</div>`
             }
             ${ratingMine || ratingTheirs
-              ? `<div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.8));padding:0.25rem 0.3rem 0.3rem;"><div style="display:flex;gap:0.2rem;justify-content:center;">${ratingMine}${ratingTheirs}</div></div>`
+              ? `<div style="position:absolute;bottom:0;left:0;right:0;background:linear-gradient(transparent,rgba(0,0,0,0.8));padding:0.2rem 0.25rem 0.25rem;"><div style="display:flex;gap:0.2rem;justify-content:center;">${ratingMine}${ratingTheirs}</div></div>`
               : ''}
           </div>`;
         });
@@ -9952,9 +9965,18 @@
         html += `</div></div>`;
       });
 
-      html += `</div>`;
+      html += `</div></div>`;
       section.innerHTML = html;
       section.style.display = 'block';
+    }
+
+    function toggleExperienceTogether(btn) {
+      const body = document.getElementById('etBody');
+      const chevron = document.getElementById('etChevron');
+      if (!body) return;
+      const open = body.style.display === 'none';
+      body.style.display = open ? 'block' : 'none';
+      if (chevron) chevron.style.transform = open ? 'rotate(180deg)' : '';
     }
 
     function filterPublicProfileType(type, btn) {

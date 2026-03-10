@@ -4934,17 +4934,21 @@
       </div>
       <div id="profileOptions" style="display: none;">
         <div class="form-group">
-          <label style="margin-bottom:0.5rem;">Visible categories</label>
-          <label class="toggle-row"><span>Movies</span><input type="checkbox" id="privacyMovie" checked></label>
-          <label class="toggle-row"><span>TV</span><input type="checkbox" id="privacyTv" checked></label>
-          <label class="toggle-row"><span>Books</span><input type="checkbox" id="privacyBook" checked></label>
-          <label class="toggle-row"><span>Podcasts</span><input type="checkbox" id="privacyPodcast" checked></label>
+          <label style="margin-bottom:0.6rem;">Visible categories</label>
+          <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+            <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.82rem; color:var(--text-secondary); cursor:pointer;"><input type="checkbox" id="privacyMovie" checked> Movies</label>
+            <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.82rem; color:var(--text-secondary); cursor:pointer;"><input type="checkbox" id="privacyTv" checked> TV</label>
+            <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.82rem; color:var(--text-secondary); cursor:pointer;"><input type="checkbox" id="privacyBook" checked> Books</label>
+            <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.82rem; color:var(--text-secondary); cursor:pointer;"><input type="checkbox" id="privacyPodcast" checked> Podcasts</label>
+          </div>
         </div>
         <div class="form-group">
-          <label style="margin-bottom:0.5rem;">Show on profile</label>
-          <label class="toggle-row"><span>Ratings</span><input type="checkbox" id="profileShowRatings" checked></label>
-          <label class="toggle-row"><span>Reviews</span><input type="checkbox" id="profileShowReviews"></label>
-          <label class="toggle-row"><span>Stats</span><input type="checkbox" id="profileShowStats" checked></label>
+          <label style="margin-bottom:0.6rem;">Show on profile</label>
+          <div style="display:flex; gap:1rem; flex-wrap:wrap;">
+            <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.82rem; color:var(--text-secondary); cursor:pointer;"><input type="checkbox" id="profileShowRatings" checked> Ratings</label>
+            <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.82rem; color:var(--text-secondary); cursor:pointer;"><input type="checkbox" id="profileShowReviews"> Reviews</label>
+            <label style="display:flex; align-items:center; gap:0.4rem; font-size:0.82rem; color:var(--text-secondary); cursor:pointer;"><input type="checkbox" id="profileShowStats" checked> Stats</label>
+          </div>
         </div>
         <div class="form-group">
           <label>Your Profile Link</label>

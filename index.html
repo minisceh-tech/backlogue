@@ -2504,20 +2504,43 @@
     }
     .social-tab-btn {
       flex: 1;
-      padding: 0.65rem 0.5rem;
+      padding: 0.75rem 0.5rem;
       background: none;
       border: none;
       border-bottom: 2px solid transparent;
       color: var(--text-tertiary);
       font-family: 'Outfit', sans-serif;
-      font-size: 0.82rem;
-      font-weight: 500;
+      font-size: 0.9rem;
+      font-weight: 600;
       cursor: pointer;
       transition: all 0.2s;
+      letter-spacing: 0.01em;
     }
     .social-tab-btn.active {
-      color: var(--accent-primary);
+      color: var(--text-primary);
       border-bottom-color: var(--accent-primary);
+    }
+    .groups-subtab-pills {
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.5rem 0 0.75rem;
+    }
+    .groups-subtab-pill {
+      padding: 0.3rem 0.9rem;
+      border-radius: 999px;
+      border: 1px solid var(--border-light);
+      background: transparent;
+      color: var(--text-secondary);
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.18s;
+    }
+    .groups-subtab-pill.active {
+      background: var(--accent-primary);
+      border-color: var(--accent-primary);
+      color: #000;
     }
     .following-feed-item {
       display: flex;
@@ -4444,12 +4467,10 @@
         </div>
       </div>
       <div id="groupsFeedPanel" style="display:none;">
-        <!-- Activity / Lists sub-tabs -->
-        <div style="display:flex;border-bottom:1px solid var(--border-light);margin-bottom:0.75rem;">
-          <button id="groups-subtab-activity" onclick="switchGroupsSubTab('activity')"
-            style="flex:1;background:none;border:none;padding:0.65rem 0;font-size:0.82rem;font-weight:600;color:var(--accent-primary);border-bottom:2px solid var(--accent-primary);cursor:pointer;font-family:'Outfit',sans-serif;">Activity</button>
-          <button id="groups-subtab-lists" onclick="switchGroupsSubTab('lists')"
-            style="flex:1;background:none;border:none;padding:0.65rem 0;font-size:0.82rem;font-weight:600;color:var(--text-tertiary);border-bottom:2px solid transparent;cursor:pointer;font-family:'Outfit',sans-serif;">Lists</button>
+        <!-- Activity / Watch Together sub-tabs (pill style) -->
+        <div class="groups-subtab-pills" style="padding-left:1rem;padding-right:1rem;">
+          <button id="groups-subtab-activity" class="groups-subtab-pill active" onclick="switchGroupsSubTab('activity')">Activity</button>
+          <button id="groups-subtab-lists" class="groups-subtab-pill" onclick="switchGroupsSubTab('lists')">Watch Together</button>
         </div>
 
         <div id="groupsActivityPanel">
@@ -8156,7 +8177,7 @@
         </button>`;
 
         if (!lists.length) {
-          container.innerHTML = newBtn + `<div style="text-align:center;padding:1.5rem 0;color:var(--text-tertiary);font-size:0.82rem;">No lists yet — create one for the group</div>`;
+          container.innerHTML = newBtn + `<div style="text-align:center;padding:1.5rem 0;color:var(--text-tertiary);font-size:0.82rem;">No Watch Together lists yet — create one for the group</div>`;
           return;
         }
 
@@ -8484,9 +8505,9 @@
     function setFabMode(mode) {
       currentFabMode = mode;
       const fab = document.getElementById('fabButton');
-      if (mode === 'group') {
+      if (mode === 'group' || mode === 'watchTogether') {
         fab.classList.add('fab-group');
-        fab.title = 'Group Options';
+        fab.title = mode === 'watchTogether' ? 'New Watch Together List' : 'Group Options';
         fab.textContent = '+';
       } else {
         fab.classList.remove('fab-group');
@@ -8497,11 +8518,29 @@
     }
 
     function handleFabClick() {
-      if (currentFabMode === 'group') {
+      if (currentFabMode === 'watchTogether') {
+        openNewWatchTogetherList();
+      } else if (currentFabMode === 'group') {
         toggleFabMenu();
       } else {
         openAddModal();
       }
+    }
+
+    function openNewWatchTogetherList() {
+      const userGroups = (groups || []).filter(g => (currentUser?.memberOf || []).includes(g.id));
+      if (!userGroups.length) { alert('Join or create a group first.'); return; }
+      let groupId;
+      if (userGroups.length === 1) {
+        groupId = userGroups[0].id;
+      } else {
+        const names = userGroups.map((g, i) => `${i+1}. ${g.name}`).join('\n');
+        const pick = prompt(`Which group?\n${names}\n\nEnter number:`);
+        const idx = parseInt(pick) - 1;
+        if (isNaN(idx) || !userGroups[idx]) return;
+        groupId = userGroups[idx].id;
+      }
+      createGroupList(groupId);
     }
 
     function toggleFabMenu() {
@@ -8542,11 +8581,13 @@
       const actPanel = document.getElementById('groupsActivityPanel');
       const lstPanel = document.getElementById('groupsListsPanel');
       const isActivity = tab === 'activity';
-      if (actBtn) { actBtn.style.color = isActivity ? 'var(--accent-primary)' : 'var(--text-tertiary)'; actBtn.style.borderBottomColor = isActivity ? 'var(--accent-primary)' : 'transparent'; }
-      if (lstBtn) { lstBtn.style.color = isActivity ? 'var(--text-tertiary)' : 'var(--accent-primary)'; lstBtn.style.borderBottomColor = isActivity ? 'transparent' : 'var(--accent-primary)'; }
+      if (actBtn) actBtn.classList.toggle('active', isActivity);
+      if (lstBtn) lstBtn.classList.toggle('active', !isActivity);
       if (actPanel) actPanel.style.display = isActivity ? '' : 'none';
       if (lstPanel) lstPanel.style.display = isActivity ? 'none' : '';
       if (!isActivity) renderAllGroupLists();
+      // Update FAB for context
+      setFabMode(isActivity ? 'group' : 'watchTogether');
     }
 
     async function renderAllGroupLists() {
@@ -8566,10 +8607,10 @@
           html += `<div style="margin-bottom:1.25rem;">
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:0.5rem;">
               <div style="font-size:0.72rem;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-tertiary);">${group.name}</div>
-              <button onclick="createGroupList('${group.id}')" style="background:none;border:none;color:var(--accent-primary);font-size:0.78rem;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;padding:0;">+ New list</button>
+              <button onclick="createGroupList('${group.id}')" style="background:none;border:none;color:var(--accent-primary);font-size:0.78rem;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;padding:0;">+ New Watch Together list</button>
             </div>`;
           if (!lists.length) {
-            html += `<div style="font-size:0.8rem;color:var(--text-tertiary);padding:0.5rem 0 0.25rem;">No lists yet</div>`;
+            html += `<div style="font-size:0.8rem;color:var(--text-tertiary);padding:0.5rem 0 0.25rem;">No Watch Together lists yet</div>`;
           } else {
             html += lists.map(list => {
               const its = list.items || [];

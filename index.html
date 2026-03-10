@@ -8229,35 +8229,115 @@
     }
 
     function addItemToGroupList(groupId, listId) {
-      const title = prompt('Search for a title to add:');
-      if (!title || !title.trim()) return;
-      // Find in user's own items first
-      const q = title.trim().toLowerCase();
-      const myMatch = items.find(i => i.title.toLowerCase().includes(q));
-      if (myMatch) {
-        _addToGroupListConfirmed(groupId, listId, { title: myMatch.title, type: myMatch.type, image: myMatch.image || '', genre: myMatch.genre || '' });
-      } else {
-        // Freeform add with type prompt
-        const type = prompt('Type (movie / tv / book / podcast):') || 'movie';
-        _addToGroupListConfirmed(groupId, listId, { title: title.trim(), type: type.trim(), image: '', genre: '' });
+      const existing = document.getElementById('glAddModal');
+      if (existing) existing.remove();
+
+      const modal = document.createElement('div');
+      modal.id = 'glAddModal';
+      modal.style.cssText = 'position:fixed;inset:0;z-index:1200;background:rgba(0,0,0,0.6);display:flex;align-items:flex-end;';
+      modal.innerHTML = `
+        <div style="background:var(--bg-secondary);border-radius:20px 20px 0 0;width:100%;max-height:85vh;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom,0px);">
+          <div style="padding:1rem 1rem 0.5rem;display:flex;align-items:center;gap:0.75rem;border-bottom:1px solid var(--border-light);">
+            <div style="flex:1;font-weight:700;font-size:0.95rem;">Add to list</div>
+            <button onclick="document.getElementById('glAddModal').remove()" style="background:none;border:none;color:var(--text-tertiary);font-size:1.4rem;cursor:pointer;line-height:1;">×</button>
+          </div>
+          <div style="padding:0.75rem 1rem 0.5rem;display:flex;gap:0.5rem;">
+            <input id="glAddSearch" type="text" placeholder="Search for a title..." autocomplete="off"
+              style="flex:1;background:var(--bg-accent);border:1px solid var(--border-light);border-radius:10px;padding:0.55rem 0.75rem;font-size:0.9rem;color:var(--text-primary);font-family:'Outfit',sans-serif;outline:none;"
+              oninput="glDoSearch('${groupId}','${listId}')">
+            <select id="glAddType" onchange="glDoSearch('${groupId}','${listId}')"
+              style="background:var(--bg-accent);border:1px solid var(--border-light);border-radius:10px;padding:0.55rem 0.6rem;font-size:0.82rem;color:var(--text-primary);font-family:'Outfit',sans-serif;outline:none;">
+              <option value="movie">Movies</option>
+              <option value="tv">TV</option>
+              <option value="book">Books</option>
+              <option value="podcast">Podcasts</option>
+            </select>
+          </div>
+          <div id="glAddResults" style="overflow-y:auto;flex:1;padding:0 1rem 1rem;">
+            <div style="font-size:0.75rem;color:var(--text-tertiary);padding:0.5rem 0 0.25rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">From your shelf</div>
+            ${(items||[]).slice(0,8).map(it => glResultRow(it, groupId, listId)).join('')}
+          </div>
+        </div>`;
+      document.body.appendChild(modal);
+      modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+      setTimeout(() => document.getElementById('glAddSearch')?.focus(), 100);
+    }
+
+    function glResultRow(it, groupId, listId) {
+      const img = it.image
+        ? `<img src="${it.image}" style="width:36px;height:54px;object-fit:cover;border-radius:5px;flex-shrink:0;">`
+        : `<div style="width:36px;height:54px;border-radius:5px;background:var(--bg-accent);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;">${{movie:'🎬',tv:'📺',book:'📚',podcast:'🎙️'}[it.type]||'🎬'}</div>`;
+      const safeTitle = (it.title||'').replace(/'/g,"&#39;");
+      const safeType = (it.type||'movie');
+      const safeImg = (it.image||'').replace(/'/g,"&#39;");
+      const safeGenre = (it.genre||'').replace(/'/g,"&#39;");
+      return `<div onclick="glPickItem('${groupId}','${listId}','${safeTitle}','${safeType}','${safeImg}','${safeGenre}')"
+        style="display:flex;gap:0.75rem;align-items:center;padding:0.5rem 0;border-bottom:1px solid var(--border-light);cursor:pointer;">
+        ${img}
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:0.88rem;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${it.title}</div>
+          <div style="font-size:0.7rem;color:var(--text-tertiary);">${it.type}${it.genre ? ' · '+it.genre : ''}</div>
+        </div>
+        <div style="color:var(--accent-primary);font-size:1.1rem;padding:0.25rem;">+</div>
+      </div>`;
+    }
+
+    let _glSearchTimer = null;
+    function glDoSearch(groupId, listId) {
+      clearTimeout(_glSearchTimer);
+      const q = (document.getElementById('glAddSearch')?.value || '').trim();
+      const type = document.getElementById('glAddType')?.value || 'movie';
+      const resultsEl = document.getElementById('glAddResults');
+      if (!resultsEl) return;
+
+      if (!q) {
+        resultsEl.innerHTML = '<div style="font-size:0.75rem;color:var(--text-tertiary);padding:0.5rem 0 0.25rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">From your shelf</div>'
+          + (items||[]).slice(0,8).map(it => glResultRow(it, groupId, listId)).join('');
+        return;
       }
+
+      // Shelf matches
+      const shelfMatches = (items||[]).filter(i => i.title.toLowerCase().includes(q.toLowerCase()));
+      const shelfHtml = shelfMatches.length
+        ? '<div style="font-size:0.75rem;color:var(--text-tertiary);padding:0.5rem 0 0.25rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">From your shelf</div>'
+          + shelfMatches.map(it => glResultRow(it, groupId, listId)).join('')
+        : '';
+      resultsEl.innerHTML = shelfHtml + '<div style="font-size:0.75rem;color:var(--text-tertiary);padding:0.5rem 0 0.25rem;font-weight:600;text-transform:uppercase;letter-spacing:0.06em;">Search results</div><div id="glApiResults" style="color:var(--text-tertiary);font-size:0.82rem;padding:0.5rem 0;">Searching...</div>';
+
+      _glSearchTimer = setTimeout(async () => {
+        const apiEl = document.getElementById('glApiResults');
+        if (!apiEl) return;
+        try {
+          let results = [];
+          if (type === 'movie' || type === 'tv') results = await searchTMDB(q, type);
+          else if (type === 'book') results = await searchBooks(q);
+          else if (type === 'podcast') results = await searchPodcasts(q);
+          apiEl.innerHTML = results.length
+            ? results.slice(0,10).map(it => glResultRow({title:it.title||it.name,type,image:it.image||'',genre:it.genre||''}, groupId, listId)).join('')
+            : '<div style="color:var(--text-tertiary);font-size:0.82rem;padding:0.5rem 0;">No results found</div>';
+        } catch { if (apiEl) apiEl.textContent = 'Search unavailable'; }
+      }, 400);
+    }
+
+    function glPickItem(groupId, listId, title, type, image, genre) {
+      const modal = document.getElementById('glAddModal');
+      if (modal) modal.remove();
+      _addToGroupListConfirmed(groupId, listId, { title, type, image, genre });
     }
 
     async function _addToGroupListConfirmed(groupId, listId, itemData) {
-      const notes = prompt('Add a note? (optional — press Enter to skip)') || '';
       const newItem = {
         ...itemData,
         addedBy: currentUser.id,
         addedByHandle: currentUser.handle || '',
         addedAt: Date.now(),
-        notes: notes.trim()
+        notes: ''
       };
       try {
         const ref = db.collection('groups').doc(groupId).collection('lists').doc(listId);
         const doc = await ref.get();
         const existing = doc.data().items || [];
         await ref.update({ items: [...existing, newItem] });
-        // Re-open the updated list
         openGroupList(groupId, listId);
       } catch (e) {
         alert('Could not add item.');

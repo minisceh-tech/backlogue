@@ -7153,50 +7153,69 @@
     }
 
     // Render shared items as a card grid grouped by media type
-    function renderFeedGrid(containerEl, filteredItems, showGroup) {
+    function renderFeedGrid(containerEl, filteredItems) {
       const typeOrderArr = ['movie', 'tv', 'podcast', 'book'];
       const typeLabels = { movie: 'Movies', tv: 'TV Shows', podcast: 'Podcasts', book: 'Books' };
 
-      // Sort by timestamp within each type
-      filteredItems.sort((a, b) => {
-        return b.timestamp - a.timestamp;
-      });
-
+      filteredItems.sort((a, b) => b.timestamp - a.timestamp);
       feedItemsCache = [];
       let html = '';
       let cardIndex = 0;
 
+      function feedCardHtml(item, feedIdx) {
+        const alreadyHave = items.some(i => i.title === item.title && i.type === item.type);
+        return `
+          <div class="card feed-card" data-feed-idx="${feedIdx}" data-type="${item.type}" style="animation-delay:${Math.min(cardIndex * 0.05, 0.5)}s;position:relative;">
+            <div class="card-image">
+              ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : `<div class="card-placeholder">${getTypeEmoji(item.type)}<div class="card-placeholder-title">${item.title}</div></div>`}
+            </div>
+            ${alreadyHave
+              ? `<div style="position:absolute;bottom:0;left:0;right:0;background:#0d9488;text-align:center;font-size:0.58rem;font-weight:700;color:#fff;padding:0.25rem 0;pointer-events:none;letter-spacing:0.06em;">✓ ON SHELF</div>`
+              : `<button onclick="event.stopPropagation();addFromGroupFeed(${feedIdx})" style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.7);border:none;color:#fff;font-size:0.65rem;font-weight:700;padding:0.25rem 0;cursor:pointer;font-family:'Outfit',sans-serif;letter-spacing:0.04em;">＋ Queue</button>`
+            }
+          </div>`;
+      }
+
+      // Single-type drill-down: vertical grid
+      if (currentFeedMediaFilter !== 'all') {
+        const typeItems = filteredItems.filter(i => i.type === currentFeedMediaFilter);
+        html += `<div style="padding:0 0 0.5rem;">
+          <button onclick="feedDrillBack()" style="background:none;border:none;color:var(--accent-primary);font-size:0.82rem;font-weight:600;cursor:pointer;font-family:'Outfit',sans-serif;padding:0.5rem 0;">← All types</button>
+        </div>`;
+        if (typeItems.length === 0) {
+          html += `<div style="text-align:center;padding:3rem 1rem;color:var(--text-tertiary);">Nothing here yet</div>`;
+        } else {
+          html += `<div class="search-results-grid" style="margin-top:0.25rem;">`;
+          typeItems.forEach(item => {
+            const feedIdx = feedItemsCache.length;
+            feedItemsCache.push(item);
+            html += feedCardHtml(item, feedIdx);
+            cardIndex++;
+          });
+          html += `</div>`;
+        }
+        containerEl.innerHTML = html;
+        return;
+      }
+
+      // Default: sections by type with horizontal scroll rows
       typeOrderArr.forEach(type => {
         const typeItems = filteredItems.filter(i => i.type === type);
         if (typeItems.length === 0) return;
 
-        html += `<section class="status-section">`;
-        html += `
-          <div class="status-section-header">
+        html += `<section class="status-section">
+          <div class="status-section-header" onclick="feedDrillInto('${type}')" style="cursor:pointer;">
             <h2 class="status-section-title">${typeLabels[type] || type}</h2>
             <div class="status-section-line"></div>
             <span class="status-section-count">${typeItems.length}</span>
+            <span style="font-size:0.8rem;color:var(--text-tertiary);margin-left:0.25rem;flex-shrink:0;">›</span>
           </div>
-        `;
-        html += `<div class="scroll-row" data-type="${type}">`;
-        html += `<div class="scroll-row-track">`;
+          <div class="scroll-row" data-type="${type}"><div class="scroll-row-track">`;
 
         typeItems.forEach(item => {
           const feedIdx = feedItemsCache.length;
           feedItemsCache.push(item);
-          const alreadyHave = items.some(i => i.title === item.title && i.type === item.type);
-
-          html += `
-            <div class="card feed-card" data-feed-idx="${feedIdx}" data-type="${item.type}" style="animation-delay: ${Math.min(cardIndex * 0.05, 0.5)}s;position:relative;">
-              <div class="card-image">
-                ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : `<div class="card-placeholder">${getTypeEmoji(item.type)}<div class="card-placeholder-title">${item.title}</div></div>`}
-              </div>
-              ${alreadyHave
-                ? `<div style="position:absolute;bottom:0;left:0;right:0;background:#0d9488;text-align:center;font-size:0.58rem;font-weight:700;color:#fff;padding:0.25rem 0;pointer-events:none;letter-spacing:0.06em;">✓ ON SHELF</div>`
-                : `<button onclick="event.stopPropagation();addFromGroupFeed(${feedIdx})" style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.7);border:none;color:#fff;font-size:0.65rem;font-weight:700;padding:0.25rem 0;cursor:pointer;font-family:'Outfit',sans-serif;letter-spacing:0.04em;">＋ Queue</button>`
-              }
-            </div>
-          `;
+          html += feedCardHtml(item, feedIdx);
           cardIndex++;
         });
 
@@ -7204,6 +7223,20 @@
       });
 
       containerEl.innerHTML = html;
+    }
+
+    function feedDrillInto(type) {
+      currentFeedMediaFilter = type;
+      const el = document.getElementById('feedMediaFilter');
+      if (el) el.value = type;
+      renderFeeds();
+    }
+
+    function feedDrillBack() {
+      currentFeedMediaFilter = 'all';
+      const el = document.getElementById('feedMediaFilter');
+      if (el) el.value = 'all';
+      renderFeeds();
     }
 
     async function renderFeeds() {

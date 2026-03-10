@@ -8870,6 +8870,75 @@
       document.getElementById('shareCardModal').classList.add('active');
     }
 
+    function openShareCardForProfile() {
+      renderProfileShareCard();
+      document.getElementById('shareCardTypes').style.display = 'none';
+      document.getElementById('shareCardModal').classList.add('active');
+    }
+
+    function renderProfileShareCard() {
+      const handle = currentUser.handle || '';
+      const profileUrl = window.location.origin + window.location.pathname + '?profile=' + (handle || currentUser.id);
+      const done = items.filter(i => i.status === 'done');
+      const typeCounts = {};
+      items.forEach(i => { typeCounts[i.type] = (typeCounts[i.type] || 0) + 1; });
+      const rated = items.filter(i => legacyToStars(i.rating) !== null);
+      const avgRating = rated.length > 0
+        ? (rated.reduce((s, i) => s + legacyToStars(i.rating), 0) / rated.length).toFixed(1) : null;
+
+      // Pick up to 9 items with posters, prioritise recently finished
+      const withPosters = [...done.filter(i => i.image), ...items.filter(i => i.status !== 'done' && i.image)]
+        .slice(0, 9);
+
+      const posterGrid = withPosters.map(i =>
+        `<img src="${i.image}" style="width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:6px;" crossorigin="anonymous">`
+      ).join('');
+
+      const statParts = [
+        typeCounts.movie ? `${typeCounts.movie} Films` : null,
+        typeCounts.tv    ? `${typeCounts.tv} Shows`    : null,
+        typeCounts.book  ? `${typeCounts.book} Books`  : null,
+        typeCounts.podcast ? `${typeCounts.podcast} Podcasts` : null,
+      ].filter(Boolean);
+
+      const container = document.getElementById('shareCardRender');
+      container.innerHTML = `
+        <div style="height:5px;background:linear-gradient(90deg,#14b8a6,#5eead4,#0d9488);"></div>
+        <div style="padding:1.4rem 1.4rem 0; display:flex; align-items:center; gap:0.6rem;">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="28" height="28">
+            <defs>
+              <radialGradient id="scbg" cx="50%" cy="55%" r="65%"><stop offset="0%" stop-color="#0e2530"/><stop offset="100%" stop-color="#050c0f"/></radialGradient>
+              <linearGradient id="schp" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4fd8c4"/><stop offset="100%" stop-color="#0d7a70"/></linearGradient>
+              <linearGradient id="scbkm" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#99f5e8"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
+            </defs>
+            <rect width="96" height="96" rx="22" fill="url(#scbg)"/>
+            <path d="M 20 52 C 20 10 76 10 76 52" fill="none" stroke="url(#schp)" stroke-width="7" stroke-linecap="round"/>
+            <rect x="11" y="46" width="14" height="26" rx="7" fill="url(#schp)"/>
+            <rect x="71" y="46" width="14" height="26" rx="7" fill="url(#schp)"/>
+            <path d="M 37 44 L 59 44 L 59 90 L 48 79 L 37 90 Z" fill="url(#scbkm)"/>
+            <polygon points="43,54 43,73 58,63.5" fill="#060e12" opacity="0.6"/>
+          </svg>
+          <span style="font-family:'Bricolage Grotesque',sans-serif;font-size:1rem;font-weight:800;background:linear-gradient(135deg,#fff 0%,#5eead4 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Cued</span>
+        </div>
+        <div style="padding:0.9rem 1.4rem 0.75rem;">
+          <div style="font-family:'Bricolage Grotesque',sans-serif;font-size:1.9rem;font-weight:800;color:#fff;line-height:1;">@${handle}</div>
+          <div style="display:flex;gap:0.6rem;margin-top:0.5rem;flex-wrap:wrap;">
+            ${statParts.map(s => `<span style="font-size:0.68rem;color:#5eead4;font-weight:600;">${s}</span><span style="color:rgba(255,255,255,0.2);font-size:0.68rem;">·</span>`).join('').replace(/·<\/span>$/, '</span>')}
+            ${avgRating ? `<span style="font-size:0.68rem;color:rgba(255,255,255,0.45);">${avgRating}★ avg</span>` : ''}
+          </div>
+        </div>
+        ${withPosters.length > 0 ? `
+        <div style="padding:0 1.4rem;">
+          <div style="display:grid;grid-template-columns:repeat(${Math.min(withPosters.length,3)},1fr);gap:6px;">
+            ${posterGrid}
+          </div>
+        </div>` : `<div style="flex:1;display:flex;align-items:center;justify-content:center;color:rgba(255,255,255,0.15);font-size:0.8rem;">No items yet</div>`}
+        <div style="position:absolute;bottom:0;left:0;right:0;padding:0.75rem 1.4rem;background:linear-gradient(transparent,rgba(13,17,23,0.95));">
+          <div style="font-size:0.6rem;color:rgba(255,255,255,0.3);letter-spacing:0.05em;">${profileUrl}</div>
+        </div>
+      `;
+    }
+
     function openShareCardForStats() {
       currentShareItem = null;
       renderStatsShareCard();
@@ -9915,12 +9984,8 @@
       });
     }
 
-    async function shareProfileLink() {
-      const link = document.getElementById('profileLinkDisplay').textContent;
-      const handle = currentUser.handle ? '@' + currentUser.handle : 'my';
-      try {
-        await navigator.share({ title: 'Cued', text: `Check out ${handle} shelf on Cued`, url: link });
-      } catch (e) { /* user cancelled or not supported */ }
+    function shareProfileLink() {
+      openShareCardForProfile();
     }
 
     async function savePublicProfile() {

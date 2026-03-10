@@ -4934,30 +4934,17 @@
       </div>
       <div id="profileOptions" style="display: none;">
         <div class="form-group">
-          <label style="margin-bottom:0.4rem;">Visible categories</label>
-          <div class="privacy-grid">
-            <div class="privacy-item"><span>Movies</span><select id="privacyMovie" style="background:var(--bg-primary);color:var(--text-primary);border:none;font-size:0.78rem;cursor:pointer;"><option value="public">Public</option><option value="private">Private</option></select></div>
-            <div class="privacy-item"><span>TV</span><select id="privacyTv" style="background:var(--bg-primary);color:var(--text-primary);border:none;font-size:0.78rem;cursor:pointer;"><option value="public">Public</option><option value="private">Private</option></select></div>
-            <div class="privacy-item"><span>Books</span><select id="privacyBook" style="background:var(--bg-primary);color:var(--text-primary);border:none;font-size:0.78rem;cursor:pointer;"><option value="public">Public</option><option value="private">Private</option></select></div>
-            <div class="privacy-item"><span>Podcasts</span><select id="privacyPodcast" style="background:var(--bg-primary);color:var(--text-primary);border:none;font-size:0.78rem;cursor:pointer;"><option value="public">Public</option><option value="private">Private</option></select></div>
-          </div>
+          <label style="margin-bottom:0.5rem;">Visible categories</label>
+          <label class="toggle-row"><span>Movies</span><input type="checkbox" id="privacyMovie" checked></label>
+          <label class="toggle-row"><span>TV</span><input type="checkbox" id="privacyTv" checked></label>
+          <label class="toggle-row"><span>Books</span><input type="checkbox" id="privacyBook" checked></label>
+          <label class="toggle-row"><span>Podcasts</span><input type="checkbox" id="privacyPodcast" checked></label>
         </div>
         <div class="form-group">
           <label style="margin-bottom:0.5rem;">Show on profile</label>
-          <div style="display:flex; gap:0.5rem;">
-            <label style="flex:1; display:flex; flex-direction:column; align-items:center; gap:0.4rem; background:var(--bg-accent); border:1px solid var(--border-light); border-radius:10px; padding:0.6rem 0.4rem; cursor:pointer; font-size:0.72rem; color:var(--text-secondary); text-align:center;">
-              <input type="checkbox" id="profileShowRatings" checked style="margin:0;">
-              Ratings
-            </label>
-            <label style="flex:1; display:flex; flex-direction:column; align-items:center; gap:0.4rem; background:var(--bg-accent); border:1px solid var(--border-light); border-radius:10px; padding:0.6rem 0.4rem; cursor:pointer; font-size:0.72rem; color:var(--text-secondary); text-align:center;">
-              <input type="checkbox" id="profileShowReviews" style="margin:0;">
-              Reviews
-            </label>
-            <label style="flex:1; display:flex; flex-direction:column; align-items:center; gap:0.4rem; background:var(--bg-accent); border:1px solid var(--border-light); border-radius:10px; padding:0.6rem 0.4rem; cursor:pointer; font-size:0.72rem; color:var(--text-secondary); text-align:center;">
-              <input type="checkbox" id="profileShowStats" checked style="margin:0;">
-              Stats
-            </label>
-          </div>
+          <label class="toggle-row"><span>Ratings</span><input type="checkbox" id="profileShowRatings" checked></label>
+          <label class="toggle-row"><span>Reviews</span><input type="checkbox" id="profileShowReviews"></label>
+          <label class="toggle-row"><span>Stats</span><input type="checkbox" id="profileShowStats" checked></label>
         </div>
         <div class="form-group">
           <label>Your Profile Link</label>
@@ -9879,7 +9866,7 @@
           const privacy = data.privacy || {};
           ['Movie','Tv','Book','Podcast'].forEach(t => {
             const el = document.getElementById('privacy' + t);
-            if (el) el.value = privacy[t.toLowerCase()] || 'public';
+            if (el) el.checked = (privacy[t.toLowerCase()] || 'public') === 'public';
           });
         } else {
           document.getElementById('profileEnabled').checked = false;
@@ -9968,7 +9955,7 @@
         const privacy = {};
         ['movie','tv','book','podcast'].forEach(t => {
           const el = document.getElementById('privacy' + t.charAt(0).toUpperCase() + t.slice(1));
-          privacy[t] = el ? el.value : 'public';
+          privacy[t] = el && el.checked ? 'public' : 'private';
         });
 
         // Auto-build spotlight from most recently added In Progress item per type

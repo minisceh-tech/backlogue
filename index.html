@@ -4861,7 +4861,7 @@
   <!-- Stats Modal -->
   <div id="statsModal" class="modal">
     <div class="modal-content">
-      <button class="modal-close" onclick="closeModal('statsModal')" aria-label="Close">&times;</button>
+      <button class="modal-close" id="statsModalClose" onclick="closeModal('statsModal')" aria-label="Close">&times;</button>
       <h2 class="modal-header">Your Stats</h2>
       <div class="stats-modal-body" id="statsBody"></div>
       <button class="btn btn-secondary" onclick="openShareCardForStats()" style="margin-top: 1rem; width: 100%; font-size: 0.8rem;">📤 Create Share Card</button>
@@ -4894,12 +4894,12 @@
       <button class="modal-close" onclick="closeModal('profileSettingsModal')" aria-label="Close">&times;</button>
       <h2 class="modal-header">Settings</h2>
       <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1.5rem;">
-        <button onclick="openStatsModal(); closeModal('profileSettingsModal')" style="background:var(--bg-accent); border:1px solid var(--border-light); border-radius:14px; padding:1rem 0.75rem; text-align:center; cursor:pointer; transition:all 0.2s; display:flex; flex-direction:column; align-items:center; gap:0.35rem;">
+        <button onclick="openStatsModal(true); closeModal('profileSettingsModal')" style="background:var(--bg-accent); border:1px solid var(--border-light); border-radius:14px; padding:1rem 0.75rem; text-align:center; cursor:pointer; transition:all 0.2s; display:flex; flex-direction:column; align-items:center; gap:0.35rem;">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="12" width="4" height="9" rx="1" fill="#14b8a6"/><rect x="10" y="7" width="4" height="14" rx="1" fill="#14b8a6" opacity="0.7"/><rect x="17" y="3" width="4" height="18" rx="1" fill="#14b8a6" opacity="0.4"/></svg>
           <div style="font-weight:700; font-size:0.88rem; color:var(--text-primary);">Stats</div>
           <div style="font-size:0.7rem; color:var(--text-tertiary);">Your media journey</div>
         </button>
-        <button onclick="openLibrary(); closeModal('profileSettingsModal')" style="background:var(--bg-accent); border:1px solid var(--border-light); border-radius:14px; padding:1rem 0.75rem; text-align:center; cursor:pointer; transition:all 0.2s; display:flex; flex-direction:column; align-items:center; gap:0.35rem;">
+        <button onclick="openLibrary(null, null, true); closeModal('profileSettingsModal')" style="background:var(--bg-accent); border:1px solid var(--border-light); border-radius:14px; padding:1rem 0.75rem; text-align:center; cursor:pointer; transition:all 0.2s; display:flex; flex-direction:column; align-items:center; gap:0.35rem;">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="3" width="11" height="16" rx="2" fill="#14b8a6" opacity="0.4"/><rect x="9" y="5" width="11" height="16" rx="2" fill="#14b8a6" opacity="0.7"/><path d="M13 9h4M13 12h4M13 15h2" stroke="#14b8a6" stroke-width="1.5" stroke-linecap="round"/></svg>
           <div style="font-weight:700; font-size:0.88rem; color:var(--text-primary);">Library</div>
           <div style="font-size:0.7rem; color:var(--text-tertiary);">Completed collection</div>
@@ -4960,14 +4960,12 @@
             <input type="checkbox" id="profileShowStats" checked>
           </label>
         </div>
-        <div style="font-size:0.75rem;color:var(--text-tertiary);background:var(--bg-accent);border-radius:8px;padding:0.5rem 0.75rem;margin-bottom:0.75rem;">
-          Your profile automatically shows your most recently started item in each category as a "Currently" row.
-        </div>
         <div class="form-group">
           <label>Your Profile Link</label>
           <div class="invite-code" style="word-break: break-all;">
             <span id="profileLinkDisplay" style="font-size: 0.7rem;"></span>
             <button class="copy-btn" onclick="copyProfileLink()">Copy</button>
+            <button class="copy-btn" id="shareProfileBtn" onclick="shareProfileLink()" style="display:none;">Share</button>
           </div>
         </div>
         <div class="modal-actions" style="justify-content: center;">
@@ -6597,9 +6595,13 @@
     }
 
     // --- Stats ---
-    function openStatsModal() {
+    function openStatsModal(fromSettings = false) {
       renderStats();
       document.getElementById('statsModal').classList.add('active');
+      const closeBtn = document.getElementById('statsModalClose');
+      if (closeBtn) {
+        closeBtn.onclick = () => { closeModal('statsModal'); if (fromSettings) openProfileSettings(); };
+      }
     }
 
     function setYearlyGoal() {
@@ -8461,7 +8463,7 @@
       runSearch();
     }
 
-    function openLibrary(btn, presetType) {
+    function openLibrary(btn, presetType, fromSettings = false) {
       document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
       document.getElementById('libraryPage').classList.add('active');
       const sf = document.getElementById('shelfFilters'); if(sf) sf.style.display = 'none';
@@ -8479,6 +8481,8 @@
       if (presetType) document.getElementById('libraryTypeFilter').value = presetType;
 
       document.getElementById('librarySearchInput').focus();
+      const backBtn = document.querySelector('#libraryPage .overlay-back-btn');
+      if (backBtn) backBtn.onclick = fromSettings ? () => { goToShelf(); openProfileSettings(); } : goToShelf;
       renderLibrary();
     }
 
@@ -9898,8 +9902,11 @@
       const enabled = document.getElementById('profileEnabled').checked;
       document.getElementById('profileOptions').style.display = enabled ? 'block' : 'none';
       if (enabled) {
-        const link = window.location.origin + window.location.pathname + '?profile=' + currentUser.id;
+        const handle = currentUser.handle;
+        const link = window.location.origin + window.location.pathname + '?profile=' + (handle || currentUser.id);
         document.getElementById('profileLinkDisplay').textContent = link;
+        const shareBtn = document.getElementById('shareProfileBtn');
+        if (shareBtn) shareBtn.style.display = navigator.share ? '' : 'none';
       }
     }
 
@@ -9916,6 +9923,14 @@
         document.body.removeChild(temp);
         alert('Profile link copied!');
       });
+    }
+
+    async function shareProfileLink() {
+      const link = document.getElementById('profileLinkDisplay').textContent;
+      const handle = currentUser.handle ? '@' + currentUser.handle : 'my';
+      try {
+        await navigator.share({ title: 'Cued', text: `Check out ${handle} shelf on Cued`, url: link });
+      } catch (e) { /* user cancelled or not supported */ }
     }
 
     async function savePublicProfile() {

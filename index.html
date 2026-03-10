@@ -4893,9 +4893,17 @@
     <div class="modal-content">
       <button class="modal-close" onclick="closeModal('profileSettingsModal')" aria-label="Close">&times;</button>
       <h2 class="modal-header">Settings</h2>
-      <div style="display:flex; gap:0.5rem; margin-bottom:1rem;">
-        <button class="btn" style="flex:1;" onclick="openStatsModal(); closeModal('profileSettingsModal')">📊 Stats</button>
-        <button class="btn" style="flex:1;" onclick="openLibrary(); closeModal('profileSettingsModal')">📖 Library</button>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:0.75rem; margin-bottom:1.5rem;">
+        <button onclick="openStatsModal(); closeModal('profileSettingsModal')" style="background:var(--bg-accent); border:1px solid var(--border-light); border-radius:14px; padding:1rem 0.75rem; text-align:center; cursor:pointer; transition:all 0.2s; display:flex; flex-direction:column; align-items:center; gap:0.35rem;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="12" width="4" height="9" rx="1" fill="#14b8a6"/><rect x="10" y="7" width="4" height="14" rx="1" fill="#14b8a6" opacity="0.7"/><rect x="17" y="3" width="4" height="18" rx="1" fill="#14b8a6" opacity="0.4"/></svg>
+          <div style="font-weight:700; font-size:0.88rem; color:var(--text-primary);">Stats</div>
+          <div style="font-size:0.7rem; color:var(--text-tertiary);">Your media journey</div>
+        </button>
+        <button onclick="openLibrary(); closeModal('profileSettingsModal')" style="background:var(--bg-accent); border:1px solid var(--border-light); border-radius:14px; padding:1rem 0.75rem; text-align:center; cursor:pointer; transition:all 0.2s; display:flex; flex-direction:column; align-items:center; gap:0.35rem;">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="3" width="11" height="16" rx="2" fill="#14b8a6" opacity="0.4"/><rect x="9" y="5" width="11" height="16" rx="2" fill="#14b8a6" opacity="0.7"/><path d="M13 9h4M13 12h4M13 15h2" stroke="#14b8a6" stroke-width="1.5" stroke-linecap="round"/></svg>
+          <div style="font-weight:700; font-size:0.88rem; color:var(--text-primary);">Library</div>
+          <div style="font-size:0.7rem; color:var(--text-tertiary);">Completed collection</div>
+        </button>
       </div>
       <div class="form-group">
         <label class="toggle-row">
@@ -6667,110 +6675,143 @@
         .sort((a, b) => legacyToStars(b.rating) - legacyToStars(a.rating))
         .slice(0, 5);
 
-      let html = `
-        <div class="stats-grid">
-          <div class="stat-card"><div class="stat-value">${total}</div><div class="stat-label">Total Items</div></div>
-          <div class="stat-card"><div class="stat-value">${done}</div><div class="stat-label">Completed</div></div>
-          <div class="stat-card"><div class="stat-value">${current}</div><div class="stat-label">In Progress</div></div>
-          <div class="stat-card"><div class="stat-value">${want}</div><div class="stat-label">Queued</div></div>
-          <div class="stat-card"><div class="stat-value">${avgRating}</div><div class="stat-label">Avg Rating</div></div>
-          <div class="stat-card"><div class="stat-value">${completionRate}%</div><div class="stat-label">Completed</div></div>
-          <div class="stat-card"><div class="stat-value">${doneThisYear}</div><div class="stat-label">Done in ${thisYear}</div></div>
-          <div class="stat-card"><div class="stat-value">${hoursDisplay}</div><div class="stat-label">Est. Hours</div></div>
-        </div>
-      `;
+      // Type display names and colors
+      const typeLabels = { movie: 'Movies', tv: 'TV Shows', podcast: 'Podcasts', book: 'Books' };
+      const typeColors = { movie: '#14b8a6', tv: '#818cf8', podcast: '#f59e0b', book: '#34d399' };
 
-      // Yearly goal section
-      html += `<div class="stats-section">
-        <div class="stats-section-title" style="display:flex; justify-content:space-between; align-items:center;">
-          <span>${thisYear} Goal</span>
-          <button onclick="setYearlyGoal()" style="font-size:0.75rem; color:var(--accent-primary); background:none; border:none; cursor:pointer; font-family:inherit; padding:0;">${yearlyGoal > 0 ? 'Edit' : 'Set goal'}</button>
-        </div>
-        ${yearlyGoal > 0 ? `
-          <div style="margin-top:0.4rem;">
-            <div style="display:flex; justify-content:space-between; font-size:0.85rem; margin-bottom:0.4rem;">
-              <span>${doneThisYear} completed</span>
-              <span style="color:var(--text-tertiary);">Goal: ${yearlyGoal}</span>
-            </div>
-            <div class="stats-bar" style="height:10px; border-radius:5px; background:var(--bg-accent);">
-              <div class="stats-bar-fill" style="width:${Math.min((doneThisYear / yearlyGoal) * 100, 100)}%; border-radius:5px;"></div>
-            </div>
-            <div style="font-size:0.75rem; color:var(--text-tertiary); margin-top:0.4rem; text-align:center;">
-              ${doneThisYear >= yearlyGoal ? '🎉 Goal reached!' : `${yearlyGoal - doneThisYear} to go`}
-              ${doneLastYear > 0 ? ` &middot; ${doneLastYear} last year` : ''}
-            </div>
+      let html = '';
+
+      // ── Hero stat ──
+      html += `
+        <div style="text-align:center; padding:1.25rem 0 1.5rem; border-bottom:1px solid var(--border-light); margin-bottom:1.5rem;">
+          <div style="font-family:'Bricolage Grotesque',sans-serif; font-size:3.5rem; font-weight:800; color:var(--accent-primary); line-height:1;">${hoursDisplay}</div>
+          <div style="font-size:0.8rem; color:var(--text-tertiary); margin-top:0.25rem; letter-spacing:0.05em; text-transform:uppercase;">Estimated hours consumed</div>
+          <div style="display:flex; justify-content:center; gap:1.5rem; margin-top:1rem;">
+            <div style="text-align:center;"><div style="font-size:1.4rem; font-weight:700; color:var(--text-primary); font-family:'Bricolage Grotesque',sans-serif;">${done}</div><div style="font-size:0.68rem; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.05em;">Finished</div></div>
+            <div style="width:1px; background:var(--border-light);"></div>
+            <div style="text-align:center;"><div style="font-size:1.4rem; font-weight:700; color:var(--text-primary); font-family:'Bricolage Grotesque',sans-serif;">${current}</div><div style="font-size:0.68rem; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.05em;">Active</div></div>
+            <div style="width:1px; background:var(--border-light);"></div>
+            <div style="text-align:center;"><div style="font-size:1.4rem; font-weight:700; color:var(--text-primary); font-family:'Bricolage Grotesque',sans-serif;">${want}</div><div style="font-size:0.68rem; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.05em;">Queued</div></div>
+            <div style="width:1px; background:var(--border-light);"></div>
+            <div style="text-align:center;"><div style="font-size:1.4rem; font-weight:700; color:var(--accent-primary); font-family:'Bricolage Grotesque',sans-serif;">${avgRating}★</div><div style="font-size:0.68rem; color:var(--text-tertiary); text-transform:uppercase; letter-spacing:0.05em;">Avg Rating</div></div>
           </div>
-        ` : `<div style="color:var(--text-tertiary); font-size:0.85rem; text-align:center; padding:0.5rem 0;">Tap "Set goal" to track your ${thisYear} progress</div>`}
+        </div>`;
+
+      // ── By Type cards ──
+      html += `<div style="margin-bottom:1.5rem;">
+        <div style="font-family:'Bricolage Grotesque',sans-serif; font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--text-tertiary); margin-bottom:0.75rem;">By Type</div>
+        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:0.5rem;">
+          ${['movie','tv','podcast','book'].map(t => {
+            const c = typeCounts[t] || 0;
+            const pct = total > 0 ? Math.round(c/total*100) : 0;
+            return `<div style="background:var(--bg-accent); border-radius:12px; padding:0.75rem 0.5rem; text-align:center; border:1px solid var(--border-light);">
+              <div style="font-family:'Bricolage Grotesque',sans-serif; font-size:1.6rem; font-weight:800; color:${typeColors[t]};">${c}</div>
+              <div style="font-size:0.62rem; color:var(--text-secondary); font-weight:600; margin-top:0.1rem;">${typeLabels[t]}</div>
+              <div style="font-size:0.58rem; color:var(--text-tertiary); margin-top:0.15rem;">${pct}%</div>
+            </div>`;
+          }).join('')}
+        </div>
       </div>`;
 
-      // By Type
-      const typeEmojis = { movie: '🎥', tv: '📺', podcast: '🎙️', book: '📚' };
-      html += '<div class="stats-section"><div class="stats-section-title">By Type</div>';
-      ['movie', 'tv', 'podcast', 'book'].forEach(t => {
-        const c = typeCounts[t] || 0;
-        html += `<div class="stats-list-item"><span>${typeEmojis[t] || ''} ${t.charAt(0).toUpperCase() + t.slice(1)}</span><div class="stats-bar"><div class="stats-bar-fill" style="width:${total > 0 ? (c/total*100) : 0}%"></div></div><span>${c}</span></div>`;
-      });
-      html += '</div>';
+      // ── This year ──
+      html += `<div style="margin-bottom:1.5rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+          <div style="font-family:'Bricolage Grotesque',sans-serif; font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--text-tertiary);">${thisYear}</div>
+          <button onclick="setYearlyGoal()" style="font-size:0.72rem; color:var(--accent-primary); background:none; border:none; cursor:pointer; font-family:inherit; padding:0;">${yearlyGoal > 0 ? 'Edit goal' : 'Set a goal'}</button>
+        </div>
+        <div style="background:var(--bg-accent); border-radius:14px; padding:1rem 1.25rem; border:1px solid var(--border-light);">
+          <div style="display:flex; align-items:baseline; gap:0.4rem; margin-bottom:${yearlyGoal > 0 ? '0.75rem' : '0'};">
+            <span style="font-family:'Bricolage Grotesque',sans-serif; font-size:2rem; font-weight:800; color:var(--text-primary);">${doneThisYear}</span>
+            <span style="font-size:0.8rem; color:var(--text-tertiary);">finished this year${doneLastYear > 0 ? ` · ${doneLastYear} last year` : ''}</span>
+          </div>
+          ${yearlyGoal > 0 ? `
+            <div style="display:flex; justify-content:space-between; font-size:0.75rem; color:var(--text-tertiary); margin-bottom:0.4rem;">
+              <span>${Math.min(Math.round(doneThisYear/yearlyGoal*100),100)}% of ${yearlyGoal} goal</span>
+              <span>${doneThisYear >= yearlyGoal ? '🎉 Reached!' : `${yearlyGoal - doneThisYear} to go`}</span>
+            </div>
+            <div style="height:8px; background:var(--bg-primary); border-radius:4px; overflow:hidden;">
+              <div style="height:100%; width:${Math.min((doneThisYear/yearlyGoal)*100,100)}%; background:linear-gradient(90deg,#14b8a6,#0d9488); border-radius:4px; transition:width 0.6s ease;"></div>
+            </div>
+          ` : ''}
+        </div>
+      </div>`;
 
-      // Top Genres
-      if (topGenres.length > 0) {
-        html += '<div class="stats-section"><div class="stats-section-title">Top Genres</div>';
-        topGenres.forEach(([g, c]) => {
-          html += `<div class="stats-list-item"><span>${g}</span><div class="stats-bar"><div class="stats-bar-fill" style="width:${(c/maxGenre*100)}%"></div></div><span>${c}</span></div>`;
-        });
-        html += '</div>';
-      }
-
-      // Rating Distribution
+      // ── Rating Distribution (column bars) ──
       if (rated.length > 0) {
-        html += '<div class="stats-section"><div class="stats-section-title">Rating Distribution</div>';
-        [5, 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1, 0.5].forEach(r => {
-          const c = ratingDist[r];
-          if (c > 0) {
-            const label = Number.isInteger(r) ? '★'.repeat(r) : '★'.repeat(Math.floor(r)) + '½';
-            html += `<div class="stats-list-item"><span>${label}</span><div class="stats-bar"><div class="stats-bar-fill" style="width:${(c/maxRatingCount*100)}%"></div></div><span>${c}</span></div>`;
-          }
-        });
-        html += '</div>';
+        const ratingKeys = [0.5,1,1.5,2,2.5,3,3.5,4,4.5,5];
+        html += `<div style="margin-bottom:1.5rem;">
+          <div style="font-family:'Bricolage Grotesque',sans-serif; font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--text-tertiary); margin-bottom:0.75rem;">Rating Distribution</div>
+          <div style="background:var(--bg-accent); border-radius:14px; padding:1rem; border:1px solid var(--border-light);">
+            <div style="display:flex; align-items:flex-end; justify-content:space-between; height:60px; gap:3px;">
+              ${ratingKeys.map(r => {
+                const c = ratingDist[r] || 0;
+                const h = maxRatingCount > 0 ? Math.round((c / maxRatingCount) * 100) : 0;
+                return `<div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:2px;">
+                  <div style="width:100%; height:${h}%; background:${h > 0 ? 'linear-gradient(180deg,#14b8a6,#0d9488)' : 'var(--border-light)'}; border-radius:3px 3px 0 0; min-height:${h > 0 ? '4px' : '2px'};"></div>
+                </div>`;
+              }).join('')}
+            </div>
+            <div style="display:flex; justify-content:space-between; margin-top:0.35rem;">
+              <span style="font-size:0.6rem; color:var(--text-tertiary);">½★</span>
+              <span style="font-size:0.6rem; color:var(--text-tertiary);">5★</span>
+            </div>
+            <div style="text-align:center; margin-top:0.5rem; font-size:0.75rem; color:var(--text-secondary);">${avgRating}★ average across ${rated.length} rated items</div>
+          </div>
+        </div>`;
       }
 
-      // Monthly Activity
+      // ── Top Genres ──
+      if (topGenres.length > 0) {
+        html += `<div style="margin-bottom:1.5rem;">
+          <div style="font-family:'Bricolage Grotesque',sans-serif; font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--text-tertiary); margin-bottom:0.75rem;">Top Genres</div>
+          <div style="display:flex; flex-wrap:wrap; gap:0.5rem;">
+            ${topGenres.map(([g, c], idx) => {
+              const opacity = 1 - (idx * 0.08);
+              return `<div style="background:rgba(20,184,166,${(0.15 - idx*0.015).toFixed(3)}); border:1px solid rgba(20,184,166,${(0.35 - idx*0.03).toFixed(3)}); border-radius:20px; padding:0.35rem 0.85rem; display:flex; align-items:center; gap:0.4rem;">
+                <span style="font-size:0.8rem; font-weight:600; color:var(--text-primary);">${g}</span>
+                <span style="font-size:0.68rem; color:var(--accent-primary); font-weight:700;">${c}</span>
+              </div>`;
+            }).join('')}
+          </div>
+        </div>`;
+      }
+
+      // ── Monthly activity (mini bar chart) ──
       if (months.length > 0) {
-        html += '<div class="stats-section"><div class="stats-section-title">Monthly Activity</div>';
-        months.forEach(([m, c]) => {
-          const [y, mo] = m.split('-');
-          const monthNames = ['','Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-          html += `<div class="stats-list-item"><span>${monthNames[parseInt(mo)]} ${y}</span><div class="stats-bar"><div class="stats-bar-fill" style="width:${(c/maxMonth*100)}%"></div></div><span>${c}</span></div>`;
-        });
-        html += '</div>';
+        const monthNames = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        html += `<div style="margin-bottom:1.5rem;">
+          <div style="font-family:'Bricolage Grotesque',sans-serif; font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--text-tertiary); margin-bottom:0.75rem;">Recent Activity</div>
+          <div style="background:var(--bg-accent); border-radius:14px; padding:1rem; border:1px solid var(--border-light);">
+            <div style="display:flex; align-items:flex-end; gap:0.35rem; height:60px;">
+              ${[...months].reverse().map(([m, c]) => {
+                const h = maxMonth > 0 ? Math.round((c / maxMonth) * 100) : 0;
+                const label = monthNames[parseInt(m.split('-')[1]) - 1];
+                return `<div style="flex:1; display:flex; flex-direction:column; align-items:center; gap:4px;">
+                  <div style="width:100%; height:${h}%; background:linear-gradient(180deg,#14b8a6,#0d9488); border-radius:3px 3px 0 0; min-height:4px;"></div>
+                  <div style="font-size:0.55rem; color:var(--text-tertiary);">${label}</div>
+                </div>`;
+              }).join('')}
+            </div>
+          </div>
+        </div>`;
       }
 
-      // Recommended By leaderboard
-      const referralCounts = {};
-      items.forEach(i => { if (i.referral) referralCounts[i.referral] = (referralCounts[i.referral] || 0) + 1; });
-      const topReferrals = Object.entries(referralCounts).sort((a, b) => b[1] - a[1]).slice(0, 5);
-      if (topReferrals.length > 0) {
-        const maxRef = topReferrals[0][1];
-        html += '<div class="stats-section"><div class="stats-section-title">Top Recommenders</div>';
-        topReferrals.forEach(([name, count]) => {
-          html += `<div class="stats-list-item"><span>${name}</span><div class="stats-bar"><div class="stats-bar-fill" style="width:${(count/maxRef*100)}%"></div></div><span>${count}</span></div>`;
-        });
-        html += '</div>';
-      }
-
-      // Top Rated
+      // ── Top Rated ──
       if (topRated.length > 0) {
-        const typeEmojis = { movie: '🎥', tv: '📺', podcast: '🎙️', book: '📚' };
-        html += '<div class="stats-section"><div class="stats-section-title">Your Top Picks</div>';
-        topRated.forEach((item, i) => {
-          const stars = legacyToStars(item.rating);
-          const starStr = stars !== null ? '★'.repeat(Math.floor(stars)) + (stars % 1 ? '½' : '') : '';
-          html += `<div class="stats-list-item">
-            <span style="flex:1; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${typeEmojis[item.type] || ''} ${item.title}</span>
-            <span style="color:#f59e0b; font-size:0.8rem; flex-shrink:0;">${starStr}</span>
-          </div>`;
-        });
-        html += '</div>';
+        const typeEmojis2 = { movie: '🎥', tv: '📺', podcast: '🎙️', book: '📚' };
+        html += `<div style="margin-bottom:1rem;">
+          <div style="font-family:'Bricolage Grotesque',sans-serif; font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--text-tertiary); margin-bottom:0.75rem;">Your Top Rated</div>
+          ${topRated.map((item, idx) => `
+            <div style="display:flex; align-items:center; gap:0.75rem; padding:0.6rem 0; border-bottom:1px solid var(--border-light);">
+              <div style="font-family:'Bricolage Grotesque',sans-serif; font-size:1.1rem; font-weight:800; color:var(--border-medium); min-width:1.5rem; text-align:center;">${idx+1}</div>
+              ${item.image ? `<img src="${item.image}" style="width:36px;height:54px;border-radius:6px;object-fit:cover;flex-shrink:0;" loading="lazy">` : `<div style="width:36px;height:54px;border-radius:6px;background:var(--bg-accent);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0;">${typeEmojis2[item.type]||'🎬'}</div>`}
+              <div style="flex:1; min-width:0;">
+                <div style="font-weight:600; font-size:0.88rem; color:var(--text-primary); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${item.title}</div>
+                <div style="font-size:0.7rem; color:var(--text-tertiary); margin-top:0.1rem;">${typeEmojis2[item.type]||''} ${item.type.charAt(0).toUpperCase()+item.type.slice(1)}</div>
+              </div>
+              <div style="color:#f59e0b; font-size:0.85rem; white-space:nowrap;">${'★'.repeat(legacyToStars(item.rating))}</div>
+            </div>`).join('')}
+        </div>`;
       }
 
       body.innerHTML = html;

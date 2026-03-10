@@ -4930,11 +4930,11 @@
           <span>Enable Public Profile</span>
           <input type="checkbox" id="profileEnabled" onchange="togglePublicProfile()">
         </label>
-        <div style="font-size: 0.7rem; color: var(--text-tertiary); margin-top: 0.3rem;">When enabled, anyone with your link can see your shelf</div>
+        <div style="font-size: 0.7rem; color: var(--text-tertiary); margin-top: 0.3rem;">Anyone with your link can see your shelf — set any category to Private to hide it.</div>
       </div>
       <div id="profileOptions" style="display: none;">
         <div class="form-group">
-          <label style="margin-bottom:0.4rem;">Who can see each category?</label>
+          <label style="margin-bottom:0.4rem;">Visible categories</label>
           <div class="privacy-grid">
             <div class="privacy-item"><span>Movies</span><select id="privacyMovie" style="background:var(--bg-primary);color:var(--text-primary);border:none;font-size:0.78rem;cursor:pointer;"><option value="public">Public</option><option value="private">Private</option></select></div>
             <div class="privacy-item"><span>TV</span><select id="privacyTv" style="background:var(--bg-primary);color:var(--text-primary);border:none;font-size:0.78rem;cursor:pointer;"><option value="public">Public</option><option value="private">Private</option></select></div>
@@ -4943,22 +4943,21 @@
           </div>
         </div>
         <div class="form-group">
-          <label class="toggle-row">
-            <span>Show Ratings</span>
-            <input type="checkbox" id="profileShowRatings" checked>
-          </label>
-        </div>
-        <div class="form-group">
-          <label class="toggle-row">
-            <span>Show Reviews</span>
-            <input type="checkbox" id="profileShowReviews">
-          </label>
-        </div>
-        <div class="form-group">
-          <label class="toggle-row">
-            <span>Show Stats</span>
-            <input type="checkbox" id="profileShowStats" checked>
-          </label>
+          <label style="margin-bottom:0.5rem;">Show on profile</label>
+          <div style="display:flex; gap:0.5rem;">
+            <label style="flex:1; display:flex; flex-direction:column; align-items:center; gap:0.4rem; background:var(--bg-accent); border:1px solid var(--border-light); border-radius:10px; padding:0.6rem 0.4rem; cursor:pointer; font-size:0.72rem; color:var(--text-secondary); text-align:center;">
+              <input type="checkbox" id="profileShowRatings" checked style="margin:0;">
+              Ratings
+            </label>
+            <label style="flex:1; display:flex; flex-direction:column; align-items:center; gap:0.4rem; background:var(--bg-accent); border:1px solid var(--border-light); border-radius:10px; padding:0.6rem 0.4rem; cursor:pointer; font-size:0.72rem; color:var(--text-secondary); text-align:center;">
+              <input type="checkbox" id="profileShowReviews" style="margin:0;">
+              Reviews
+            </label>
+            <label style="flex:1; display:flex; flex-direction:column; align-items:center; gap:0.4rem; background:var(--bg-accent); border:1px solid var(--border-light); border-radius:10px; padding:0.6rem 0.4rem; cursor:pointer; font-size:0.72rem; color:var(--text-secondary); text-align:center;">
+              <input type="checkbox" id="profileShowStats" checked style="margin:0;">
+              Stats
+            </label>
+          </div>
         </div>
         <div class="form-group">
           <label>Your Profile Link</label>

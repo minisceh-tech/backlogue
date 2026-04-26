@@ -6786,6 +6786,7 @@
 
     function setTypeFilter(value, btn) {
       currentMediaFilter = value;
+      if (value === 'all') { currentTagFilters = []; updateTagNavBtn(); }
       document.querySelectorAll('#typeChipsRow .type-nav-btn').forEach(c => c.classList.remove('active'));
       if (btn) btn.classList.add('active');
       if (!document.getElementById('myShelf').classList.contains('active')) {

@@ -4647,10 +4647,10 @@
 
           <div class="form-group">
             <label for="itemTitle">Title</label>
+            <div class="helper-text">Start typing to search, or just enter the title manually</div>
             <input type="search" id="itemTitle" required name="notafield" autocomplete="nope" autocorrect="off" autocapitalize="off" spellcheck="false" data-lpignore="true" data-form-type="other" oninput="if(typeof handleTitleInput==='function') handleTitleInput();">
             <div id="autocompleteResults" class="autocomplete-results"></div>
             <div id="dupWarning" style="display:none; margin-top:0.5rem; padding:0.6rem 0.9rem; background:#f59e0b; color:#000; border-radius:8px; font-size:0.85rem; font-weight:600;"></div>
-            <div class="helper-text">Start typing to search, or just enter the title manually</div>
           </div>
         </div>
 
@@ -4737,34 +4737,34 @@
 
         <div class="form-group">
           <label for="itemPremiereDate">Premieres / Airs On</label>
+          <div class="helper-text">Release or air date (auto-filled from search when available)</div>
           <div class="date-logged-row">
             <input type="date" id="itemPremiereDate">
             <button type="button" class="date-clear-btn" onclick="document.getElementById('itemPremiereDate').value=''">Clear</button>
           </div>
-          <div class="helper-text">Release or air date (auto-filled from search when available)</div>
         </div>
 
         <div class="form-group">
           <label for="itemDateLogged">Date Logged</label>
+          <div class="helper-text">When did you watch/read/listen to this?</div>
           <div class="date-logged-row">
             <input type="date" id="itemDateLogged">
             <button type="button" class="date-clear-btn" onclick="clearDateLogged()">Clear</button>
           </div>
-          <div class="helper-text">When did you watch/read/listen to this?</div>
         </div>
 
         <div class="form-group" style="position:relative;">
           <label for="itemTagInput">Tags</label>
+          <div class="helper-text">Use tags to organize your shelf your way — try "kids", "date night", or "holiday". Filter by any tag to see just those items.</div>
           <input type="text" id="itemTagInput" placeholder="Type a tag and press Enter or comma" onkeydown="handleTagInput(event)" oninput="showTagSuggestions()">
           <div class="tag-suggestions" id="tagSuggestions"></div>
           <div class="tag-chips" id="tagChips"></div>
-          <div class="helper-text">Use tags to organize your shelf your way — try "kids", "date night", or "holiday". Filter by any tag to see just those items.</div>
         </div>
 
         <div class="form-group">
           <label for="itemNotes">Your Review / Thoughts</label>
-          <textarea id="itemNotes" placeholder="Write your review, thoughts, quotes, or reminders..."></textarea>
           <div class="helper-text">Your review will be visible on the card</div>
+          <textarea id="itemNotes" placeholder="Write your review, thoughts, quotes, or reminders..."></textarea>
         </div>
 
         <div class="form-group">

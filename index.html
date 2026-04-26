@@ -5787,7 +5787,7 @@
           notes: document.getElementById('itemNotes').value,
           premiereDate: document.getElementById('itemPremiereDate').value || (isEditing && existingItem ? existingItem.premiereDate : '') || '',
           dateLogged: document.getElementById('itemDateLogged').value || (isEditing && existingItem ? existingItem.dateLogged : '') || '',
-          tags: [...currentTags],
+          tags: (() => { const pending = document.getElementById('itemTagInput')?.value.trim(); if (pending) { addTag(pending); document.getElementById('itemTagInput').value = ''; } return [...currentTags]; })(),
           group: groupId,
           userId: currentUser.id
         };

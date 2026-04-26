@@ -3237,18 +3237,90 @@
     }
     .type-nav-btn.active .type-nav-label { color: var(--accent-primary); }
 
-    /* Tag filter row */
-    #tagFilterRow {
-      display: none;
-      width: 100%;
-      overflow-x: auto;
-      -webkit-overflow-scrolling: touch;
-      scrollbar-width: none;
-      padding: 0.4rem 0 0.25rem;
-      gap: 0.4rem;
-      flex-wrap: nowrap;
+    /* Tag button in type row */
+    #tagNavBtn {
+      flex-shrink: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 3px;
+      padding: 0.45rem 0.55rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-tertiary);
+      font-family: 'Outfit', sans-serif;
+      transition: opacity 0.2s, color 0.2s;
+      -webkit-tap-highlight-color: transparent;
+      opacity: 0.45;
+      border-left: 1px solid rgba(255,255,255,0.08);
+      margin-left: auto;
     }
-    #tagFilterRow::-webkit-scrollbar { display: none; }
+    #tagNavBtn.active { color: var(--accent-primary); opacity: 1; }
+    #tagNavBtn .type-nav-label { font-size: 0.6rem; font-weight: 600; letter-spacing: 0.02em; color: inherit; }
+    body.light-mode #tagNavBtn { border-left-color: rgba(0,0,0,0.08); }
+
+    /* Tag bottom sheet */
+    #tagSheet {
+      display: none;
+      position: fixed;
+      inset: 0;
+      z-index: 1100;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      align-items: flex-end;
+    }
+    #tagSheet.active { display: flex; }
+    #tagSheetPanel {
+      width: 100%;
+      background: var(--surface-2, #1a1a1c);
+      border-radius: 20px 20px 0 0;
+      padding: 1.25rem 1.25rem calc(1.5rem + env(safe-area-inset-bottom, 0px));
+      animation: sheetSlideUp 0.28s cubic-bezier(0.4,0,0.2,1);
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+    body.light-mode #tagSheetPanel { background: #f5f5f4; }
+    @keyframes sheetSlideUp {
+      from { transform: translateY(100%); }
+      to { transform: translateY(0); }
+    }
+    #tagSheetHandle {
+      width: 36px; height: 4px; border-radius: 2px;
+      background: rgba(255,255,255,0.2);
+      margin: 0 auto 1rem;
+    }
+    body.light-mode #tagSheetHandle { background: rgba(0,0,0,0.15); }
+    #tagSheetTitle {
+      font-size: 0.65rem; font-weight: 700; letter-spacing: 0.1em;
+      text-transform: uppercase; color: var(--text-tertiary);
+      margin-bottom: 0.85rem;
+    }
+    #tagSheetPills {
+      display: flex; flex-wrap: wrap; gap: 0.5rem;
+    }
+    .tag-sheet-pill {
+      flex-shrink: 0;
+      padding: 0.4rem 0.9rem;
+      border-radius: 20px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid var(--border-medium);
+      background: none;
+      color: var(--text-secondary);
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tag-sheet-pill.active {
+      background: rgba(20,184,166,0.15);
+      color: var(--accent-primary);
+      border-color: var(--accent-primary);
+    }
+
+    /* legacy — keep class but unused */
     .tag-filter-pill {
       flex-shrink: 0;
       padding: 0.25rem 0.75rem;
@@ -4401,8 +4473,11 @@
           <span class="type-nav-icon">📚</span>
           <span class="type-nav-label">Books</span>
         </button>
+        <button id="tagNavBtn" onclick="openTagSheet()" aria-label="Filter by tag">
+          <svg class="type-nav-icon" width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path d="M2 5a1 1 0 0 1 1-1h3.382a1 1 0 0 1 .894.553l.724 1.447H17a1 1 0 0 1 .97 1.243l-1.5 6A1 1 0 0 1 15.5 14H5a1 1 0 0 1-.97-.757L2.03 5.757A1 1 0 0 1 2 5.5V5z"/></svg>
+          <span class="type-nav-label" id="tagNavLabel">Tags</span>
+        </button>
       </div>
-      <div id="tagFilterRow" style="display:none;"></div>
     </div>
     <div id="groupTabsContainer" style="display: none;"></div>
     <!-- My Shelf Tab -->
@@ -4982,6 +5057,15 @@
   </div>
 
   <!-- Stats Modal -->
+  <!-- Tag Filter Bottom Sheet -->
+  <div id="tagSheet" onclick="closeTagSheet(event)">
+    <div id="tagSheetPanel">
+      <div id="tagSheetHandle"></div>
+      <div id="tagSheetTitle">Filter by Tag</div>
+      <div id="tagSheetPills"></div>
+    </div>
+  </div>
+
   <div id="statsModal" class="modal">
     <div class="modal-content">
       <button class="modal-close" id="statsModalClose" onclick="closeModal('statsModal')" aria-label="Close">&times;</button>
@@ -6735,31 +6819,50 @@
 
     function tagFilter(value) {
       currentTagFilter = value;
-      renderTagFilterRow();
+      updateTagNavBtn();
       renderItems();
     }
 
-    function renderTagFilterRow() {
-      const row = document.getElementById('tagFilterRow');
-      if (!row) return;
+    function updateTagNavBtn() {
+      const btn = document.getElementById('tagNavBtn');
+      const label = document.getElementById('tagNavLabel');
+      if (!btn || !label) return;
       const allTags = getAllUserTags();
       if (allTags.length === 0) {
-        row.style.display = 'none';
-        adjustContentForFilters();
+        btn.style.display = 'none';
         return;
       }
-      row.style.display = 'flex';
-      const pills = ['all', ...allTags].map(tag => {
-        const label = tag === 'all' ? 'All' : tag;
-        const active = currentTagFilter === tag ? 'active' : '';
-        return `<button class="tag-filter-pill ${active}" onclick="tagFilter('${tag.replace(/'/g, "\\'")}')">${label}</button>`;
-      }).join('');
-      row.innerHTML = pills;
-      requestAnimationFrame(adjustContentForFilters);
+      btn.style.display = 'flex';
+      if (currentTagFilter && currentTagFilter !== 'all') {
+        btn.classList.add('active');
+        label.textContent = currentTagFilter;
+      } else {
+        btn.classList.remove('active');
+        label.textContent = 'Tags';
+      }
     }
 
-    function adjustContentForFilters() {
-      updateContentOffset();
+    // kept for backward compat calls inside renderItems
+    function renderTagFilterRow() { updateTagNavBtn(); }
+
+    function openTagSheet() {
+      const allTags = getAllUserTags();
+      if (allTags.length === 0) return;
+      const pane = document.getElementById('tagSheetPills');
+      const tags = ['all', ...allTags];
+      pane.innerHTML = tags.map(tag => {
+        const label = tag === 'all' ? 'All Tags' : tag;
+        const active = currentTagFilter === tag ? 'active' : '';
+        return `<button class="tag-sheet-pill ${active}" onclick="tagFilter('${tag.replace(/'/g, "\\'")}');closeTagSheet()">${label}</button>`;
+      }).join('');
+      document.getElementById('tagSheet').classList.add('active');
+      document.body.style.overflow = 'hidden';
+    }
+
+    function closeTagSheet(e) {
+      if (e && e.target !== document.getElementById('tagSheet')) return;
+      document.getElementById('tagSheet').classList.remove('active');
+      document.body.style.overflow = '';
     }
 
     // --- Stats ---

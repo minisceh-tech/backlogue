@@ -3237,6 +3237,36 @@
     }
     .type-nav-btn.active .type-nav-label { color: var(--accent-primary); }
 
+    /* Tag filter row */
+    #tagFilterRow {
+      display: none;
+      width: 100%;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      padding: 0.4rem 0 0.25rem;
+      gap: 0.4rem;
+      flex-wrap: nowrap;
+    }
+    #tagFilterRow::-webkit-scrollbar { display: none; }
+    .tag-filter-pill {
+      flex-shrink: 0;
+      padding: 0.25rem 0.75rem;
+      border-radius: 20px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      border: 1px solid var(--border-medium);
+      background: var(--bg-secondary);
+      color: var(--text-secondary);
+      font-family: 'Outfit', sans-serif;
+      transition: all 0.15s ease;
+      -webkit-tap-highlight-color: transparent;
+    }
+    .tag-filter-pill:hover { background: rgba(20,184,166,0.08); color: var(--accent-primary); border-color: var(--accent-secondary); }
+    .tag-filter-pill.active { background: rgba(20,184,166,0.15); color: var(--accent-primary); border-color: var(--accent-primary); }
+
     /* Bottom Navigation Bar */
 
 
@@ -4372,6 +4402,7 @@
           <span class="type-nav-label">Books</span>
         </button>
       </div>
+      <div id="tagFilterRow" style="display:none;"></div>
     </div>
     <div id="groupTabsContainer" style="display: none;"></div>
     <!-- My Shelf Tab -->
@@ -6704,7 +6735,25 @@
 
     function tagFilter(value) {
       currentTagFilter = value;
+      renderTagFilterRow();
       renderItems();
+    }
+
+    function renderTagFilterRow() {
+      const row = document.getElementById('tagFilterRow');
+      if (!row) return;
+      const allTags = getAllUserTags();
+      if (allTags.length === 0) {
+        row.style.display = 'none';
+        return;
+      }
+      row.style.display = 'flex';
+      const pills = ['all', ...allTags].map(tag => {
+        const label = tag === 'all' ? 'All' : tag;
+        const active = currentTagFilter === tag ? 'active' : '';
+        return `<button class="tag-filter-pill ${active}" onclick="tagFilter('${tag.replace(/'/g, "\\'")}')">${label}</button>`;
+      }).join('');
+      row.innerHTML = pills;
     }
 
     // --- Stats ---
@@ -6935,6 +6984,7 @@
     // Render items
     function renderItems() {
       updateShelfHero();
+      renderTagFilterRow();
       const grid = document.getElementById('itemsGrid');
       const emptyState = document.getElementById('emptyState');
 

@@ -3300,7 +3300,24 @@
     }
     #tagSheetPills {
       display: flex; flex-wrap: wrap; gap: 0.5rem;
+      margin-bottom: 1.25rem;
     }
+    #tagSheetApply {
+      display: block;
+      width: 100%;
+      padding: 0.85rem 1rem;
+      border-radius: 12px;
+      border: none;
+      background: var(--accent-primary);
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #tagSheetApply:active { opacity: 0.8; }
     .tag-sheet-pill {
       flex-shrink: 0;
       padding: 0.4rem 0.9rem;
@@ -5063,6 +5080,7 @@
       <div id="tagSheetHandle"></div>
       <div id="tagSheetTitle">Filter by Tag</div>
       <div id="tagSheetPills"></div>
+      <button id="tagSheetApply" onclick="applyTagSheet()"></button>
     </div>
   </div>
 
@@ -6861,12 +6879,33 @@
         const active = tag === 'all' ? (currentTagFilters.length === 0 ? 'active' : '') : (currentTagFilters.includes(tag) ? 'active' : '');
         return `<button class="tag-sheet-pill ${active}" onclick="tagFilter('${tag.replace(/'/g, "\\'")}')">${label}</button>`;
       }).join('');
+      updateTagSheetApplyBtn();
+    }
+
+    function updateTagSheetApplyBtn() {
+      const btn = document.getElementById('tagSheetApply');
+      if (!btn) return;
+      if (currentTagFilters.length === 0) {
+        const total = items.length;
+        btn.textContent = `Show all ${total} items`;
+      } else {
+        const count = items.filter(item =>
+          item.tags && Array.isArray(item.tags) && currentTagFilters.some(t => item.tags.includes(t))
+        ).length;
+        btn.textContent = `Show ${count} item${count !== 1 ? 's' : ''} →`;
+      }
+    }
+
+    function applyTagSheet() {
+      document.getElementById('tagSheet').classList.remove('active');
+      document.body.style.overflow = '';
     }
 
     function openTagSheet() {
       const allTags = getAllUserTags();
       if (allTags.length === 0) return;
       renderTagSheetPills();
+      updateTagSheetApplyBtn();
       document.getElementById('tagSheet').classList.add('active');
       document.body.style.overflow = 'hidden';
     }

@@ -5327,7 +5327,7 @@
     let feedItemsCache = []; // Cache feed items for read-only detail view
     let currentReferralFilter = 'all'; // My Shelf referral filter
     let currentGenreFilter = 'all'; // My Shelf genre filter
-    let currentTagFilter = 'all'; // My Shelf tag filter
+    let currentTagFilters = []; // My Shelf tag filters (multi-select)
     let currentTags = []; // Tags for current modal item
     let groupFilters = {}; // Track filters for each individual group {groupId: {media: 'all', referral: 'all'}}
     let items = [];
@@ -6817,10 +6817,18 @@
       hero.style.display = 'block';
     }
 
-    function tagFilter(value) {
-      currentTagFilter = value;
+    function tagFilter(tag) {
+      if (tag === 'all') {
+        currentTagFilters = [];
+      } else {
+        const idx = currentTagFilters.indexOf(tag);
+        if (idx === -1) currentTagFilters.push(tag);
+        else currentTagFilters.splice(idx, 1);
+      }
       updateTagNavBtn();
       renderItems();
+      // re-render pills in sheet so active state updates
+      renderTagSheetPills();
     }
 
     function updateTagNavBtn() {
@@ -6828,33 +6836,37 @@
       const label = document.getElementById('tagNavLabel');
       if (!btn || !label) return;
       const allTags = getAllUserTags();
-      if (allTags.length === 0) {
-        btn.style.display = 'none';
-        return;
-      }
+      if (allTags.length === 0) { btn.style.display = 'none'; return; }
       btn.style.display = 'flex';
-      if (currentTagFilter && currentTagFilter !== 'all') {
-        btn.classList.add('active');
-        label.textContent = currentTagFilter;
-      } else {
+      if (currentTagFilters.length === 0) {
         btn.classList.remove('active');
         label.textContent = 'Tags';
+      } else if (currentTagFilters.length === 1) {
+        btn.classList.add('active');
+        label.textContent = currentTagFilters[0];
+      } else {
+        btn.classList.add('active');
+        label.textContent = `Tags (${currentTagFilters.length})`;
       }
     }
 
-    // kept for backward compat calls inside renderItems
     function renderTagFilterRow() { updateTagNavBtn(); }
+
+    function renderTagSheetPills() {
+      const pane = document.getElementById('tagSheetPills');
+      if (!pane) return;
+      const allTags = getAllUserTags();
+      pane.innerHTML = ['all', ...allTags].map(tag => {
+        const label = tag === 'all' ? 'All Tags' : tag;
+        const active = tag === 'all' ? (currentTagFilters.length === 0 ? 'active' : '') : (currentTagFilters.includes(tag) ? 'active' : '');
+        return `<button class="tag-sheet-pill ${active}" onclick="tagFilter('${tag.replace(/'/g, "\\'")}')">${label}</button>`;
+      }).join('');
+    }
 
     function openTagSheet() {
       const allTags = getAllUserTags();
       if (allTags.length === 0) return;
-      const pane = document.getElementById('tagSheetPills');
-      const tags = ['all', ...allTags];
-      pane.innerHTML = tags.map(tag => {
-        const label = tag === 'all' ? 'All Tags' : tag;
-        const active = currentTagFilter === tag ? 'active' : '';
-        return `<button class="tag-sheet-pill ${active}" onclick="tagFilter('${tag.replace(/'/g, "\\'")}');closeTagSheet()">${label}</button>`;
-      }).join('');
+      renderTagSheetPills();
       document.getElementById('tagSheet').classList.add('active');
       document.body.style.overflow = 'hidden';
     }
@@ -7118,8 +7130,8 @@
 
         // Apply tag filter
         let matchesTag = true;
-        if (currentTagFilter !== 'all') {
-          matchesTag = item.tags && Array.isArray(item.tags) && item.tags.includes(currentTagFilter);
+        if (currentTagFilters.length > 0) {
+          matchesTag = item.tags && Array.isArray(item.tags) && currentTagFilters.some(t => item.tags.includes(t));
         }
 
         // Item must match ALL filters
@@ -8751,7 +8763,7 @@
       currentStatusFilter = 'all';
       currentReferralFilter = 'all';
       currentGenreFilter = 'all';
-      currentTagFilter = 'all';
+      currentTagFilters = [];
 
       // Reset filter chips to All
       document.querySelectorAll('#typeChipsRow .type-nav-btn').forEach(b => b.classList.toggle('active', b.dataset.value === 'all'));
@@ -8794,7 +8806,7 @@
       currentMediaFilter = type === 'all' ? 'all' : type;
       currentReferralFilter = 'all';
       currentGenreFilter = 'all';
-      currentTagFilter = 'all';
+      currentTagFilters = [];
 
       // Sync header dropdown
       const typeDropdown = document.getElementById('typeFilter');

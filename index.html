@@ -6745,6 +6745,7 @@
       const allTags = getAllUserTags();
       if (allTags.length === 0) {
         row.style.display = 'none';
+        adjustContentForFilters();
         return;
       }
       row.style.display = 'flex';
@@ -6754,6 +6755,11 @@
         return `<button class="tag-filter-pill ${active}" onclick="tagFilter('${tag.replace(/'/g, "\\'")}')">${label}</button>`;
       }).join('');
       row.innerHTML = pills;
+      requestAnimationFrame(adjustContentForFilters);
+    }
+
+    function adjustContentForFilters() {
+      updateContentOffset();
     }
 
     // --- Stats ---

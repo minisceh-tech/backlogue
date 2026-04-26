@@ -10369,7 +10369,6 @@
 
       const item = items.find(i => i.id === itemId);
       if (!item || item.status === newStatus) return;
-      const wasUnrated = !item.rating;
       item.status = newStatus;
       if (newStatus === 'done' && !item.dateLogged) {
         item.dateLogged = getTodayDate();
@@ -10379,9 +10378,6 @@
       openDetailCard(itemId);
       const labels = { want: 'Queued', current: 'In Progress', done: 'Finished' };
       showToast(`→ ${labels[newStatus]}`);
-      if (newStatus === 'done' && wasUnrated) {
-        showRatingPrompt(itemId);
-      }
     }
 
     function closeDetailCard() {
@@ -11504,7 +11500,7 @@
           if (!card) return;
           const now = Date.now();
           const lastTap = parseInt(card.dataset.lastTap || '0');
-          if (now - lastTap < 300) {
+          if (now - lastTap < 200) {
             // Double-tap: cycle status
             card.dataset.lastTap = '0';
             swipeUpStatus(card.dataset.id);
@@ -11540,14 +11536,12 @@
       const cycle = { want: 'current', current: 'done', done: 'want' };
       const newStatus = cycle[item.status] || 'want';
       const labels = { want: 'Queued', current: 'In Progress', done: 'Finished' };
-      const wasUnrated = !item.rating;
       item.status = newStatus;
       if (newStatus === 'done' && !item.dateLogged) item.dateLogged = getTodayDate();
       if (newStatus !== 'done') item.dateLogged = '';
       renderItems();
       showToast(`→ ${labels[newStatus]}`);
       await saveItemToFirestore(item);
-      if (newStatus === 'done' && wasUnrated) showRatingPrompt(itemId);
     }
 
 

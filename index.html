@@ -4289,6 +4289,52 @@
       transform: translateX(-50%) translateY(0);
     }
 
+    .status-confirm-bar {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--text-primary);
+      color: var(--bg-primary);
+      padding: 0.6rem 0.75rem 0.6rem 1.2rem;
+      border-radius: 24px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      z-index: 3001;
+      opacity: 0;
+      transform-origin: center;
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .status-confirm-bar.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+    .status-confirm-btn {
+      border: none;
+      border-radius: 16px;
+      padding: 0.35rem 0.8rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .status-confirm-yes {
+      background: var(--accent-secondary, #5B9BD5);
+      color: #fff;
+    }
+    .status-confirm-no {
+      background: transparent;
+      color: var(--bg-primary);
+      opacity: 0.7;
+    }
+
     /* === SWIPE TAB TRANSITION === */
     .shelf-sections {
       transition: opacity 0.15s ease;
@@ -4751,31 +4797,32 @@
         <input type="hidden" id="editId">
         <input type="hidden" id="itemImage">
 
-        <!-- Add-mode essentials: Type + Title (hidden in edit mode) -->
-        <div id="addModeFields">
-          <div class="form-group">
-            <label>Type</label>
-            <div class="type-icons">
-              <button type="button" class="type-icon-btn active" data-type="movie" onclick="selectType('movie')">
-                <span class="icon">🎥</span>
-                <span class="label">Movie</span>
-              </button>
-              <button type="button" class="type-icon-btn" data-type="tv" onclick="selectType('tv')">
-                <span class="icon">📺</span>
-                <span class="label">TV</span>
-              </button>
-              <button type="button" class="type-icon-btn" data-type="podcast" onclick="selectType('podcast')">
-                <span class="icon">🎙️</span>
-                <span class="label">Podcast</span>
-              </button>
-              <button type="button" class="type-icon-btn" data-type="book" onclick="selectType('book')">
-                <span class="icon">📚</span>
-                <span class="label">Book</span>
-              </button>
-            </div>
-            <input type="hidden" id="itemType" value="movie">
+        <!-- Type: always editable, even for existing items, so a miscategorized item can be fixed -->
+        <div class="form-group">
+          <label>Type</label>
+          <div class="type-icons">
+            <button type="button" class="type-icon-btn active" data-type="movie" onclick="selectType('movie')">
+              <span class="icon">🎥</span>
+              <span class="label">Movie</span>
+            </button>
+            <button type="button" class="type-icon-btn" data-type="tv" onclick="selectType('tv')">
+              <span class="icon">📺</span>
+              <span class="label">TV</span>
+            </button>
+            <button type="button" class="type-icon-btn" data-type="podcast" onclick="selectType('podcast')">
+              <span class="icon">🎙️</span>
+              <span class="label">Podcast</span>
+            </button>
+            <button type="button" class="type-icon-btn" data-type="book" onclick="selectType('book')">
+              <span class="icon">📚</span>
+              <span class="label">Book</span>
+            </button>
           </div>
+          <input type="hidden" id="itemType" value="movie">
+        </div>
 
+        <!-- Add-mode essentials: Title (hidden in edit mode, shown as a static preview instead) -->
+        <div id="addModeFields">
           <div class="form-group">
             <label for="itemTitle">Title</label>
             <div class="helper-text">Start typing to search, or just enter the title manually</div>
@@ -4809,6 +4856,11 @@
           <label for="itemEpisode">Episode</label>
           <input type="text" id="itemEpisode" placeholder="e.g. Ep. 42: The One Where...">
           <div class="helper-text">Optional — leave blank to track the whole show</div>
+        </div>
+
+        <div class="form-group" id="authorGroup" style="display: none;">
+          <label for="itemAuthor">Author</label>
+          <input type="text" id="itemAuthor" placeholder="Author name" autocomplete="off">
         </div>
 
         <div class="form-group" id="streamingPlatformGroup" style="display: none;">
@@ -5892,6 +5944,7 @@
           image: document.getElementById('itemImage').value,
           streamingPlatform: document.getElementById('itemStreamingPlatform').value,
           episode: document.getElementById('itemEpisode').value.trim(),
+          author: document.getElementById('itemAuthor') ? document.getElementById('itemAuthor').value.trim() : '',
           referral: document.getElementById('itemReferral').value,
           genre: document.getElementById('itemGenre').value === 'Other' ? (document.getElementById('itemGenreOther').value || 'Other') : document.getElementById('itemGenre').value,
           notes: document.getElementById('itemNotes').value,
@@ -5976,6 +6029,7 @@
             image: document.getElementById('itemImage').value,
             streamingPlatform: document.getElementById('itemStreamingPlatform').value,
             episode: document.getElementById('itemEpisode').value.trim(),
+            author: document.getElementById('itemAuthor') ? document.getElementById('itemAuthor').value.trim() : '',
             referral: document.getElementById('itemReferral').value,
             genre: document.getElementById('itemGenre').value === 'Other' ? (document.getElementById('itemGenreOther').value || 'Other') : document.getElementById('itemGenre').value,
             notes: document.getElementById('itemNotes').value,
@@ -6058,6 +6112,9 @@
       }
       _lastSearchQuery = query;
 
+      // Editing the title invalidates any cover art picked from a previous search result
+      document.getElementById('itemImage').value = '';
+
       clearTimeout(searchTimeout);
       resultsDiv.classList.remove('active');
 
@@ -6085,6 +6142,15 @@
       titleInput.addEventListener('input', handleTitleInput);
       titleInput.addEventListener('compositionend', handleTitleInput);
 
+      // Prevent the keyboard's Go/Done/Return key from silently submitting the
+      // form before status, rating, and other details have been filled in
+      titleInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          resultsDiv.classList.remove('active');
+        }
+      });
+
       typeSelect.addEventListener('change', () => {
         toggleStreamingPlatform();
         const query = titleInput.value.trim();
@@ -6108,12 +6174,15 @@
       const typeSelect = document.getElementById('itemType');
       const streamingGroup = document.getElementById('streamingPlatformGroup');
       const episodeGroup = document.getElementById('episodeGroup');
+      const authorGroup = document.getElementById('authorGroup');
       const type = typeSelect.value;
 
       // Show streaming platform for movies and TV shows
       streamingGroup.style.display = (type === 'movie' || type === 'tv') ? 'block' : 'none';
       // Show episode field for podcasts only
       episodeGroup.style.display = (type === 'podcast') ? 'block' : 'none';
+      // Show author field for books and podcasts
+      if (authorGroup) authorGroup.style.display = (type === 'book' || type === 'podcast') ? 'block' : 'none';
     }
 
     // Update status labels based on media type
@@ -6141,6 +6210,13 @@
       const titleInput = document.getElementById('itemTitle');
       if (titleInput.value) {
         document.getElementById('autocompleteResults').classList.remove('active');
+      }
+
+      // If editing an existing item, keep the static preview badge (e.g. "📺 TV Show") in sync
+      const previewType = document.getElementById('previewType');
+      if (previewType && document.getElementById('editId').value) {
+        const typeEmojis = { movie: '🎥', tv: '📺', podcast: '🎙️', book: '📚' };
+        previewType.textContent = (typeEmojis[type] || '') + ' ' + (type === 'tv' ? 'TV Show' : type.charAt(0).toUpperCase() + type.slice(1));
       }
     }
 
@@ -6262,10 +6338,11 @@
     }
 
     // Search Google Books API
+    const GOOGLE_BOOKS_API_KEY = 'AIzaSyC70opDWxPl1_9W14PQJLtJ8ZkcEoM6W_o';
+
     async function searchBooks(query) {
       try {
-        // Use CORS proxy to avoid CORS issues
-        const searchUrl = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=20&printType=books&orderBy=relevance&langRestrict=en`;
+        const searchUrl = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=20&printType=books&orderBy=relevance&langRestrict=en&key=${GOOGLE_BOOKS_API_KEY}`;
         
         const response = await fetch(searchUrl, {
           method: 'GET',
@@ -6358,7 +6435,7 @@
         <div class="quick-add-buttons">
           <button class="quick-add-btn" onclick="event.stopPropagation(); quickAddItem(${index}, 'want')">📌 Queued</button>
           <button class="quick-add-btn" onclick="event.stopPropagation(); quickAddItem(${index}, 'current')">🔥 In Progress</button>
-          <button class="quick-add-btn" onclick="event.stopPropagation(); quickAddItem(${index}, 'done')">✅ Done</button>
+          <button class="quick-add-btn" onclick="event.stopPropagation(); openAddFormForDone(${index})">✅ Done</button>
         </div>
       `).join('');
 
@@ -6391,6 +6468,9 @@
         document.getElementById('itemTitle').value = result.title;
         document.getElementById('itemImage').value = result.image || '';
         document.getElementById('itemPremiereDate').value = result.premiereDate || '';
+        if (document.getElementById('itemAuthor')) {
+          document.getElementById('itemAuthor').value = result.author || '';
+        }
         document.getElementById('autocompleteResults').classList.remove('active');
 
         // Warn if already on shelf
@@ -7633,7 +7713,8 @@
       document.querySelectorAll('.type-icon-btn').forEach(btn => {
         btn.classList.remove('active');
       });
-      document.querySelector('[data-type="movie"]')?.classList.add('active');
+      document.querySelectorAll('.type-icon-btn[data-type="movie"]').forEach(el => el.classList.add('active'));
+      updateStatusOptions('movie');
 
       setStarRating(null); // Reset stars
       document.getElementById('itemPremiereDate').value = '';
@@ -7760,6 +7841,9 @@
         document.getElementById('itemStreamingPlatform').value = item.streamingPlatform || '';
         document.getElementById('itemReferral').value = item.referral || '';
         document.getElementById('itemEpisode').value = item.episode || '';
+        if (document.getElementById('itemAuthor')) {
+          document.getElementById('itemAuthor').value = item.author || '';
+        }
         // Update genre options for the item's type, then set value
         updateGenreOptions(item.type);
         const genreSelect = document.getElementById('itemGenre');
@@ -10140,6 +10224,7 @@
           : `<div style="width:140px;height:210px;margin:0 auto 1rem;border-radius:10px;background:linear-gradient(135deg,#282828,#333);display:flex;align-items:center;justify-content:center;font-size:3rem;">${getTypeEmoji(item.type)}</div>`
         }
         <div class="detail-card-title">${item.title}</div>
+        ${item.author ? `<div class="detail-card-author" style="text-align:center; font-size:0.85rem; color:var(--text-secondary); margin-top:-0.25rem;">by ${item.author}</div>` : ''}
         <div class="detail-card-meta">
           ${getTypeEmoji(item.type)} ${item.type.charAt(0).toUpperCase() + item.type.slice(1)}
           ${item.genre ? ' &middot; ' + item.genre : ''}
@@ -11486,6 +11571,12 @@
 
       containers.forEach(grid => {
         if (!grid) return;
+        // renderItems() calls initLongPress() on every render, but these containers
+        // persist across renders (only their innerHTML changes) — without this guard,
+        // every render stacked another full set of listeners on the same element,
+        // so a single tap could be misread as a double-tap by a leftover listener.
+        if (grid.dataset.longPressBound === '1') return;
+        grid.dataset.longPressBound = '1';
 
         let touchStartX = 0, touchStartY = 0;
         let touchMoved = false;
@@ -11510,9 +11601,9 @@
           const now = Date.now();
           const lastTap = parseInt(card.dataset.lastTap || '0');
           if (now - lastTap < 200) {
-            // Double-tap: cycle status
+            // Double-tap: ask for confirmation before cycling status
             card.dataset.lastTap = '0';
-            swipeUpStatus(card.dataset.id);
+            requestStatusChange(card.dataset.id);
           } else {
             card.dataset.lastTap = now;
             openDetailCard(card.dataset.id);
@@ -11534,9 +11625,44 @@
         grid.addEventListener('dblclick', (e) => {
           const card = e.target.closest('.card[data-id]');
           if (!card) return;
-          swipeUpStatus(card.dataset.id);
+          requestStatusChange(card.dataset.id);
         });
       });
+    }
+
+    // Double-tap/double-click no longer changes status immediately — it asks for
+    // confirmation first, since two quick taps are too easy to trigger by accident.
+    let _pendingStatusChangeId = null;
+    let _statusConfirmTimeout = null;
+
+    function requestStatusChange(itemId) {
+      const item = items.find(i => i.id === itemId);
+      if (!item) return;
+      const cycle = { want: 'current', current: 'done', done: 'want' };
+      const newStatus = cycle[item.status] || 'want';
+      const labels = { want: 'Queued', current: 'In Progress', done: 'Finished' };
+
+      _pendingStatusChangeId = itemId;
+      document.getElementById('statusConfirmText').textContent = `Mark as ${labels[newStatus]}?`;
+      document.getElementById('statusConfirmBar').classList.add('visible');
+
+      clearTimeout(_statusConfirmTimeout);
+      _statusConfirmTimeout = setTimeout(cancelStatusChange, 4000);
+    }
+
+    function cancelStatusChange() {
+      _pendingStatusChangeId = null;
+      clearTimeout(_statusConfirmTimeout);
+      document.getElementById('statusConfirmBar').classList.remove('visible');
+    }
+
+    async function confirmStatusChange() {
+      const itemId = _pendingStatusChangeId;
+      document.getElementById('statusConfirmBar').classList.remove('visible');
+      clearTimeout(_statusConfirmTimeout);
+      _pendingStatusChangeId = null;
+      if (!itemId) return;
+      await swipeUpStatus(itemId);
     }
 
     async function swipeUpStatus(itemId) {
@@ -11708,6 +11834,7 @@
           : `<div style="width:140px;height:210px;margin:0 auto 1rem;border-radius:10px;background:linear-gradient(135deg,#282828,#333);display:flex;align-items:center;justify-content:center;font-size:3rem;">${getTypeEmoji(item.type)}</div>`
         }
         <div class="detail-card-title">${item.title}</div>
+        ${item.author ? `<div class="detail-card-author" style="text-align:center; font-size:0.85rem; color:var(--text-secondary); margin-top:-0.25rem;">by ${item.author}</div>` : ''}
         <div class="detail-card-meta">
           ${getTypeEmoji(item.type)} ${item.type.charAt(0).toUpperCase() + item.type.slice(1)}
           ${item.genre ? ' &middot; ' + item.genre : ''}
@@ -11770,6 +11897,31 @@
       renderItems();
       const labels = { want: 'Queued', current: 'In Progress', done: 'Finished' };
       showToast(`Added "${result.title}" as ${labels[status] || status}`);
+    }
+
+    // "Done" needs a rating/notes, unlike Queued/In Progress, so it opens the
+    // full add form pre-filled instead of saving immediately like quickAddItem does.
+    function openAddFormForDone(index) {
+      if (!searchResults || !searchResults[index]) return;
+      const result = searchResults[index];
+
+      if (items.some(i => i.title === result.title && i.type === result.type)) {
+        showToast('Already in your list!');
+        return;
+      }
+
+      const type = document.getElementById('itemType').value || 'movie';
+
+      document.getElementById('autocompleteResults').classList.remove('active');
+      document.getElementById('itemTitle').value = result.title;
+      document.getElementById('itemImage').value = result.image || '';
+      document.getElementById('itemPremiereDate').value = result.premiereDate || '';
+      if (document.getElementById('itemAuthor')) {
+        document.getElementById('itemAuthor').value = result.author || '';
+      }
+      const genreSelect = document.getElementById('itemGenre');
+      if (genreSelect && result.genre) genreSelect.value = result.genre;
+      selectStatus('done');
     }
 
     // === PULL-TO-REFRESH (Feature 7) ===
@@ -12165,6 +12317,13 @@
 
   <!-- Toast Notification -->
   <div id="toast" class="toast"></div>
+
+  <!-- Status Change Confirm Bar -->
+  <div id="statusConfirmBar" class="status-confirm-bar">
+    <span id="statusConfirmText"></span>
+    <button type="button" class="status-confirm-btn status-confirm-yes" onclick="confirmStatusChange()">Confirm</button>
+    <button type="button" class="status-confirm-btn status-confirm-no" onclick="cancelStatusChange()">Cancel</button>
+  </div>
 
   <!-- Spotlight Picker Modal -->
   <div id="spotlightPickerModal" class="modal" style="display:none;" onclick="if(event.target===this)closeSpotlightPicker()">

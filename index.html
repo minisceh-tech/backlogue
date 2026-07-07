@@ -4848,6 +4848,19 @@
             </select>
           </div>
 
+          <!-- Rating: shown in add mode when status is Finished (edit mode rates via the preview header) -->
+          <div class="form-group" id="addRatingGroup" style="display: none;">
+            <label>Rating</label>
+            <div class="star-rating-picker" id="addStarPicker">
+              <button type="button" class="star-btn" data-star="1" onclick="handleStarClick(1, event)">★</button>
+              <button type="button" class="star-btn" data-star="2" onclick="handleStarClick(2, event)">★</button>
+              <button type="button" class="star-btn" data-star="3" onclick="handleStarClick(3, event)">★</button>
+              <button type="button" class="star-btn" data-star="4" onclick="handleStarClick(4, event)">★</button>
+              <button type="button" class="star-btn" data-star="5" onclick="handleStarClick(5, event)">★</button>
+              <button type="button" class="star-rating-clear" onclick="setStarRating(null)">clear</button>
+            </div>
+          </div>
+
           <input type="hidden" id="itemRating" value="">
         </div>
 
@@ -6337,44 +6350,75 @@
       }
     }
 
-    // Search Google Books API
-    const GOOGLE_BOOKS_API_KEY = 'AIzaSyC70opDWxPl1_9W14PQJLtJ8ZkcEoM6W_o';
-
+    // Search books via Open Library
     async function searchBooks(query) {
       try {
-        const searchUrl = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=20&printType=books&orderBy=relevance&langRestrict=en&key=${GOOGLE_BOOKS_API_KEY}`;
-        
-        const response = await fetch(searchUrl, {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json'
+        // Open Library — keyless and quota-free. (Google Books rejects requests from
+        // newer cloud projects even with the API enabled, and its anonymous quota is
+        // shared globally and usually exhausted.)
+        // Run title, author, and general searches in parallel and merge, so typing
+        // either a book title or an author name both work.
+        const fields = 'title,author_name,first_publish_year,cover_i,subject';
+        const urls = [
+          `https://openlibrary.org/search.json?author=${encodeURIComponent(query)}&limit=10&fields=${fields}&lang=en&sort=readinglog`,
+          `https://openlibrary.org/search.json?title=${encodeURIComponent(query)}&limit=10&fields=${fields}&lang=en`,
+          `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=10&fields=${fields}&lang=en`
+        ];
+
+        const responses = await Promise.allSettled(urls.map(u =>
+          fetch(u, { method: 'GET', headers: { 'Accept': 'application/json' } })
+            .then(r => r.ok ? r.json() : null)
+        ));
+        const [authorDocs, titleDocs, generalDocs] = responses.map(r =>
+          (r.status === 'fulfilled' && r.value && r.value.docs) ? r.value.docs : []
+        );
+
+        // Rank results: if the query looks like an author's name (some result's author
+        // starts with it), that author's books come first, sorted by popularity.
+        // Otherwise exact title matches lead, and author results whose name merely
+        // *contains* the query (e.g. "One of the passengers") sink to the bottom.
+        const norm = s => (s || '').toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+        const q = norm(query);
+        const isStrongAuthor = d => (d.author_name || []).some(a => norm(a) === q || norm(a).startsWith(q));
+        const strongAuthor = authorDocs.filter(isStrongAuthor);
+        const looseAuthor = authorDocs.filter(d => !isStrongAuthor(d));
+        const exactTitle = titleDocs.filter(d => norm(d.title) === q);
+        const otherTitle = titleDocs.filter(d => norm(d.title) !== q);
+        const ordered = strongAuthor.length > 0
+          ? [...strongAuthor, ...exactTitle, ...otherTitle, ...generalDocs, ...looseAuthor]
+          : [...exactTitle, ...otherTitle, ...generalDocs, ...looseAuthor];
+
+        const bookGenres = genresByType.book;
+        const seen = new Set();
+        const merged = [];
+        {
+          for (const doc of ordered) {
+            const title = doc.title || 'Unknown Title';
+            const author = doc.author_name ? doc.author_name.join(', ') : '';
+            const key = title.toLowerCase() + '|' + author.toLowerCase();
+            if (seen.has(key)) continue;
+            seen.add(key);
+            // Pick the first subject that resembles one of the app's book genres
+            const subjects = doc.subject || [];
+            const genre = subjects.find(s =>
+              bookGenres.some(g => s.toLowerCase().includes(g.toLowerCase()))
+            ) || '';
+            merged.push({
+              title: title,
+              year: doc.first_publish_year ? String(doc.first_publish_year) : '',
+              premiereDate: '',
+              image: doc.cover_i ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg` : null,
+              author: author,
+              type: 'book',
+              genre: genre
+            });
           }
-        });
-        
-        if (!response.ok) {
-          console.error('Books API response not OK:', response.status);
-          return [];
         }
-        
-        const data = await response.json();
-        
-        if (!data.items || data.items.length === 0) {
+
+        if (merged.length === 0) {
           console.log('No book results found');
-          return [];
         }
-        
-        return data.items.map(item => {
-          const volumeInfo = item.volumeInfo || {};
-          return {
-            title: volumeInfo.title || 'Unknown Title',
-            year: volumeInfo.publishedDate ? volumeInfo.publishedDate.substring(0, 4) : '',
-            premiereDate: volumeInfo.publishedDate && volumeInfo.publishedDate.length >= 10 ? volumeInfo.publishedDate.substring(0, 10) : '',
-            image: volumeInfo.imageLinks?.thumbnail || volumeInfo.imageLinks?.smallThumbnail || null,
-            author: volumeInfo.authors ? volumeInfo.authors.join(', ') : '',
-            type: 'book',
-            genre: volumeInfo.categories?.[0] || ''
-          };
-        });
+        return merged.slice(0, 20);
       } catch (error) {
         console.error('Books search error:', error);
         // Return empty array instead of throwing to allow manual entry
@@ -6737,7 +6781,7 @@
     }
 
     function updateStarPicker(value) {
-      document.querySelectorAll('#starPicker .star-btn').forEach(btn => {
+      document.querySelectorAll('#starPicker .star-btn, #addStarPicker .star-btn').forEach(btn => {
         const star = parseInt(btn.getAttribute('data-star'));
         btn.classList.remove('full', 'half');
         if (value !== null && value !== undefined) {
@@ -7922,6 +7966,12 @@
       document.querySelectorAll('.status-pill-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.status === status);
       });
+      // In add mode, offer star rating only for Finished items (edit mode rates via the preview header)
+      const ratingGroup = document.getElementById('addRatingGroup');
+      if (ratingGroup) {
+        const isAddMode = !document.getElementById('editId').value;
+        ratingGroup.style.display = (isAddMode && status === 'done') ? 'block' : 'none';
+      }
       // Auto-fill date when marking as done
       if (status === 'done') {
         const dateInput = document.getElementById('itemDateLogged');

@@ -4805,9 +4805,16 @@
         <a id="reserveMaps" target="_blank" rel="noopener" class="btn btn-secondary" style="flex:1; text-align:center; text-decoration:none; font-size:0.78rem; padding:0.5rem 0.3rem;">📍 Maps</a>
       </div>
 
+      <!-- Buy links (shown when editing a book) -->
+      <div id="buyRow" style="display:none; gap:0.5rem; margin-bottom:1rem;">
+        <a id="buyBookshop" target="_blank" rel="noopener" class="btn btn-secondary" style="flex:1; text-align:center; text-decoration:none; font-size:0.78rem; padding:0.5rem 0.3rem;">🛒 Bookshop.org</a>
+        <a id="buyAmazon" target="_blank" rel="noopener" class="btn btn-secondary" style="flex:1; text-align:center; text-decoration:none; font-size:0.78rem; padding:0.5rem 0.3rem;">🛒 Amazon</a>
+      </div>
+
       <form id="itemForm">
         <input type="hidden" id="editId">
         <input type="hidden" id="itemImage">
+        <input type="hidden" id="itemIsbn">
 
         <!-- Type: always editable, even for existing items, so a miscategorized item can be fixed -->
         <div class="form-group">
@@ -5985,7 +5992,8 @@
           userId: currentUser.id,
           statusChangedAt: (isEditing && existingItem && existingItem.status === document.getElementById('itemStatus').value)
             ? (existingItem.statusChangedAt || null) : Date.now(),
-          nudgeSnoozedAt: (isEditing && existingItem) ? (existingItem.nudgeSnoozedAt || null) : null
+          nudgeSnoozedAt: (isEditing && existingItem) ? (existingItem.nudgeSnoozedAt || null) : null,
+          isbn: document.getElementById('itemIsbn').value || (isEditing && existingItem ? existingItem.isbn : '') || ''
         };
 
         console.log('New item:', newItem);
@@ -6073,7 +6081,8 @@
             userId: currentUser.id,
             statusChangedAt: (isEditingForm && existingItemForm && existingItemForm.status === document.getElementById('itemStatus').value)
               ? (existingItemForm.statusChangedAt || null) : Date.now(),
-            nudgeSnoozedAt: (isEditingForm && existingItemForm) ? (existingItemForm.nudgeSnoozedAt || null) : null
+            nudgeSnoozedAt: (isEditingForm && existingItemForm) ? (existingItemForm.nudgeSnoozedAt || null) : null,
+            isbn: document.getElementById('itemIsbn').value || (isEditingForm && existingItemForm ? existingItemForm.isbn : '') || ''
           };
 
           console.log('New item:', newItem);
@@ -6148,8 +6157,9 @@
       }
       _lastSearchQuery = query;
 
-      // Editing the title invalidates any cover art picked from a previous search result
+      // Editing the title invalidates any cover art or ISBN picked from a previous search result
       document.getElementById('itemImage').value = '';
+      document.getElementById('itemIsbn').value = '';
 
       clearTimeout(searchTimeout);
       resultsDiv.classList.remove('active');
@@ -6399,7 +6409,7 @@
         // shared globally and usually exhausted.)
         // Run title, author, and general searches in parallel and merge, so typing
         // either a book title or an author name both work.
-        const fields = 'title,author_name,first_publish_year,cover_i,subject';
+        const fields = 'title,author_name,first_publish_year,cover_i,subject,isbn';
         const urls = [
           `https://openlibrary.org/search.json?author=${encodeURIComponent(query)}&limit=10&fields=${fields}&lang=en&sort=readinglog`,
           `https://openlibrary.org/search.json?title=${encodeURIComponent(query)}&limit=10&fields=${fields}&lang=en`,
@@ -6451,7 +6461,8 @@
               image: doc.cover_i ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg` : null,
               author: author,
               type: 'book',
-              genre: genre
+              genre: genre,
+              isbn: (doc.isbn || []).find(n => /^97[89]\d{10}$/.test(n)) || ''
             });
           }
         }
@@ -6470,6 +6481,13 @@
     // Google Places (New) — key is browser-safe: restricted to this site's
     // referrers and the Places API only, with quota caps in the console.
     const PLACES_API_KEY = 'AIzaSyAyQOEtvEqL8wy-lFBY0w1CoOjC2RfD8M0';
+
+    // Affiliate IDs for the Buy buttons on books. Empty IDs keep the
+    // buttons working as plain store links (no commission attribution).
+    const AFFILIATE = {
+      bookshopId: '',   // Bookshop.org affiliate profile ID
+      amazonTag: ''     // Amazon Associates tracking tag (e.g. mycued-20)
+    };
 
     async function searchRestaurants(query) {
       const places = await searchRestaurantsGoogle(query);
@@ -6638,6 +6656,7 @@
 
         document.getElementById('itemTitle').value = result.title;
         document.getElementById('itemImage').value = result.image || '';
+        document.getElementById('itemIsbn').value = result.isbn || '';
         document.getElementById('itemPremiereDate').value = result.premiereDate || '';
         if (document.getElementById('itemAuthor')) {
           document.getElementById('itemAuthor').value = result.author || '';
@@ -7901,6 +7920,7 @@
       document.getElementById('editModeTypeTitle').style.display = 'none';
       document.querySelector('.modal-content').classList.remove('quick-edit-mode');
       document.getElementById('reserveRow').style.display = 'none';
+      document.getElementById('buyRow').style.display = 'none';
       selectStatus('want');
 
       // Add mode: show Save + Cancel
@@ -8069,6 +8089,20 @@
           reserveRow.style.display = 'flex';
         } else {
           reserveRow.style.display = 'none';
+        }
+
+        // Buy links for books (direct product page when we know the ISBN)
+        document.getElementById('itemIsbn').value = item.isbn || '';
+        const buyRow = document.getElementById('buyRow');
+        if (item.type === 'book') {
+          const bq = encodeURIComponent(item.title + (item.author ? ' ' + item.author : ''));
+          document.getElementById('buyBookshop').href = (AFFILIATE.bookshopId && item.isbn)
+            ? `https://bookshop.org/a/${AFFILIATE.bookshopId}/${item.isbn}`
+            : `https://bookshop.org/search?keywords=${bq}` + (AFFILIATE.bookshopId ? `&affiliate=${AFFILIATE.bookshopId}` : '');
+          document.getElementById('buyAmazon').href = `https://www.amazon.com/s?k=${bq}` + (AFFILIATE.amazonTag ? `&tag=${AFFILIATE.amazonTag}` : '');
+          buyRow.style.display = 'flex';
+        } else {
+          buyRow.style.display = 'none';
         }
 
         // Update type icon buttons
@@ -12148,6 +12182,7 @@
       document.getElementById('autocompleteResults').classList.remove('active');
       document.getElementById('itemTitle').value = result.title;
       document.getElementById('itemImage').value = result.image || '';
+      document.getElementById('itemIsbn').value = result.isbn || '';
       document.getElementById('itemPremiereDate').value = result.premiereDate || '';
       if (document.getElementById('itemAuthor')) {
         document.getElementById('itemAuthor').value = result.author || '';

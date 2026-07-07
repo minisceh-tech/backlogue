@@ -7707,14 +7707,9 @@
       document.getElementById('editId').value = '';
       document.getElementById('itemRating').value = '';
       document.getElementById('itemStreamingPlatform').value = '';
-      document.getElementById('itemType').value = 'movie';
-
-      // Reset type icons to movie
-      document.querySelectorAll('.type-icon-btn').forEach(btn => {
-        btn.classList.remove('active');
-      });
-      document.querySelectorAll('.type-icon-btn[data-type="movie"]').forEach(el => el.classList.add('active'));
-      updateStatusOptions('movie');
+      // Default the type to the active media filter (e.g. TV), or movie when viewing all
+      const defaultType = ['movie', 'tv', 'podcast', 'book'].includes(currentMediaFilter) ? currentMediaFilter : 'movie';
+      selectType(defaultType);
 
       setStarRating(null); // Reset stars
       document.getElementById('itemPremiereDate').value = '';
@@ -7724,8 +7719,6 @@
       currentTags = [];
       renderTagChips();
       document.getElementById('autocompleteResults').classList.remove('active');
-      toggleStreamingPlatform(); // Show/hide streaming platform
-      updateGenreOptions('movie'); // Reset genre options for default type
       document.getElementById('itemGenre').value = '';
       document.getElementById('itemGenreOther').value = '';
       document.getElementById('itemGenreOther').style.display = 'none';

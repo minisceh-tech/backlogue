@@ -4798,6 +4798,13 @@
         </div>
       </div>
 
+      <!-- Reserve links (shown when editing a restaurant) -->
+      <div id="reserveRow" style="display:none; gap:0.5rem; margin-bottom:1rem;">
+        <a id="reserveOpenTable" target="_blank" rel="noopener" class="btn btn-secondary" style="flex:1; text-align:center; text-decoration:none; font-size:0.78rem; padding:0.5rem 0.3rem;">📅 OpenTable</a>
+        <a id="reserveResy" target="_blank" rel="noopener" class="btn btn-secondary" style="flex:1; text-align:center; text-decoration:none; font-size:0.78rem; padding:0.5rem 0.3rem;">📅 Resy</a>
+        <a id="reserveMaps" target="_blank" rel="noopener" class="btn btn-secondary" style="flex:1; text-align:center; text-decoration:none; font-size:0.78rem; padding:0.5rem 0.3rem;">📍 Maps</a>
+      </div>
+
       <form id="itemForm">
         <input type="hidden" id="editId">
         <input type="hidden" id="itemImage">
@@ -5912,6 +5919,7 @@
       await checkJoinRequestsBadge();
       await checkGroupFeedBadge();
       loadFollowRequests();
+      checkDiningNudge();
 
       // Check for localStorage migration on first login
       await checkLocalStorageMigration(firebaseUser);
@@ -5974,7 +5982,10 @@
           dateLogged: document.getElementById('itemDateLogged').value || (isEditing && existingItem ? existingItem.dateLogged : '') || '',
           tags: (() => { const pending = document.getElementById('itemTagInput')?.value.trim(); if (pending) { addTag(pending); document.getElementById('itemTagInput').value = ''; } return [...currentTags]; })(),
           group: groupId,
-          userId: currentUser.id
+          userId: currentUser.id,
+          statusChangedAt: (isEditing && existingItem && existingItem.status === document.getElementById('itemStatus').value)
+            ? (existingItem.statusChangedAt || null) : Date.now(),
+          nudgeSnoozedAt: (isEditing && existingItem) ? (existingItem.nudgeSnoozedAt || null) : null
         };
 
         console.log('New item:', newItem);
@@ -6059,7 +6070,10 @@
             dateLogged: document.getElementById('itemDateLogged').value || (isEditingForm && existingItemForm ? existingItemForm.dateLogged : '') || '',
             tags: [...currentTags],
             group: groupId,
-            userId: currentUser.id
+            userId: currentUser.id,
+            statusChangedAt: (isEditingForm && existingItemForm && existingItemForm.status === document.getElementById('itemStatus').value)
+              ? (existingItemForm.statusChangedAt || null) : Date.now(),
+            nudgeSnoozedAt: (isEditingForm && existingItemForm) ? (existingItemForm.nudgeSnoozedAt || null) : null
           };
 
           console.log('New item:', newItem);
@@ -7886,6 +7900,7 @@
       document.getElementById('modalItemPreview').classList.remove('visible');
       document.getElementById('editModeTypeTitle').style.display = 'none';
       document.querySelector('.modal-content').classList.remove('quick-edit-mode');
+      document.getElementById('reserveRow').style.display = 'none';
       selectStatus('want');
 
       // Add mode: show Save + Cancel
@@ -8044,13 +8059,26 @@
         document.getElementById('editModeTypeTitle').style.display = 'block';
         document.querySelector('.modal-content').classList.add('quick-edit-mode');
 
+        // Reserve links for restaurants
+        const reserveRow = document.getElementById('reserveRow');
+        if (item.type === 'restaurant') {
+          const q = encodeURIComponent(item.title + (item.author ? ' ' + item.author : ''));
+          document.getElementById('reserveOpenTable').href = 'https://www.opentable.com/s?term=' + q;
+          document.getElementById('reserveResy').href = 'https://resy.com/search?query=' + encodeURIComponent(item.title);
+          document.getElementById('reserveMaps').href = 'https://www.google.com/maps/search/?api=1&query=' + q;
+          reserveRow.style.display = 'flex';
+        } else {
+          reserveRow.style.display = 'none';
+        }
+
         // Update type icon buttons
         document.querySelectorAll('.type-icon-btn').forEach(btn => {
           btn.classList.remove('active');
         });
         document.querySelector(`[data-type="${item.type}"]`)?.classList.add('active');
 
-        // Update status pills
+        // Update status pill labels for the item's type, then select
+        updateStatusOptions(item.type);
         selectStatus(item.status);
 
         // Update star rating display (backward compat: legacy values converted)
@@ -11793,12 +11821,18 @@
     let _pendingStatusChangeId = null;
     let _statusConfirmTimeout = null;
 
+    function statusLabelsFor(type) {
+      return type === 'restaurant'
+        ? { want: 'Want to Try', current: 'Reserved', done: 'Been There' }
+        : { want: 'Queued', current: 'In Progress', done: 'Finished' };
+    }
+
     function requestStatusChange(itemId) {
       const item = items.find(i => i.id === itemId);
       if (!item) return;
       const cycle = { want: 'current', current: 'done', done: 'want' };
       const newStatus = cycle[item.status] || 'want';
-      const labels = { want: 'Queued', current: 'In Progress', done: 'Finished' };
+      const labels = statusLabelsFor(item.type);
 
       _pendingStatusChangeId = itemId;
       document.getElementById('statusConfirmText').textContent = `Mark as ${labels[newStatus]}?`;
@@ -11828,8 +11862,9 @@
       if (!item) return;
       const cycle = { want: 'current', current: 'done', done: 'want' };
       const newStatus = cycle[item.status] || 'want';
-      const labels = { want: 'Queued', current: 'In Progress', done: 'Finished' };
+      const labels = statusLabelsFor(item.type);
       item.status = newStatus;
+      item.statusChangedAt = Date.now();
       if (newStatus === 'done' && !item.dateLogged) item.dateLogged = getTodayDate();
       if (newStatus !== 'done') item.dateLogged = '';
       renderItems();
@@ -11881,6 +11916,46 @@
         placeholder.style.display = 'flex';
         placeholder.textContent = getTypeEmoji(item.type);
       }
+    }
+
+    // === "DID YOU GO?" NUDGE for reserved restaurants ===
+    let _diningNudgeItemId = null;
+
+    function checkDiningNudge() {
+      const DAY = 86400000;
+      const now = Date.now();
+      const candidate = items.find(i =>
+        i.type === 'restaurant' &&
+        i.status === 'current' &&
+        now - (i.statusChangedAt || parseInt(i.id) || now) > DAY &&
+        (!i.nudgeSnoozedAt || now - i.nudgeSnoozedAt > 3 * DAY)
+      );
+      if (!candidate) return;
+      _diningNudgeItemId = candidate.id;
+      document.getElementById('diningNudgeText').textContent = `Did you make it to ${candidate.title}?`;
+      document.getElementById('diningNudgeBar').classList.add('visible');
+    }
+
+    async function diningNudgeBeenThere() {
+      const item = items.find(i => i.id === _diningNudgeItemId);
+      document.getElementById('diningNudgeBar').classList.remove('visible');
+      _diningNudgeItemId = null;
+      if (!item) return;
+      item.status = 'done';
+      item.statusChangedAt = Date.now();
+      if (!item.dateLogged) item.dateLogged = getTodayDate();
+      renderItems();
+      await saveItemToFirestore(item);
+      showRatingPrompt(item.id);
+    }
+
+    async function diningNudgeSnooze() {
+      const item = items.find(i => i.id === _diningNudgeItemId);
+      document.getElementById('diningNudgeBar').classList.remove('visible');
+      _diningNudgeItemId = null;
+      if (!item) return;
+      item.nudgeSnoozedAt = Date.now();
+      await saveItemToFirestore(item);
     }
 
     let ratingPromptItemId = null;
@@ -12477,6 +12552,12 @@
   <div id="toast" class="toast"></div>
 
   <!-- Status Change Confirm Bar -->
+  <div id="diningNudgeBar" class="status-confirm-bar">
+    <span id="diningNudgeText"></span>
+    <button type="button" class="status-confirm-btn status-confirm-yes" onclick="diningNudgeBeenThere()">⭐ Been There</button>
+    <button type="button" class="status-confirm-btn status-confirm-no" onclick="diningNudgeSnooze()">Not yet</button>
+  </div>
+
   <div id="statusConfirmBar" class="status-confirm-bar">
     <span id="statusConfirmText"></span>
     <button type="button" class="status-confirm-btn status-confirm-yes" onclick="confirmStatusChange()">Confirm</button>

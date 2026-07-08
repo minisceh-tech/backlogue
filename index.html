@@ -5926,7 +5926,7 @@
       await checkJoinRequestsBadge();
       await checkGroupFeedBadge();
       loadFollowRequests();
-      checkDiningNudge();
+      checkStatusNudge();
 
       // Check for localStorage migration on first login
       await checkLocalStorageMigration(firebaseUser);
@@ -12080,22 +12080,37 @@
       }
     }
 
-    // === "DID YOU GO?" NUDGE for reserved restaurants ===
+    // === STATUS NUDGE — at most ONE gentle question per app open ===
+    // Restaurants: Reserved >1 day (reservations resolve fast, snooze 3d).
+    // Movies: In Progress >7 days (a movie is two hours, snooze 14d).
+    // Books: In Progress >60 days (books are slow, snooze 14d).
+    // TV and podcasts are never nudged: In Progress is their natural state.
     let _diningNudgeItemId = null;
 
-    function checkDiningNudge() {
+    const NUDGE_RULES = [
+      { type: 'restaurant', ageDays: 1,  snoozeDays: 3,  question: t => `Did you make it to ${t}?`, yes: '⭐ Been There' },
+      { type: 'movie',      ageDays: 7,  snoozeDays: 14, question: t => `Did you finish ${t}?`,     yes: '⭐ Finished' },
+      { type: 'book',       ageDays: 60, snoozeDays: 14, question: t => `Did you finish ${t}?`,     yes: '⭐ Finished' }
+    ];
+
+    function checkStatusNudge() {
       const DAY = 86400000;
       const now = Date.now();
-      const candidate = items.find(i =>
-        i.type === 'restaurant' &&
-        i.status === 'current' &&
-        now - (i.statusChangedAt || parseInt(i.id) || now) > DAY &&
-        (!i.nudgeSnoozedAt || now - i.nudgeSnoozedAt > 3 * DAY)
-      );
-      if (!candidate) return;
-      _diningNudgeItemId = candidate.id;
-      document.getElementById('diningNudgeText').textContent = `Did you make it to ${candidate.title}?`;
-      document.getElementById('diningNudgeBar').classList.add('visible');
+      for (const rule of NUDGE_RULES) {
+        const candidate = items.find(i =>
+          i.type === rule.type &&
+          i.status === 'current' &&
+          now - (i.statusChangedAt || parseInt(i.id) || now) > rule.ageDays * DAY &&
+          (!i.nudgeSnoozedAt || now - i.nudgeSnoozedAt > rule.snoozeDays * DAY)
+        );
+        if (candidate) {
+          _diningNudgeItemId = candidate.id;
+          document.getElementById('diningNudgeText').textContent = rule.question(candidate.title);
+          document.getElementById('diningNudgeYes').textContent = rule.yes;
+          document.getElementById('diningNudgeBar').classList.add('visible');
+          return;
+        }
+      }
     }
 
     async function diningNudgeBeenThere() {
@@ -12648,7 +12663,7 @@
   <!-- Status Change Confirm Bar -->
   <div id="diningNudgeBar" class="status-confirm-bar">
     <span id="diningNudgeText"></span>
-    <button type="button" class="status-confirm-btn status-confirm-yes" onclick="diningNudgeBeenThere()">⭐ Been There</button>
+    <button type="button" class="status-confirm-btn status-confirm-yes" id="diningNudgeYes" onclick="diningNudgeBeenThere()">⭐ Been There</button>
     <button type="button" class="status-confirm-btn status-confirm-no" onclick="diningNudgeSnooze()">Not yet</button>
   </div>
 

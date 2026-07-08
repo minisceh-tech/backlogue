@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
   <title>Cued — What's Next, All in One Place</title>
+  <link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"%3E%3Cdefs%3E%3ClinearGradient id="b" x1="0" y1="0" x2="0" y2="1"%3E%3Cstop offset="0%25" stop-color="%2399f5e8"/%3E%3Cstop offset="100%25" stop-color="%230d9488"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="96" height="96" rx="22" fill="%23081419"/%3E%3Cpath d="M32 16h32v64L48 66.5 32 80z" fill="url(%23b)"/%3E%3Cpolyline points="42,32 53,43 42,54" fill="none" stroke="%23060e12" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity="0.65"/%3E%3C/svg%3E'>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
@@ -4418,23 +4419,15 @@
 
         <!-- Background -->
         <rect width="96" height="96" rx="22" fill="url(#splBg)"/>
-        <rect x="30" y="30" width="36" height="55" rx="4" fill="url(#splGlow)"/>
+        <rect x="24" y="14" width="48" height="70" rx="6" fill="url(#splGlow)"/>
         <rect width="96" height="96" rx="22" fill="none" stroke="#14b8a6" stroke-width="1" opacity="0.2"/>
 
-        <!-- Headphones — refined arc + slim ear cups with depth -->
-        <path d="M 20 52 C 20 10 76 10 76 52"
-              fill="none" stroke="url(#splHp)" stroke-width="7" stroke-linecap="round"/>
-        <rect x="11" y="46" width="14" height="26" rx="7" fill="url(#splHp)"/>
-        <rect x="14" y="51" width="8" height="16" rx="4" fill="#050c0f" opacity="0.45"/>
-        <rect x="71" y="46" width="14" height="26" rx="7" fill="url(#splHp)"/>
-        <rect x="74" y="51" width="8" height="16" rx="4" fill="#050c0f" opacity="0.45"/>
+        <!-- Bookmark hero — save anything for later -->
+        <path d="M 32 16 L 64 16 L 64 80 L 48 66.5 L 32 80 Z" fill="url(#splBkm)"/>
+        <line x1="32" y1="16" x2="32" y2="80" stroke="#a7f3e8" stroke-width="1.5" opacity="0.4"/>
 
-        <!-- Bookmark — glowing, near-white top fading to teal -->
-        <path d="M 37 44 L 59 44 L 59 90 L 48 79 L 37 90 Z" fill="url(#splBkm)"/>
-        <line x1="37" y1="44" x2="37" y2="90" stroke="#a7f3e8" stroke-width="1.5" opacity="0.4"/>
-
-        <!-- Play triangle -->
-        <polygon points="43,54 43,73 58,63.5" fill="#060e12" opacity="0.6"/>
+        <!-- What's-next chevron -->
+        <polyline points="42,32 53,43 42,54" fill="none" stroke="#060e12" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity="0.65"/>
       </svg>
     </div>
     <div class="splash-wordmark">Cued</div>
@@ -4491,6 +4484,16 @@
       <div class="drawer-brand">Cued</div>
     </div>
     <div class="drawer-items">
+      <button class="drawer-item" onclick="openSearchPage(); closeDrawer()">
+        <span class="drawer-item-icon">🔍</span> Search
+      </button>
+      <button class="drawer-item" onclick="switchToGroups(); closeDrawer()">
+        <span class="drawer-item-icon">👥</span> Friends &amp; Groups
+      </button>
+      <button class="drawer-item" onclick="openProfileSettings(); closeDrawer()">
+        <span class="drawer-item-icon">👤</span> Account &amp; Settings
+      </button>
+      <div class="drawer-divider"></div>
       <button class="drawer-item" onclick="showTutorial(); closeDrawer()">
         <span class="drawer-item-icon">❓</span> Help &amp; Tutorial
       </button>
@@ -5079,7 +5082,9 @@
   <div id="loginModal" class="modal">
     <div class="modal-content auth-modal">
       <h2 class="modal-header">Welcome to Cued</h2>
-      <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Log in to see what's in your cue</p>
+      <div style="font-size:1.05rem; letter-spacing:0.35em; margin:0.25rem 0 0.5rem;">🎥📺🎙️📚🍽️</div>
+      <p style="color: var(--text-secondary); margin-bottom: 0.4rem;">One cue for the movies, shows, podcasts, books &amp; restaurants you don't want to forget.</p>
+      <p style="color: var(--text-tertiary); font-size: 0.85rem; margin-bottom: 1.5rem;">Log in to see what's in your cue</p>
       
       <form id="loginForm" onsubmit="handleLogin(event)">
         <div class="form-group">
@@ -5123,6 +5128,7 @@
   <div id="signupModal" class="modal">
     <div class="modal-content auth-modal">
       <h2 class="modal-header">Create Your Account</h2>
+      <div style="font-size:1.05rem; letter-spacing:0.35em; margin:0.25rem 0 0.5rem;">🎥📺🎙️📚🍽️</div>
       <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Start building your cue</p>
       
       <form id="signupForm" onsubmit="handleSignup(event)">
@@ -11244,8 +11250,8 @@
       localStorage.setItem('backlogue-light-mode', enabled ? '1' : '0');
     }
 
-    // Apply saved theme on load
-    if (localStorage.getItem('backlogue-light-mode') === '1') {
+    // Apply saved theme on load — light is the default; dark only when explicitly chosen
+    if (localStorage.getItem('backlogue-light-mode') !== '0') {
       document.body.classList.add('light-mode');
     }
 

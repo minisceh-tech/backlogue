@@ -1732,6 +1732,23 @@
       display: none;
     }
 
+    /* Restaurant photos don't carry the name like posters/covers do */
+    .card-title-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(rgba(0,0,0,0.8), transparent);
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-align: center;
+      padding: 0.35rem 0.4rem 0.9rem;
+      line-height: 1.25;
+      pointer-events: none;
+    }
+
     .card-rating-overlay {
       position: absolute;
       bottom: 0;
@@ -4973,7 +4990,7 @@
 
         <div class="form-group">
           <label for="itemDateLogged">Date Logged</label>
-          <div class="helper-text">When did you watch/read/listen to this?</div>
+          <div class="helper-text" id="dateLoggedHelper">When did you watch/read/listen to this?</div>
           <div class="date-logged-row">
             <input type="date" id="itemDateLogged">
             <button type="button" class="date-clear-btn" onclick="clearDateLogged()">Clear</button>
@@ -6237,6 +6254,9 @@
       // Hide the premiere/air date field for restaurants
       const premiereGroup = document.getElementById('premiereDateGroup');
       if (premiereGroup) premiereGroup.style.display = (type === 'restaurant') ? 'none' : 'block';
+      // Date Logged wording per type
+      const dateHelper = document.getElementById('dateLoggedHelper');
+      if (dateHelper) dateHelper.textContent = (type === 'restaurant') ? 'When did you go?' : 'When did you watch/read/listen to this?';
       // Show author field for books and podcasts; reuse it as Location for restaurants
       if (authorGroup) {
         authorGroup.style.display = (type === 'book' || type === 'podcast' || type === 'restaurant') ? 'block' : 'none';
@@ -6894,6 +6914,11 @@
         restaurant: '🍽️'
       };
       return emojis[type];
+    }
+
+    function cardTitleOverlay(item) {
+      if (item.type !== 'restaurant' || !item.image) return '';
+      return `<div class="card-title-overlay">${item.title}</div>`;
     }
 
     function cardRatingOverlay(item) {
@@ -7584,7 +7609,7 @@
           <div class="card" data-id="${item.id}" data-type="${item.type}" style="animation-delay: ${Math.min(index * 0.05, 0.5)}s">
             <div class="card-image">
               ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : `<div class="card-placeholder">${getTypeEmoji(item.type)}<div class="card-placeholder-title">${item.title}</div></div>`}
-              ${cardRatingOverlay(item)}
+              ${cardRatingOverlay(item)}${cardTitleOverlay(item)}
             </div>
           </div>
         `;
@@ -7666,6 +7691,7 @@
           <div class="card feed-card" data-feed-idx="${feedIdx}" data-type="${item.type}" style="animation-delay:${Math.min(cardIndex * 0.05, 0.5)}s;position:relative;">
             <div class="card-image">
               ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : `<div class="card-placeholder">${getTypeEmoji(item.type)}<div class="card-placeholder-title">${item.title}</div></div>`}
+              ${cardTitleOverlay(item)}
             </div>
             ${alreadyHave
               ? `<div style="position:absolute;bottom:0;left:0;right:0;background:#0d9488;text-align:center;font-size:0.58rem;font-weight:700;color:#fff;padding:0.25rem 0;pointer-events:none;letter-spacing:0.06em;">✓ ON SHELF</div>`
@@ -9659,7 +9685,7 @@
             <div class="card" data-id="${item.id}" data-type="${item.type}" style="animation-delay: ${Math.min(i * 0.05, 0.5)}s">
               <div class="card-image">
                 ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : `<div class="card-placeholder">${getTypeEmoji(item.type)}<div class="card-placeholder-title">${item.title}</div></div>`}
-                ${cardRatingOverlay(item)}
+                ${cardRatingOverlay(item)}${cardTitleOverlay(item)}
               </div>
             </div>
           `).join('');
@@ -9750,7 +9776,7 @@
           <div class="card" data-id="${item.id}" data-type="${item.type}" style="animation-delay: ${Math.min(i * 0.05, 0.5)}s">
             <div class="card-image">
               ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : `<div class="card-placeholder">${getTypeEmoji(item.type)}<div class="card-placeholder-title">${item.title}</div></div>`}
-              ${cardRatingOverlay(item)}
+              ${cardRatingOverlay(item)}${cardTitleOverlay(item)}
             </div>
           </div>
         `).join('');
@@ -10560,11 +10586,46 @@
             description = data.results[0].overview || '';
           }
         } else if (item.type === 'book') {
-          const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(item.title)}&maxResults=1&langRestrict=en`;
-          const res = await fetch(url);
-          const data = await res.json();
-          if (data.items && data.items.length > 0) {
-            description = data.items[0].volumeInfo?.description || '';
+          // Open Library: try the stored ISBN's work, then a title/author search.
+          // Some records carry junk like "Hardcover", so require a real synopsis.
+          const fetchWorkDesc = async (workKey) => {
+            if (!workKey) return '';
+            const work = await fetch(`https://openlibrary.org${workKey}.json`).then(r => r.ok ? r.json() : null).catch(() => null);
+            if (!work || !work.description) return '';
+            return typeof work.description === 'string' ? work.description : (work.description.value || '');
+          };
+          const candidates = [];
+          if (item.isbn) {
+            const ed = await fetch(`https://openlibrary.org/isbn/${item.isbn}.json`).then(r => r.ok ? r.json() : null).catch(() => null);
+            candidates.push(await fetchWorkDesc(ed && ed.works && ed.works[0] ? ed.works[0].key : null));
+          }
+          if (!candidates.some(d => d.length >= 40)) {
+            const q = `https://openlibrary.org/search.json?title=${encodeURIComponent(item.title)}${item.author ? '&author=' + encodeURIComponent(item.author) : ''}&limit=1&fields=key`;
+            const s = await fetch(q).then(r => r.ok ? r.json() : null).catch(() => null);
+            candidates.push(await fetchWorkDesc(s && s.docs && s.docs[0] ? s.docs[0].key : null));
+          }
+          if (!candidates.some(d => d.length >= 40)) {
+            // Apple Books publisher blurb as a final fallback
+            const it = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(item.title + ' ' + (item.author || ''))}&media=ebook&limit=1`).then(r => r.ok ? r.json() : null).catch(() => null);
+            const blurb = it && it.results && it.results[0] && it.results[0].description ? it.results[0].description : '';
+            candidates.push(blurb.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim());
+          }
+          description = candidates.find(d => d.length >= 40) || '';
+        } else if (item.type === 'restaurant') {
+          // Google Places editorial summary
+          const res = await fetch('https://places.googleapis.com/v1/places:searchText', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Goog-Api-Key': PLACES_API_KEY,
+              'X-Goog-FieldMask': 'places.editorialSummary'
+            },
+            body: JSON.stringify({ textQuery: item.title + (item.author ? ' ' + item.author : ''), pageSize: 1, languageCode: 'en' })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            description = data.places && data.places[0] && data.places[0].editorialSummary
+              ? data.places[0].editorialSummary.text : '';
           }
         }
 

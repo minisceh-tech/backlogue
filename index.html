@@ -7977,6 +7977,8 @@
       document.getElementById('modalCloseBtn').textContent = 'Cancel';
 
       document.getElementById('itemModal').classList.add('active');
+      // Always open scrolled to the top (the element keeps its old scroll position)
+      document.querySelector('#itemModal .modal-content').scrollTop = 0;
     }
 
     // Open group modal
@@ -8177,6 +8179,8 @@
         document.getElementById('modalCloseBtn').textContent = 'Done';
 
         document.getElementById('itemModal').classList.add('active');
+        // Always open scrolled to the top (the element keeps its old scroll position)
+        document.querySelector('#itemModal .modal-content').scrollTop = 0;
       } catch (error) {
         console.error('Error editing item:', error);
         alert('Failed to open item for editing.');

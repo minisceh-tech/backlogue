@@ -6243,9 +6243,36 @@
       }
     }
 
+    // Clear everything the user may have entered in the add form
+    function clearAddFormFields() {
+      document.getElementById('itemTitle').value = '';
+      document.getElementById('itemImage').value = '';
+      document.getElementById('itemIsbn').value = '';
+      document.getElementById('itemAuthor').value = '';
+      document.getElementById('itemPremiereDate').value = '';
+      document.getElementById('itemDateLogged').value = '';
+      document.getElementById('itemEpisode').value = '';
+      document.getElementById('itemStreamingPlatform').value = '';
+      document.getElementById('itemGenre').value = '';
+      document.getElementById('itemGenreOther').value = '';
+      document.getElementById('itemGenreOther').style.display = 'none';
+      document.getElementById('itemReferral').value = '';
+      document.getElementById('itemNotes').value = '';
+      setStarRating(null);
+      currentTags = [];
+      renderTagChips();
+      _lastSearchQuery = '';
+      document.getElementById('autocompleteResults').classList.remove('active');
+      const dupWarning = document.getElementById('dupWarning');
+      if (dupWarning) dupWarning.style.display = 'none';
+    }
+
     // Update status labels based on media type
     // Select media type
     function selectType(type) {
+      const prevType = document.getElementById('itemType').value;
+      const isAddMode = !document.getElementById('editId').value;
+
       // Update hidden input
       document.getElementById('itemType').value = type;
 
@@ -6263,6 +6290,13 @@
 
       // Update genre options for this type
       updateGenreOptions(type);
+
+      // Switching type while adding invalidates everything already entered.
+      // (Edit mode deliberately keeps fields so miscategorized items can be fixed.)
+      if (isAddMode && prevType && prevType !== type) {
+        clearAddFormFields();
+        selectStatus('want');
+      }
 
       // Clear autocomplete if search is active
       const titleInput = document.getElementById('itemTitle');

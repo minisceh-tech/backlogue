@@ -4956,8 +4956,8 @@
         <div id="editModeTypeTitle" style="display:none;"></div>
 
         <div class="form-group" id="premiereDateGroup">
-          <label for="itemPremiereDate">Premieres / Airs On</label>
-          <div class="helper-text">Release or air date (auto-filled from search when available)</div>
+          <label for="itemPremiereDate">Release Date</label>
+          <div class="helper-text">Auto-filled from search when available</div>
           <div class="date-logged-row">
             <input type="date" id="itemPremiereDate">
             <button type="button" class="date-clear-btn" onclick="document.getElementById('itemPremiereDate').value=''">Clear</button>
@@ -6233,6 +6233,9 @@
       // Date Logged wording per type
       const dateHelper = document.getElementById('dateLoggedHelper');
       if (dateHelper) dateHelper.textContent = (type === 'restaurant') ? 'When did you go?' : 'When did you watch/read/listen to this?';
+      // Premiere/publication label per type
+      const premiereLabel = document.querySelector('label[for="itemPremiereDate"]');
+      if (premiereLabel) premiereLabel.textContent = premiereDateLabelFor(type);
       // Show author field for books and podcasts; reuse it as Location for restaurants
       if (authorGroup) {
         authorGroup.style.display = (type === 'book' || type === 'podcast' || type === 'restaurant') ? 'block' : 'none';
@@ -6241,6 +6244,13 @@
         if (authorLabel) authorLabel.textContent = type === 'restaurant' ? 'Location' : 'Author';
         if (authorInput) authorInput.placeholder = type === 'restaurant' ? 'Neighborhood, city, or address' : 'Author name';
       }
+    }
+
+    // Label for the premiere/publication date field per type
+    function premiereDateLabelFor(type) {
+      if (type === 'book') return 'Publication Date';
+      if (type === 'tv') return 'Premieres / Airs On';
+      return 'Release Date'; // movies, podcasts
     }
 
     // Clear everything the user may have entered in the add form
@@ -6751,9 +6761,9 @@
           dupWarning.style.display = 'none';
         }
 
-        // Reset premiere label
+        // Reset premiere label (a TV search may later override it with season info)
         const premiereLabel = document.querySelector('label[for="itemPremiereDate"]');
-        if (premiereLabel) premiereLabel.textContent = 'Premieres / Airs On';
+        if (premiereLabel) premiereLabel.textContent = premiereDateLabelFor(document.getElementById('itemType').value);
 
         // Auto-populate genre + streaming + season dates
         if (result.type === 'movie' || result.type === 'tv') {
@@ -7988,7 +7998,7 @@
       setStarRating(null); // Reset stars
       document.getElementById('itemPremiereDate').value = '';
       const premiereLabel = document.querySelector('label[for="itemPremiereDate"]');
-      if (premiereLabel) premiereLabel.textContent = 'Premieres / Airs On';
+      if (premiereLabel) premiereLabel.textContent = premiereDateLabelFor(document.getElementById('itemType').value);
       document.getElementById('itemDateLogged').value = '';
       currentTags = [];
       renderTagChips();

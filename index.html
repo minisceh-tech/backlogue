@@ -6357,42 +6357,60 @@
     }
 
     // Search media based on type
+    async function searchByType(query, type) {
+      if (type === 'movie' || type === 'tv') return searchTMDB(query, type);
+      if (type === 'book') return searchBooks(query);
+      if (type === 'podcast') return searchPodcasts(query);
+      if (type === 'restaurant') return searchRestaurants(query);
+      return [];
+    }
+
+    // Google-style typo forgiveness: when a search finds nothing, ask
+    // Wikipedia (very typo-tolerant, knows every title) for the intended
+    // spelling and re-run the search with it.
+    async function fuzzySpellingSuggestion(query, type) {
+      try {
+        const res = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&srlimit=1&format=json&origin=*`)
+          .then(r => r.ok ? r.json() : null).catch(() => null);
+        if (!res || !res.query) return null;
+        let guess = (res.query.searchinfo && res.query.searchinfo.suggestion)
+          || (res.query.search && res.query.search[0] && res.query.search[0].title) || '';
+        // Strip Wikipedia disambiguation suffixes like "(film)" or "(TV series)"
+        guess = guess.replace(/\s*\([^)]*\)\s*$/, '').trim();
+        return guess && guess.toLowerCase() !== query.trim().toLowerCase() ? guess : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
     async function searchMedia(query, type) {
       const resultsDiv = document.getElementById('autocompleteResults');
 
       try {
-        let results = [];
+        let results = await searchByType(query, type);
 
-        if (type === 'movie' || type === 'tv') {
-          // Try OMDB first, then fall back to a simpler search
-          results = await searchTMDB(query, type);
-          
-          // If OMDB fails or returns nothing, show message
-          if (results.length === 0) {
-            resultsDiv.innerHTML = '<div class="loading-indicator" style="color:var(--text-tertiary);">No matches found — type the title manually to add it.</div>';
-            return;
-          }
-        } else if (type === 'book') {
-          results = await searchBooks(query);
-          if (results.length === 0) {
-            resultsDiv.innerHTML = '<div class="loading-indicator" style="color:var(--text-tertiary);">No books found — type the title manually to add it.</div>';
-            return;
-          }
-        } else if (type === 'podcast') {
-          results = await searchPodcasts(query);
-          if (results.length === 0) {
-            resultsDiv.innerHTML = '<div class="loading-indicator" style="color:var(--text-tertiary);">No podcasts found — type the title manually to add it.</div>';
-            return;
-          }
-        } else if (type === 'restaurant') {
-          results = await searchRestaurants(query);
-          if (results.length === 0) {
-            resultsDiv.innerHTML = '<div class="loading-indicator" style="color:var(--text-tertiary);">No restaurants found — add the city (e.g. "Lilia Brooklyn"), or type the name manually.</div>';
-            return;
+        // Nothing found — retry with a spell-corrected query, like Google
+        let correctedQuery = null;
+        if (results.length === 0) {
+          const corrected = await fuzzySpellingSuggestion(query, type);
+          if (corrected) {
+            const retry = await searchByType(corrected, type);
+            if (retry.length > 0) {
+              results = retry;
+              correctedQuery = corrected;
+            }
           }
         }
 
-        displayAutocompleteResults(results, type);
+        if (results.length === 0) {
+          const noneMsg = type === 'restaurant'
+            ? 'No restaurants found — add the city (e.g. "Lilia Brooklyn"), or type the name manually.'
+            : `No ${type === 'book' ? 'books' : type === 'podcast' ? 'podcasts' : 'matches'} found — type the title manually to add it.`;
+          resultsDiv.innerHTML = `<div class="loading-indicator" style="color:var(--text-tertiary);">${noneMsg}</div>`;
+          return;
+        }
+
+        displayAutocompleteResults(results, type, correctedQuery);
       } catch (error) {
         console.error('Search error:', error);
         resultsDiv.innerHTML = '<div class="loading-indicator" style="color:var(--text-tertiary);">Search unavailable — type the title manually to add it.</div>';
@@ -6443,6 +6461,11 @@
           `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=10&fields=${fields}&lang=en`
         ];
 
+        // Apple Books runs alongside: its search forgives typos (Google-style)
+        // and covers new releases Open Library hasn't indexed yet
+        const applePromise = fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=ebook&limit=8`)
+          .then(r => r.ok ? r.json() : null).catch(() => null);
+
         const responses = await Promise.allSettled(urls.map(u =>
           fetch(u, { method: 'GET', headers: { 'Accept': 'application/json' } })
             .then(r => r.ok ? r.json() : null)
@@ -6450,6 +6473,17 @@
         const [authorDocs, titleDocs, generalDocs] = responses.map(r =>
           (r.status === 'fulfilled' && r.value && r.value.docs) ? r.value.docs : []
         );
+        const appleData = await applePromise;
+        const appleBooks = (appleData && appleData.results ? appleData.results : []).map(b => ({
+          title: b.trackName || '',
+          year: b.releaseDate ? b.releaseDate.substring(0, 4) : '',
+          premiereDate: '',
+          image: b.artworkUrl100 ? b.artworkUrl100.replace('100x100', '400x400') : null,
+          author: b.artistName || '',
+          type: 'book',
+          genre: b.primaryGenreName === 'Fiction & Literature' ? 'Fiction' : (b.primaryGenreName || ''),
+          isbn: ''
+        })).filter(b => b.title);
 
         // Rank results: if the query looks like an author's name (some result's author
         // starts with it), that author's books come first, sorted by popularity.
@@ -6467,31 +6501,39 @@
           : [...exactTitle, ...otherTitle, ...generalDocs, ...looseAuthor];
 
         const bookGenres = genresByType.book;
+        const olMapped = ordered.map(doc => {
+          const title = doc.title || 'Unknown Title';
+          const author = doc.author_name ? doc.author_name.join(', ') : '';
+          // Pick the first subject that resembles one of the app's book genres
+          const subjects = doc.subject || [];
+          const genre = subjects.find(s =>
+            bookGenres.some(g => s.toLowerCase().includes(g.toLowerCase()))
+          ) || '';
+          return {
+            title: title,
+            year: doc.first_publish_year ? String(doc.first_publish_year) : '',
+            premiereDate: '',
+            image: doc.cover_i ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg` : null,
+            author: author,
+            type: 'book',
+            genre: genre,
+            isbn: (doc.isbn || []).find(n => /^97[89]\d{10}$/.test(n)) || ''
+          };
+        });
+
+        // Apple's typo-tolerant results slot in after the strong Open Library
+        // matches; when Open Library has nothing good (misspelling, brand-new
+        // release), Apple leads.
+        const splitIndex = strongAuthor.length + exactTitle.length;
+        const combined = [...olMapped.slice(0, splitIndex), ...appleBooks, ...olMapped.slice(splitIndex)];
+
         const seen = new Set();
         const merged = [];
-        {
-          for (const doc of ordered) {
-            const title = doc.title || 'Unknown Title';
-            const author = doc.author_name ? doc.author_name.join(', ') : '';
-            const key = title.toLowerCase() + '|' + author.toLowerCase();
-            if (seen.has(key)) continue;
-            seen.add(key);
-            // Pick the first subject that resembles one of the app's book genres
-            const subjects = doc.subject || [];
-            const genre = subjects.find(s =>
-              bookGenres.some(g => s.toLowerCase().includes(g.toLowerCase()))
-            ) || '';
-            merged.push({
-              title: title,
-              year: doc.first_publish_year ? String(doc.first_publish_year) : '',
-              premiereDate: '',
-              image: doc.cover_i ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg` : null,
-              author: author,
-              type: 'book',
-              genre: genre,
-              isbn: (doc.isbn || []).find(n => /^97[89]\d{10}$/.test(n)) || ''
-            });
-          }
+        for (const b of combined) {
+          const key = norm(b.title) + '|' + norm(b.author);
+          if (seen.has(key)) continue;
+          seen.add(key);
+          merged.push(b);
         }
 
         if (merged.length === 0) {
@@ -6621,7 +6663,7 @@
     }
 
     // Display autocomplete results
-    function displayAutocompleteResults(results, type) {
+    function displayAutocompleteResults(results, type, correctedQuery) {
       const resultsDiv = document.getElementById('autocompleteResults');
 
       if (results.length === 0) {
@@ -6632,8 +6674,11 @@
       const typeEmoji = getTypeEmoji(type);
       searchResults = results;
 
+      const headerText = correctedQuery
+        ? `Showing results for &ldquo;${correctedQuery}&rdquo; — tap to select`
+        : `${results.length} result${results.length !== 1 ? 's' : ''} — tap to select`;
       resultsDiv.innerHTML =
-        `<div style="padding:0.4rem 0.75rem; font-size:0.7rem; color:var(--text-tertiary); border-bottom:1px solid var(--border-light);">${results.length} result${results.length !== 1 ? 's' : ''} — tap to select</div>` +
+        `<div style="padding:0.4rem 0.75rem; font-size:0.7rem; color:var(--text-tertiary); border-bottom:1px solid var(--border-light);">${headerText}</div>` +
         results.map((result, index) => `
         <div class="autocomplete-item" onclick="selectSearchResult(${index})">
           ${result.image
@@ -6647,11 +6692,6 @@
               ${result.author ? ` • ${result.author}` : ''}
             </div>
           </div>
-        </div>
-        <div class="quick-add-buttons">
-          <button class="quick-add-btn" onclick="event.stopPropagation(); quickAddItem(${index}, 'want')">📌 Queued</button>
-          <button class="quick-add-btn" onclick="event.stopPropagation(); quickAddItem(${index}, 'current')">🔥 In Progress</button>
-          <button class="quick-add-btn" onclick="event.stopPropagation(); openAddFormForDone(${index})">✅ Done</button>
         </div>
       `).join('');
 
@@ -12185,75 +12225,6 @@
       `;
 
       document.getElementById('detailCardOverlay').classList.add('visible');
-    }
-
-    // === QUICK-ADD FROM SEARCH (Feature 6) ===
-    async function quickAddItem(index, status) {
-      if (!searchResults || !searchResults[index]) return;
-      const result = searchResults[index];
-
-      // Check if already in list
-      if (items.some(i => i.title === result.title && i.type === result.type)) {
-        showToast('Already in your list!');
-        return;
-      }
-
-      const type = document.getElementById('itemType').value || 'movie';
-      const newItem = {
-        id: Date.now().toString(),
-        title: result.title,
-        type: type,
-        status: status,
-        watchSoon: false,
-        rating: null,
-        image: result.image || '',
-        streamingPlatform: '',
-        genre: result.genre || '',
-        referral: '',
-        notes: '',
-        premiereDate: result.premiereDate || '',
-        dateLogged: '',
-        tags: [],
-        group: '',
-        userId: currentUser.id
-      };
-
-      items.push(newItem);
-      await saveItemToFirestore(newItem);
-
-      // Close autocomplete and clear input
-      document.getElementById('autocompleteResults').classList.remove('active');
-      document.getElementById('itemTitle').value = '';
-
-      renderItems();
-      const labels = { want: 'Queued', current: 'In Progress', done: 'Finished' };
-      showToast(`Added "${result.title}" as ${labels[status] || status}`);
-    }
-
-    // "Done" needs a rating/notes, unlike Queued/In Progress, so it opens the
-    // full add form pre-filled instead of saving immediately like quickAddItem does.
-    function openAddFormForDone(index) {
-      if (!searchResults || !searchResults[index]) return;
-      const result = searchResults[index];
-
-      if (items.some(i => i.title === result.title && i.type === result.type)) {
-        showToast('Already in your list!');
-        return;
-      }
-
-      const type = document.getElementById('itemType').value || 'movie';
-
-      document.getElementById('autocompleteResults').classList.remove('active');
-      document.getElementById('itemTitle').value = result.title;
-      document.getElementById('itemImage').value = result.image || '';
-      document.getElementById('itemIsbn').value = result.isbn || '';
-      document.getElementById('itemPremiereDate').value = result.premiereDate || '';
-      if (document.getElementById('itemAuthor')) {
-        document.getElementById('itemAuthor').value = result.author || '';
-      }
-      const genreSelect = document.getElementById('itemGenre');
-      if (genreSelect && result.genre) genreSelect.value = result.genre;
-      selectStatus('done');
     }
 
     // === PULL-TO-REFRESH (Feature 7) ===

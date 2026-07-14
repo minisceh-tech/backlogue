@@ -5441,6 +5441,33 @@
     </div>
   </div>
 
+  <!-- Upgrade / Cued Plus Modal -->
+  <div id="upgradeModal" class="modal">
+    <div class="modal-content" style="max-width: 420px; text-align: center;">
+      <button class="modal-close" onclick="closeModal('upgradeModal')" aria-label="Close">&times;</button>
+      <div style="font-size: 2rem; margin-bottom: 0.25rem;">✨</div>
+      <h2 class="modal-header" style="margin-bottom: 0.5rem;">Cued Plus</h2>
+      <p id="upgradeReason" style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.25rem;"></p>
+      <div style="text-align: left; background: var(--bg-accent); border: 1px solid var(--border-light); border-radius: 14px; padding: 1rem 1.25rem; margin-bottom: 1.25rem; font-size: 0.88rem; line-height: 2;">
+        <div>👥 Create unlimited groups</div>
+        <div>📊 Wrapped &amp; shareable stat cards</div>
+        <div>🏷️ Advanced filters, tags &amp; custom sorts</div>
+        <div>📥 Priority, larger imports</div>
+      </div>
+      <div style="display: flex; gap: 0.75rem;">
+        <button class="btn btn-secondary" onclick="startUpgrade('monthly')" style="flex: 1; padding: 0.75rem 0.5rem;">
+          <div style="font-weight: 800; font-size: 1.05rem;">$3.99</div>
+          <div style="font-size: 0.72rem; opacity: 0.75;">per month</div>
+        </button>
+        <button class="btn" onclick="startUpgrade('annual')" style="flex: 1; padding: 0.75rem 0.5rem;">
+          <div style="font-weight: 800; font-size: 1.05rem;">$29.99</div>
+          <div style="font-size: 0.72rem; opacity: 0.85;">per year — save 37%</div>
+        </button>
+      </div>
+      <div style="font-size: 0.72rem; color: var(--text-tertiary); margin-top: 0.9rem;">Joining groups, tracking, and imports stay free forever.</div>
+    </div>
+  </div>
+
   <!-- Tutorial Overlay -->
   <div id="tutorialOverlay" class="tutorial-overlay">
     <div class="tutorial-container">
@@ -5569,7 +5596,8 @@
           await db.collection('users').doc(uid).set({
             name: user.name,
             email: user.email,
-            memberOf: []
+            memberOf: [],
+            tier: 'free'
           });
         }
 
@@ -5945,7 +5973,8 @@
           name: handle || email.split('@')[0],
           email: email,
           memberOf: [],
-          handle: handle || null
+          handle: handle || null,
+          tier: 'free'
         });
 
         // onAuthStateChanged will handle the rest
@@ -5975,7 +6004,8 @@
           await db.collection('users').doc(result.user.uid).set({
             name: result.user.email.split('@')[0],
             email: result.user.email,
-            memberOf: []
+            memberOf: [],
+            tier: 'free'
           });
         }
         // onAuthStateChanged will handle the rest
@@ -6004,6 +6034,8 @@
       groups = data.groups;
       currentUser = data.user;
       settings = data.settings;
+      // Accounts created before tiers existed default to free
+      if (currentUser && !currentUser.tier) currentUser.tier = 'free';
 
       currentMediaFilter = 'all';
       currentStatusFilter = 'all';
@@ -6674,6 +6706,52 @@
       bookshopId: '',   // Bookshop.org affiliate profile ID
       amazonTag: ''     // Amazon Associates tracking tag (e.g. mycued-20)
     };
+
+    // ===== PRICING TIERS =====
+    // Master switch for the paid tier. While false, EVERY user gets full
+    // access: no group-creation limit, no upgrade modal, and all paid
+    // features (Wrapped/stat cards, tags & advanced filters, large imports)
+    // stay unlocked. Flip to true to activate gating once Stripe is wired up.
+    let ENABLE_PAID_TIER = false;
+
+    const PRICING = {
+      monthlyLabel: '$3.99',
+      annualLabel: '$29.99',
+      freeGroupCreateLimit: 2,   // free users can JOIN unlimited groups but CREATE only this many
+      freeImportRowLimit: 100    // rows per CSV import for free users
+    };
+
+    // True when this user has full access — either they're on the paid
+    // tier, or the paid tier isn't enabled yet.
+    function isPaidUser() {
+      if (!ENABLE_PAID_TIER) return true;
+      return !!(currentUser && currentUser.tier === 'paid');
+    }
+
+    function createdGroupCount() {
+      if (!currentUser) return 0;
+      return (groups || []).filter(g => g.createdBy === currentUser.id).length;
+    }
+
+    // Gate a paid feature: returns true if allowed, otherwise shows the
+    // upgrade modal with the given reason and returns false.
+    function requirePaid(reason) {
+      if (isPaidUser()) return true;
+      showUpgradeModal(reason);
+      return false;
+    }
+
+    function showUpgradeModal(reason) {
+      const el = document.getElementById('upgradeReason');
+      if (el) el.textContent = reason || 'This is a Cued Plus feature.';
+      document.getElementById('upgradeModal').classList.add('active');
+    }
+
+    function startUpgrade(plan) {
+      // Stripe checkout will land here later; plan is 'monthly' or 'annual'
+      showToast('Upgrades are coming soon — thanks for your interest!');
+      closeModal('upgradeModal');
+    }
 
     async function searchRestaurants(query) {
       const places = await searchRestaurantsGoogle(query);
@@ -7371,6 +7449,7 @@
     }
 
     function openTagSheet() {
+      if (!requirePaid('Advanced filters and tags are a Cued Plus feature.')) return;
       const allTags = getAllUserTags();
       if (allTags.length === 0) return;
       renderTagSheetPills();
@@ -8382,6 +8461,12 @@
       try {
         const name = document.getElementById('newGroupName').value.trim();
         if (!name) return;
+
+        // Free tier: joining groups is unlimited, creating is capped
+        if (!isPaidUser() && createdGroupCount() >= PRICING.freeGroupCreateLimit) {
+          showUpgradeModal(`Free accounts can create up to ${PRICING.freeGroupCreateLimit} groups (joining is always unlimited). Create as many as you like with Cued Plus.`);
+          return null;
+        }
 
         const newGroup = {
           id: Date.now().toString(),
@@ -10330,6 +10415,7 @@
     }
 
     function openShareCardForProfile() {
+      if (!requirePaid('Wrapped and shareable stat cards are a Cued Plus feature.')) return;
       renderProfileShareCard();
       document.getElementById('shareCardTypes').style.display = 'none';
       document.getElementById('shareCardModal').classList.add('active');
@@ -10395,6 +10481,7 @@
     }
 
     function openShareCardForStats() {
+      if (!requirePaid('Wrapped and shareable stat cards are a Cued Plus feature.')) return;
       currentShareItem = null;
       renderStatsShareCard();
       document.getElementById('shareCardTypes').style.display = 'none';
@@ -11531,6 +11618,12 @@
       const text = await file.text();
       const rows = parseCSV(text);
       if (rows.length === 0) { alert('No data found in file.'); return; }
+
+      // Free tier: cap import size; paid gets priority/large imports
+      if (!isPaidUser() && rows.length > PRICING.freeImportRowLimit) {
+        showUpgradeModal(`That file has ${rows.length} rows — free imports are capped at ${PRICING.freeImportRowLimit}. Import your full history with Cued Plus.`);
+        return;
+      }
 
       // Detect source by headers
       const headers = Object.keys(rows[0]);

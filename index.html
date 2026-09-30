@@ -3,7 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>Cued — Your Media Tracker</title>
+  <title>Cued — Track Movies, Books, Podcasts &amp; Restaurants with Friends</title>
+  <meta name="description" content="Cued is the one shelf for movies, TV, books, podcasts, and restaurants. Track what's next, share with friends and family, and import your existing Letterboxd or Goodreads lists.">
+  <meta property="og:title" content="Cued — What's next, together.">
+  <meta property="og:description" content="One shelf for movies, TV, books, podcasts, and restaurants. Track what's next and share it with your people.">
+  <meta property="og:image" content="https://www.mycued.com/og-image.png">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
+  <meta property="og:url" content="https://www.mycued.com/">
+  <meta property="og:type" content="website">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="icon" type="image/svg+xml" href='data:image/svg+xml;utf8,%3Csvg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96"%3E%3Cdefs%3E%3ClinearGradient id="b" x1="0" y1="0" x2="0" y2="1"%3E%3Cstop offset="0%25" stop-color="%2399f5e8"/%3E%3Cstop offset="100%25" stop-color="%230d9488"/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width="96" height="96" rx="22" fill="%23081419"/%3E%3Cpath d="M32 16h32v64L48 66.5 32 80z" fill="url(%23b)"/%3E%3Cpolyline points="42,32 53,43 42,54" fill="none" stroke="%23060e12" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity="0.65"/%3E%3C/svg%3E'>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,300;12..96,400;12..96,500;12..96,600;12..96,700;12..96,800&family=Outfit:wght@300;400;500;600;700;800&display=swap');
 
@@ -837,8 +847,8 @@
 
       /* Type icons — 2x2 on very small screens */
       .type-icons {
-        grid-template-columns: repeat(4, 1fr);
-        gap: 0.5rem;
+        grid-template-columns: repeat(5, minmax(0, 1fr));
+        gap: 0.4rem;
       }
 
       .type-icon-btn {
@@ -1731,6 +1741,23 @@
       display: none;
     }
 
+    /* Restaurant photos don't carry the name like posters/covers do */
+    .card-title-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: linear-gradient(rgba(0,0,0,0.8), transparent);
+      color: #fff;
+      font-family: 'Outfit', sans-serif;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-align: center;
+      padding: 0.35rem 0.4rem 0.9rem;
+      line-height: 1.25;
+      pointer-events: none;
+    }
+
     .card-rating-overlay {
       position: absolute;
       bottom: 0;
@@ -1933,6 +1960,33 @@
       box-sizing: border-box;
     }
 
+    /* ── Landing page (logged-out visitors) ── */
+    #landingPage {
+      min-height: 100vh;
+      padding: 3rem 1.25rem 4rem;
+      box-sizing: border-box;
+    }
+    .landing-inner { max-width: 680px; margin: 0 auto; text-align: center; }
+    .landing-brand { display: flex; align-items: center; justify-content: center; gap: 0.6rem; margin-bottom: 2.25rem; }
+    .landing-wordmark { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 800; font-size: 1.6rem; color: var(--text-primary); }
+    .landing-hero {
+      font-family: 'Bricolage Grotesque', sans-serif;
+      font-size: 2.5rem;
+      font-weight: 800;
+      line-height: 1.08;
+      color: var(--text-primary);
+      margin: 0 0 1rem;
+    }
+    .landing-sub { color: var(--text-secondary); font-size: 1.02rem; line-height: 1.55; margin: 0 auto 1.75rem; max-width: 540px; }
+    .landing-actions { display: flex; gap: 0.75rem; justify-content: center; flex-wrap: wrap; margin-bottom: 3rem; }
+    .landing-features { display: grid; grid-template-columns: 1fr; gap: 0.9rem; text-align: left; margin-bottom: 3rem; }
+    @media (min-width: 640px) { .landing-features { grid-template-columns: 1fr 1fr; } }
+    .landing-feature { background: var(--bg-accent); border: 1px solid var(--border-light); border-radius: 16px; padding: 1.25rem; }
+    .landing-feature-icon { font-size: 1.6rem; margin-bottom: 0.5rem; }
+    .landing-feature-heading { font-family: 'Bricolage Grotesque', sans-serif; font-weight: 700; font-size: 1rem; margin-bottom: 0.4rem; color: var(--text-primary); }
+    .landing-feature-body { font-size: 0.88rem; color: var(--text-secondary); line-height: 1.5; }
+    .landing-closing { font-family: 'Bricolage Grotesque', sans-serif; font-size: 1.15rem; font-weight: 700; color: var(--text-primary); margin: 0 0 1.25rem; }
+
     .modal-close {
       position: absolute;
       top: 1rem;
@@ -2124,7 +2178,7 @@
 
     .type-icons {
       display: grid;
-      grid-template-columns: repeat(4, 1fr);
+      grid-template-columns: repeat(5, minmax(0, 1fr));
       gap: 0.75rem;
       margin-top: 0.5rem;
     }
@@ -2134,7 +2188,8 @@
       flex-direction: column;
       align-items: center;
       gap: 0.5rem;
-      padding: 1rem 0.5rem;
+      padding: 1rem 0.25rem;
+      min-width: 0;
       background: var(--bg-secondary);
       border: 2px solid var(--border-light);
       border-radius: 8px;
@@ -4212,30 +4267,6 @@
       transform: scale(1.3);
     }
 
-    /* === QUICK-ADD FROM SEARCH === */
-    .quick-add-buttons {
-      display: flex;
-      gap: 0.3rem;
-      padding: 0.3rem 0.5rem 0.4rem;
-      flex-wrap: wrap;
-    }
-    .quick-add-btn {
-      font-size: 0.65rem;
-      padding: 0.2rem 0.5rem;
-      border-radius: 12px;
-      border: 1px solid var(--border-light);
-      background: var(--bg-accent);
-      color: var(--text-secondary);
-      cursor: pointer;
-      transition: all 0.15s;
-      white-space: nowrap;
-    }
-    .quick-add-btn:hover {
-      background: linear-gradient(135deg, #14b8a6, #0d9488);
-      color: #fff;
-      border-color: #14b8a6;
-    }
-
     /* === PULL TO REFRESH === */
     .pull-refresh-indicator {
       position: absolute;
@@ -4287,6 +4318,52 @@
     .toast.visible {
       opacity: 1;
       transform: translateX(-50%) translateY(0);
+    }
+
+    .status-confirm-bar {
+      position: fixed;
+      bottom: 80px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: var(--text-primary);
+      color: var(--bg-primary);
+      padding: 0.6rem 0.75rem 0.6rem 1.2rem;
+      border-radius: 24px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+      z-index: 3001;
+      opacity: 0;
+      transform-origin: center;
+      transition: opacity 0.2s, transform 0.2s;
+      pointer-events: none;
+      white-space: nowrap;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .status-confirm-bar.visible {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+      pointer-events: auto;
+    }
+    .status-confirm-btn {
+      border: none;
+      border-radius: 16px;
+      padding: 0.35rem 0.8rem;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .status-confirm-yes {
+      background: var(--accent-secondary, #5B9BD5);
+      color: #fff;
+    }
+    .status-confirm-no {
+      background: transparent;
+      color: var(--bg-primary);
+      opacity: 0.7;
     }
 
     /* === SWIPE TAB TRANSITION === */
@@ -4371,31 +4448,28 @@
 
         <!-- Background -->
         <rect width="96" height="96" rx="22" fill="url(#splBg)"/>
-        <rect x="30" y="30" width="36" height="55" rx="4" fill="url(#splGlow)"/>
+        <rect x="24" y="14" width="48" height="70" rx="6" fill="url(#splGlow)"/>
         <rect width="96" height="96" rx="22" fill="none" stroke="#14b8a6" stroke-width="1" opacity="0.2"/>
 
-        <!-- Headphones — refined arc + slim ear cups with depth -->
-        <path d="M 20 52 C 20 10 76 10 76 52"
-              fill="none" stroke="url(#splHp)" stroke-width="7" stroke-linecap="round"/>
-        <rect x="11" y="46" width="14" height="26" rx="7" fill="url(#splHp)"/>
-        <rect x="14" y="51" width="8" height="16" rx="4" fill="#050c0f" opacity="0.45"/>
-        <rect x="71" y="46" width="14" height="26" rx="7" fill="url(#splHp)"/>
-        <rect x="74" y="51" width="8" height="16" rx="4" fill="#050c0f" opacity="0.45"/>
+        <!-- Bookmark hero — save anything for later -->
+        <path d="M 32 16 L 64 16 L 64 80 L 48 66.5 L 32 80 Z" fill="url(#splBkm)"/>
+        <line x1="32" y1="16" x2="32" y2="80" stroke="#a7f3e8" stroke-width="1.5" opacity="0.4"/>
 
-        <!-- Bookmark — glowing, near-white top fading to teal -->
-        <path d="M 37 44 L 59 44 L 59 90 L 48 79 L 37 90 Z" fill="url(#splBkm)"/>
-        <line x1="37" y1="44" x2="37" y2="90" stroke="#a7f3e8" stroke-width="1.5" opacity="0.4"/>
-
-        <!-- Play triangle -->
-        <polygon points="43,54 43,73 58,63.5" fill="#060e12" opacity="0.6"/>
+        <!-- What's-next chevron -->
+        <polyline points="42,32 53,43 42,54" fill="none" stroke="#060e12" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity="0.65"/>
       </svg>
     </div>
     <div class="splash-wordmark">Cued</div>
-    <div class="splash-tagline">Your media, cued up</div>
+    <div class="splash-tagline">Whatever's next, cued up</div>
   </div>
   <div class="header">
     <div class="header-main">
       <div class="header-left" style="flex:1;">
+        <button class="header-icon-btn" onclick="openDrawer()" title="Menu" aria-label="Menu">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M2 4h12M2 8h12M2 12h12" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </button>
         <button class="header-icon-btn" onclick="openSearchPage()" title="Search" aria-label="Search">
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="6.5" cy="6.5" r="4.5" stroke="currentColor" stroke-width="1.5"/>
@@ -4439,6 +4513,16 @@
       <div class="drawer-brand">Cued</div>
     </div>
     <div class="drawer-items">
+      <button class="drawer-item" onclick="openSearchPage(); closeDrawer()">
+        <span class="drawer-item-icon">🔍</span> Search
+      </button>
+      <button class="drawer-item" onclick="switchToGroups(); closeDrawer()">
+        <span class="drawer-item-icon">👥</span> Friends &amp; Groups
+      </button>
+      <button class="drawer-item" onclick="openProfileSettings(); closeDrawer()">
+        <span class="drawer-item-icon">👤</span> Account &amp; Settings
+      </button>
+      <div class="drawer-divider"></div>
       <button class="drawer-item" onclick="showTutorial(); closeDrawer()">
         <span class="drawer-item-icon">❓</span> Help &amp; Tutorial
       </button>
@@ -4498,6 +4582,10 @@
           <span class="type-nav-icon">📚</span>
           <span class="type-nav-label">Books</span>
         </button>
+        <button class="type-nav-btn" data-value="restaurant" onclick="setTypeFilter('restaurant',this)">
+          <span class="type-nav-icon">🍽️</span>
+          <span class="type-nav-label">Dining</span>
+        </button>
         <button id="tagNavBtn" onclick="openTagSheet()" aria-label="Filter by tag">
           <svg class="type-nav-icon" width="18" height="18" viewBox="0 0 20 20" fill="currentColor"><path d="M2 5a1 1 0 0 1 1-1h3.382a1 1 0 0 1 .894.553l.724 1.447H17a1 1 0 0 1 .97 1.243l-1.5 6A1 1 0 0 1 15.5 14H5a1 1 0 0 1-.97-.757L2.03 5.757A1 1 0 0 1 2 5.5V5z"/></svg>
           <span class="type-nav-label" id="tagNavLabel">Tags</span>
@@ -4511,7 +4599,7 @@
       <div id="emptyState" class="empty-state" style="display: none;">
         <div class="empty-state-icon">📚</div>
         <div class="empty-state-text">Your shelf is empty</div>
-        <p style="color:var(--text-tertiary); font-size:0.9rem; margin-bottom:1.5rem;">Start by adding something you're watching, reading, or listening to.</p>
+        <p style="color:var(--text-tertiary); font-size:0.9rem; margin-bottom:1.5rem;">Add whatever's next — a movie, a show, a book, a podcast, or a table for two.</p>
         <button class="btn" onclick="handleFabClick()" style="margin-bottom:1rem;">+ Add Your First Item</button>
         <div style="font-size:0.8rem; color:var(--text-tertiary);">
           Already on Letterboxd or Goodreads?<br>
@@ -4747,35 +4835,54 @@
         </div>
       </div>
 
+      <!-- Reserve links (shown when editing a restaurant) -->
+      <div id="reserveRow" style="display:none; gap:0.5rem; margin-bottom:1rem;">
+        <a id="reserveOpenTable" target="_blank" rel="noopener" class="btn btn-secondary" style="flex:1; text-align:center; text-decoration:none; font-size:0.78rem; padding:0.5rem 0.3rem;">📅 OpenTable</a>
+        <a id="reserveResy" target="_blank" rel="noopener" class="btn btn-secondary" style="flex:1; text-align:center; text-decoration:none; font-size:0.78rem; padding:0.5rem 0.3rem;">📅 Resy</a>
+        <a id="reserveMaps" target="_blank" rel="noopener" class="btn btn-secondary" style="flex:1; text-align:center; text-decoration:none; font-size:0.78rem; padding:0.5rem 0.3rem;">📍 Maps</a>
+      </div>
+
+      <!-- Buy links (shown when editing a book) -->
+      <div id="buyRow" style="display:none; gap:0.5rem; margin-bottom:1rem;">
+        <a id="buyBookshop" target="_blank" rel="noopener" class="btn btn-secondary" style="flex:1; text-align:center; text-decoration:none; font-size:0.78rem; padding:0.5rem 0.3rem;">🛒 Bookshop.org</a>
+        <a id="buyAmazon" target="_blank" rel="noopener" class="btn btn-secondary" style="flex:1; text-align:center; text-decoration:none; font-size:0.78rem; padding:0.5rem 0.3rem;">🛒 Amazon</a>
+      </div>
+
       <form id="itemForm">
         <input type="hidden" id="editId">
         <input type="hidden" id="itemImage">
+        <input type="hidden" id="itemIsbn">
 
-        <!-- Add-mode essentials: Type + Title (hidden in edit mode) -->
-        <div id="addModeFields">
-          <div class="form-group">
-            <label>Type</label>
-            <div class="type-icons">
-              <button type="button" class="type-icon-btn active" data-type="movie" onclick="selectType('movie')">
-                <span class="icon">🎥</span>
-                <span class="label">Movie</span>
-              </button>
-              <button type="button" class="type-icon-btn" data-type="tv" onclick="selectType('tv')">
-                <span class="icon">📺</span>
-                <span class="label">TV</span>
-              </button>
-              <button type="button" class="type-icon-btn" data-type="podcast" onclick="selectType('podcast')">
-                <span class="icon">🎙️</span>
-                <span class="label">Podcast</span>
-              </button>
-              <button type="button" class="type-icon-btn" data-type="book" onclick="selectType('book')">
-                <span class="icon">📚</span>
-                <span class="label">Book</span>
-              </button>
-            </div>
-            <input type="hidden" id="itemType" value="movie">
+        <!-- Type: always editable, even for existing items, so a miscategorized item can be fixed -->
+        <div class="form-group">
+          <label>Type</label>
+          <div class="type-icons">
+            <button type="button" class="type-icon-btn active" data-type="movie" onclick="selectType('movie')">
+              <span class="icon">🎥</span>
+              <span class="label">Movie</span>
+            </button>
+            <button type="button" class="type-icon-btn" data-type="tv" onclick="selectType('tv')">
+              <span class="icon">📺</span>
+              <span class="label">TV</span>
+            </button>
+            <button type="button" class="type-icon-btn" data-type="podcast" onclick="selectType('podcast')">
+              <span class="icon">🎙️</span>
+              <span class="label">Podcast</span>
+            </button>
+            <button type="button" class="type-icon-btn" data-type="book" onclick="selectType('book')">
+              <span class="icon">📚</span>
+              <span class="label">Book</span>
+            </button>
+            <button type="button" class="type-icon-btn" data-type="restaurant" onclick="selectType('restaurant')">
+              <span class="icon">🍽️</span>
+              <span class="label">Dining</span>
+            </button>
           </div>
+          <input type="hidden" id="itemType" value="movie">
+        </div>
 
+        <!-- Add-mode essentials: Title (hidden in edit mode, shown as a static preview instead) -->
+        <div id="addModeFields">
           <div class="form-group">
             <label for="itemTitle">Title</label>
             <div class="helper-text">Start typing to search, or just enter the title manually</div>
@@ -4801,6 +4908,19 @@
             </select>
           </div>
 
+          <!-- Rating: shown in add mode when status is Finished (edit mode rates via the preview header) -->
+          <div class="form-group" id="addRatingGroup" style="display: none;">
+            <label>Rating</label>
+            <div class="star-rating-picker" id="addStarPicker">
+              <button type="button" class="star-btn" data-star="1" onclick="handleStarClick(1, event)">★</button>
+              <button type="button" class="star-btn" data-star="2" onclick="handleStarClick(2, event)">★</button>
+              <button type="button" class="star-btn" data-star="3" onclick="handleStarClick(3, event)">★</button>
+              <button type="button" class="star-btn" data-star="4" onclick="handleStarClick(4, event)">★</button>
+              <button type="button" class="star-btn" data-star="5" onclick="handleStarClick(5, event)">★</button>
+              <button type="button" class="star-rating-clear" onclick="setStarRating(null)">clear</button>
+            </div>
+          </div>
+
           <input type="hidden" id="itemRating" value="">
         </div>
 
@@ -4809,6 +4929,11 @@
           <label for="itemEpisode">Episode</label>
           <input type="text" id="itemEpisode" placeholder="e.g. Ep. 42: The One Where...">
           <div class="helper-text">Optional — leave blank to track the whole show</div>
+        </div>
+
+        <div class="form-group" id="authorGroup" style="display: none;">
+          <label for="itemAuthor">Author</label>
+          <input type="text" id="itemAuthor" placeholder="Author name" autocomplete="off">
         </div>
 
         <div class="form-group" id="streamingPlatformGroup" style="display: none;">
@@ -4866,9 +4991,9 @@
         <input type="text" id="itemGenreOther" style="display:none;">
         <div id="editModeTypeTitle" style="display:none;"></div>
 
-        <div class="form-group">
-          <label for="itemPremiereDate">Premieres / Airs On</label>
-          <div class="helper-text">Release or air date (auto-filled from search when available)</div>
+        <div class="form-group" id="premiereDateGroup">
+          <label for="itemPremiereDate">Release Date</label>
+          <div class="helper-text">Auto-filled from search when available</div>
           <div class="date-logged-row">
             <input type="date" id="itemPremiereDate">
             <button type="button" class="date-clear-btn" onclick="document.getElementById('itemPremiereDate').value=''">Clear</button>
@@ -4877,7 +5002,7 @@
 
         <div class="form-group">
           <label for="itemDateLogged">Date Logged</label>
-          <div class="helper-text">When did you watch/read/listen to this?</div>
+          <div class="helper-text" id="dateLoggedHelper">When did you watch/read/listen to this?</div>
           <div class="date-logged-row">
             <input type="date" id="itemDateLogged">
             <button type="button" class="date-clear-btn" onclick="clearDateLogged()">Clear</button>
@@ -4982,11 +5107,65 @@
     </div>
   </div>
 
+  <!-- Landing page for logged-out visitors -->
+  <div id="landingPage" style="display:none;">
+    <div class="landing-inner">
+      <div class="landing-brand">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="40" height="40">
+          <defs>
+            <radialGradient id="ldbg" cx="50%" cy="55%" r="65%"><stop offset="0%" stop-color="#0e2530"/><stop offset="100%" stop-color="#050c0f"/></radialGradient>
+            <linearGradient id="ldbkm" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#99f5e8"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
+          </defs>
+          <rect width="96" height="96" rx="22" fill="url(#ldbg)"/>
+          <path d="M 32 16 L 64 16 L 64 80 L 48 66.5 L 32 80 Z" fill="url(#ldbkm)"/>
+          <polyline points="42,32 53,43 42,54" fill="none" stroke="#060e12" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity="0.65"/>
+        </svg>
+        <span class="landing-wordmark">Cued</span>
+      </div>
+
+      <h1 class="landing-hero">What's next, together.</h1>
+      <p class="landing-sub">Cued is the one shelf for what you're watching, reading, listening to &mdash; and where you're eating next. Add it, rate it, and see what your friends and family are into.</p>
+
+      <div class="landing-actions">
+        <button class="btn" onclick="showSignup()">Create Your Own Cued</button>
+        <button class="btn btn-secondary" onclick="showLogin()">Log In</button>
+      </div>
+
+      <div class="landing-features">
+        <div class="landing-feature">
+          <div class="landing-feature-icon">🎬</div>
+          <div class="landing-feature-heading">One shelf for everything</div>
+          <div class="landing-feature-body">Movies, TV, books, podcasts, and restaurants, all in the same place. No more switching apps to remember what's next.</div>
+        </div>
+        <div class="landing-feature">
+          <div class="landing-feature-icon">🍽️</div>
+          <div class="landing-feature-heading">The only tracker that does dinner too</div>
+          <div class="landing-feature-body">Log a restaurant recommendation the same way you log a movie. Tap through to OpenTable, Resy, or Maps when you're ready to book.</div>
+        </div>
+        <div class="landing-feature">
+          <div class="landing-feature-icon">👥</div>
+          <div class="landing-feature-heading">Built for your people, not just you</div>
+          <div class="landing-feature-body">Create a group with friends or family, share what you're loving, and see what everyone else is into &mdash; all in one feed.</div>
+        </div>
+        <div class="landing-feature">
+          <div class="landing-feature-icon">📥</div>
+          <div class="landing-feature-heading">Bring your history with you</div>
+          <div class="landing-feature-body">Already on Letterboxd or Goodreads? Import your existing lists in two clicks. You don't start from zero.</div>
+        </div>
+      </div>
+
+      <p class="landing-closing">Your next watch, read, listen, or reservation &mdash; cued up in one place.</p>
+      <button class="btn" onclick="showSignup()">Create Your Own Cued</button>
+    </div>
+  </div>
+
   <!-- Login Modal -->
   <div id="loginModal" class="modal">
     <div class="modal-content auth-modal">
       <h2 class="modal-header">Welcome to Cued</h2>
-      <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Log in to access your media library</p>
+      <div style="font-size:1.05rem; letter-spacing:0.35em; margin:0.25rem 0 0.5rem;">🎥📺🎙️📚🍽️</div>
+      <p style="color: var(--text-secondary); margin-bottom: 0.4rem;">One cue for the movies, shows, podcasts, books &amp; restaurants you don't want to forget.</p>
+      <p style="color: var(--text-tertiary); font-size: 0.85rem; margin-bottom: 1.5rem;">Log in to see what's in your cue</p>
       
       <form id="loginForm" onsubmit="handleLogin(event)">
         <div class="form-group">
@@ -5030,7 +5209,8 @@
   <div id="signupModal" class="modal">
     <div class="modal-content auth-modal">
       <h2 class="modal-header">Create Your Account</h2>
-      <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Start tracking your media journey</p>
+      <div style="font-size:1.05rem; letter-spacing:0.35em; margin:0.25rem 0 0.5rem;">🎥📺🎙️📚🍽️</div>
+      <p style="color: var(--text-secondary); margin-bottom: 1.5rem;">Start building your cue</p>
       
       <form id="signupForm" onsubmit="handleSignup(event)">
         <div class="form-group">
@@ -5133,7 +5313,7 @@
         <button onclick="openStatsModal(true); closeModal('profileSettingsModal')" style="background:var(--bg-accent); border:1px solid var(--border-light); border-radius:14px; padding:1rem 0.75rem; text-align:center; cursor:pointer; transition:all 0.2s; display:flex; flex-direction:column; align-items:center; gap:0.35rem;">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="12" width="4" height="9" rx="1" fill="#14b8a6"/><rect x="10" y="7" width="4" height="14" rx="1" fill="#14b8a6" opacity="0.7"/><rect x="17" y="3" width="4" height="18" rx="1" fill="#14b8a6" opacity="0.4"/></svg>
           <div style="font-weight:700; font-size:0.88rem; color:var(--text-primary);">Stats</div>
-          <div style="font-size:0.7rem; color:var(--text-tertiary);">Your media journey</div>
+          <div style="font-size:0.7rem; color:var(--text-tertiary);">Your cue, by the numbers</div>
         </button>
         <button onclick="openLibrary(null, null, true); closeModal('profileSettingsModal')" style="background:var(--bg-accent); border:1px solid var(--border-light); border-radius:14px; padding:1rem 0.75rem; text-align:center; cursor:pointer; transition:all 0.2s; display:flex; flex-direction:column; align-items:center; gap:0.35rem;">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="4" y="3" width="11" height="16" rx="2" fill="#14b8a6" opacity="0.4"/><rect x="9" y="5" width="11" height="16" rx="2" fill="#14b8a6" opacity="0.7"/><path d="M13 9h4M13 12h4M13 15h2" stroke="#14b8a6" stroke-width="1.5" stroke-linecap="round"/></svg>
@@ -5236,15 +5416,11 @@
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="28" height="28">
           <defs>
             <radialGradient id="ppbg" cx="50%" cy="55%" r="65%"><stop offset="0%" stop-color="#0e2530"/><stop offset="100%" stop-color="#050c0f"/></radialGradient>
-            <linearGradient id="pphp" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4fd8c4"/><stop offset="100%" stop-color="#0d7a70"/></linearGradient>
             <linearGradient id="ppbkm" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#99f5e8"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
           </defs>
           <rect width="96" height="96" rx="22" fill="url(#ppbg)"/>
-          <path d="M 20 52 C 20 10 76 10 76 52" fill="none" stroke="url(#pphp)" stroke-width="7" stroke-linecap="round"/>
-          <rect x="11" y="46" width="14" height="26" rx="7" fill="url(#pphp)"/>
-          <rect x="71" y="46" width="14" height="26" rx="7" fill="url(#pphp)"/>
-          <path d="M 37 44 L 59 44 L 59 90 L 48 79 L 37 90 Z" fill="url(#ppbkm)"/>
-          <polygon points="43,54 43,73 58,63.5" fill="#060e12" opacity="0.6"/>
+          <path d="M 32 16 L 64 16 L 64 80 L 48 66.5 L 32 80 Z" fill="url(#ppbkm)"/>
+          <polyline points="42,32 53,43 42,54" fill="none" stroke="#060e12" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity="0.65"/>
         </svg>
         <span class="public-profile-brand-word">Cued</span>
       </div>
@@ -5260,7 +5436,35 @@
       <div id="publicProfileGrid" class="grid"></div>
     </div>
     <div class="public-profile-footer">
+      <p class="landing-closing">Your next watch, read, listen, or reservation &mdash; cued up in one place.</p>
       <a class="btn" onclick="window.location.href=window.location.origin+window.location.pathname">Create Your Own Cued</a>
+    </div>
+  </div>
+
+  <!-- Upgrade / Cued Plus Modal -->
+  <div id="upgradeModal" class="modal">
+    <div class="modal-content" style="max-width: 420px; text-align: center;">
+      <button class="modal-close" onclick="closeModal('upgradeModal')" aria-label="Close">&times;</button>
+      <div style="font-size: 2rem; margin-bottom: 0.25rem;">✨</div>
+      <h2 class="modal-header" style="margin-bottom: 0.5rem;">Cued Plus</h2>
+      <p id="upgradeReason" style="color: var(--text-secondary); font-size: 0.9rem; margin-bottom: 1.25rem;"></p>
+      <div style="text-align: left; background: var(--bg-accent); border: 1px solid var(--border-light); border-radius: 14px; padding: 1rem 1.25rem; margin-bottom: 1.25rem; font-size: 0.88rem; line-height: 2;">
+        <div>👥 Create unlimited groups</div>
+        <div>📊 Wrapped &amp; shareable stat cards</div>
+        <div>🏷️ Advanced filters, tags &amp; custom sorts</div>
+        <div>📥 Priority, larger imports</div>
+      </div>
+      <div style="display: flex; gap: 0.75rem;">
+        <button class="btn btn-secondary" onclick="startUpgrade('monthly')" style="flex: 1; padding: 0.75rem 0.5rem;">
+          <div style="font-weight: 800; font-size: 1.05rem;">$3.99</div>
+          <div style="font-size: 0.72rem; opacity: 0.75;">per month</div>
+        </button>
+        <button class="btn" onclick="startUpgrade('annual')" style="flex: 1; padding: 0.75rem 0.5rem;">
+          <div style="font-weight: 800; font-size: 1.05rem;">$29.99</div>
+          <div style="font-size: 0.72rem; opacity: 0.85;">per year — save 37%</div>
+        </button>
+      </div>
+      <div style="font-size: 0.72rem; color: var(--text-tertiary); margin-top: 0.9rem;">Joining groups, tracking, and imports stay free forever.</div>
     </div>
   </div>
 
@@ -5270,32 +5474,32 @@
       <div class="tutorial-slide active" data-slide="0">
         <div class="tutorial-slide-icon">&#128218;</div>
         <div class="tutorial-slide-title">Welcome to Cued</div>
-        <div class="tutorial-slide-text">Your personal media shelf for everything you watch, read, and listen to. All in one beautiful place.</div>
+        <div class="tutorial-slide-text">Your personal media shelf for everything you watch, read, and listen to — and everywhere you want to eat next.</div>
       </div>
       <div class="tutorial-slide" data-slide="1">
         <div class="tutorial-slide-icon">&#127916;</div>
-        <div class="tutorial-slide-title">Track Movies, TV, Books &amp; Podcasts</div>
-        <div class="tutorial-slide-text">Search and add any title. We auto-fill artwork, genres, and where to stream it.</div>
+        <div class="tutorial-slide-title">Track Movies, TV, Books, Podcasts &amp; Restaurants</div>
+        <div class="tutorial-slide-text">Search and add any title or restaurant. We auto-fill artwork, genres, cuisine — and where to stream it or book a table.</div>
       </div>
       <div class="tutorial-slide" data-slide="2">
         <div class="tutorial-slide-icon">&#11088;</div>
         <div class="tutorial-slide-title">Organize Your Way</div>
-        <div class="tutorial-slide-text">Sort by status — In Progress, Queued, and Finished. Tap any card to see details, change status, or rate it.</div>
+        <div class="tutorial-slide-text">Sort by status — In Progress, Queued, and Finished for media; Want to Try, Reserved, and Been There for restaurants. Tap any card to see details or change status.</div>
       </div>
       <div class="tutorial-slide" data-slide="3">
-        <div class="tutorial-slide-icon">&#128101;</div>
-        <div class="tutorial-slide-title">Share &amp; Discover</div>
-        <div class="tutorial-slide-text">Create groups with friends, share titles from your shelf, and see what others are watching and reading.</div>
+        <div class="tutorial-slide-icon">&#128070;</div>
+        <div class="tutorial-slide-title">Card Tricks</div>
+        <div class="tutorial-slide-text">Tap any card for details and quick edits. Double-tap to move it to the next status — Queued &rarr; In Progress &rarr; Finished (we'll always ask you to confirm). Press and hold for quick actions.</div>
       </div>
       <div class="tutorial-slide" data-slide="4">
-        <div class="tutorial-slide-icon">&#127922;</div>
-        <div class="tutorial-slide-title">Can't Decide? Let Us Pick</div>
-        <div class="tutorial-slide-text">Tap 🎲 Surprise Me on your shelf to get a random pick from your Queued list. Already on Letterboxd or Goodreads? Import your lists from Profile.</div>
+        <div class="tutorial-slide-icon">&#128101;</div>
+        <div class="tutorial-slide-title">Share &amp; Discover</div>
+        <div class="tutorial-slide-text">Create groups with friends or family, share what you're loving, and see what everyone's watching, reading — and where they're eating.</div>
       </div>
       <div class="tutorial-slide" data-slide="5">
         <div class="tutorial-slide-icon">&#128640;</div>
         <div class="tutorial-slide-title">Ready to Start?</div>
-        <div class="tutorial-slide-text">Tap below to add your first title and start building your shelf.</div>
+        <div class="tutorial-slide-text">Add your first title — or the restaurant everyone keeps telling you about.</div>
         <button class="btn" onclick="closeTutorial(); handleFabClick();" style="margin-top:1rem;">+ Add Your First Item</button>
       </div>
       <div class="tutorial-dots">
@@ -5392,7 +5596,8 @@
           await db.collection('users').doc(uid).set({
             name: user.name,
             email: user.email,
-            memberOf: []
+            memberOf: [],
+            tier: 'free'
           });
         }
 
@@ -5637,7 +5842,8 @@
     }
 
     // Show login modal
-    function showLogin() {
+    // Landing page shown to logged-out visitors; login/signup open from its buttons
+    function showLanding() {
       dismissSplash();
       // Preserve ?join= code across auth for new users
       const joinCode = new URLSearchParams(window.location.search).get('join');
@@ -5645,11 +5851,17 @@
         sessionStorage.setItem('pendingJoinCode', joinCode.trim().toUpperCase());
         history.replaceState({}, '', window.location.pathname);
       }
-      document.getElementById('loginModal').classList.add('active');
+      document.getElementById('landingPage').style.display = 'block';
+      document.getElementById('loginModal').classList.remove('active');
       document.getElementById('signupModal').classList.remove('active');
       // Hide main app content
       document.querySelector('.header').style.display = 'none';
       document.querySelector('.container').style.display = 'none';
+    }
+
+    function showLogin() {
+      document.getElementById('loginModal').classList.add('active');
+      document.getElementById('signupModal').classList.remove('active');
     }
 
     // Show signup modal
@@ -5661,8 +5873,9 @@
     function switchToSignup() { showSignup(); }
     function switchToLogin() { showLogin(); }
 
-    // Hide auth modals
+    // Hide auth modals and the logged-out landing page
     function hideAuthModals() {
+      document.getElementById('landingPage').style.display = 'none';
       document.getElementById('loginModal').classList.remove('active');
       document.getElementById('signupModal').classList.remove('active');
       document.querySelector('.header').style.display = 'block';
@@ -5760,7 +5973,8 @@
           name: handle || email.split('@')[0],
           email: email,
           memberOf: [],
-          handle: handle || null
+          handle: handle || null,
+          tier: 'free'
         });
 
         // onAuthStateChanged will handle the rest
@@ -5790,7 +6004,8 @@
           await db.collection('users').doc(result.user.uid).set({
             name: result.user.email.split('@')[0],
             email: result.user.email,
-            memberOf: []
+            memberOf: [],
+            tier: 'free'
           });
         }
         // onAuthStateChanged will handle the rest
@@ -5819,6 +6034,8 @@
       groups = data.groups;
       currentUser = data.user;
       settings = data.settings;
+      // Accounts created before tiers existed default to free
+      if (currentUser && !currentUser.tier) currentUser.tier = 'free';
 
       currentMediaFilter = 'all';
       currentStatusFilter = 'all';
@@ -5838,6 +6055,7 @@
       await checkJoinRequestsBadge();
       await checkGroupFeedBadge();
       loadFollowRequests();
+      checkStatusNudge();
 
       // Check for localStorage migration on first login
       await checkLocalStorageMigration(firebaseUser);
@@ -5892,6 +6110,7 @@
           image: document.getElementById('itemImage').value,
           streamingPlatform: document.getElementById('itemStreamingPlatform').value,
           episode: document.getElementById('itemEpisode').value.trim(),
+          author: document.getElementById('itemAuthor') ? document.getElementById('itemAuthor').value.trim() : '',
           referral: document.getElementById('itemReferral').value,
           genre: document.getElementById('itemGenre').value === 'Other' ? (document.getElementById('itemGenreOther').value || 'Other') : document.getElementById('itemGenre').value,
           notes: document.getElementById('itemNotes').value,
@@ -5899,7 +6118,11 @@
           dateLogged: document.getElementById('itemDateLogged').value || (isEditing && existingItem ? existingItem.dateLogged : '') || '',
           tags: (() => { const pending = document.getElementById('itemTagInput')?.value.trim(); if (pending) { addTag(pending); document.getElementById('itemTagInput').value = ''; } return [...currentTags]; })(),
           group: groupId,
-          userId: currentUser.id
+          userId: currentUser.id,
+          statusChangedAt: (isEditing && existingItem && existingItem.status === document.getElementById('itemStatus').value)
+            ? (existingItem.statusChangedAt || null) : Date.now(),
+          nudgeSnoozedAt: (isEditing && existingItem) ? (existingItem.nudgeSnoozedAt || null) : null,
+          isbn: document.getElementById('itemIsbn').value || (isEditing && existingItem ? existingItem.isbn : '') || ''
         };
 
         console.log('New item:', newItem);
@@ -5976,6 +6199,7 @@
             image: document.getElementById('itemImage').value,
             streamingPlatform: document.getElementById('itemStreamingPlatform').value,
             episode: document.getElementById('itemEpisode').value.trim(),
+            author: document.getElementById('itemAuthor') ? document.getElementById('itemAuthor').value.trim() : '',
             referral: document.getElementById('itemReferral').value,
             genre: document.getElementById('itemGenre').value === 'Other' ? (document.getElementById('itemGenreOther').value || 'Other') : document.getElementById('itemGenre').value,
             notes: document.getElementById('itemNotes').value,
@@ -5983,7 +6207,11 @@
             dateLogged: document.getElementById('itemDateLogged').value || (isEditingForm && existingItemForm ? existingItemForm.dateLogged : '') || '',
             tags: [...currentTags],
             group: groupId,
-            userId: currentUser.id
+            userId: currentUser.id,
+            statusChangedAt: (isEditingForm && existingItemForm && existingItemForm.status === document.getElementById('itemStatus').value)
+              ? (existingItemForm.statusChangedAt || null) : Date.now(),
+            nudgeSnoozedAt: (isEditingForm && existingItemForm) ? (existingItemForm.nudgeSnoozedAt || null) : null,
+            isbn: document.getElementById('itemIsbn').value || (isEditingForm && existingItemForm ? existingItemForm.isbn : '') || ''
           };
 
           console.log('New item:', newItem);
@@ -6058,6 +6286,10 @@
       }
       _lastSearchQuery = query;
 
+      // Editing the title invalidates any cover art or ISBN picked from a previous search result
+      document.getElementById('itemImage').value = '';
+      document.getElementById('itemIsbn').value = '';
+
       clearTimeout(searchTimeout);
       resultsDiv.classList.remove('active');
 
@@ -6085,6 +6317,15 @@
       titleInput.addEventListener('input', handleTitleInput);
       titleInput.addEventListener('compositionend', handleTitleInput);
 
+      // Prevent the keyboard's Go/Done/Return key from silently submitting the
+      // form before status, rating, and other details have been filled in
+      titleInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          resultsDiv.classList.remove('active');
+        }
+      });
+
       typeSelect.addEventListener('change', () => {
         toggleStreamingPlatform();
         const query = titleInput.value.trim();
@@ -6108,17 +6349,69 @@
       const typeSelect = document.getElementById('itemType');
       const streamingGroup = document.getElementById('streamingPlatformGroup');
       const episodeGroup = document.getElementById('episodeGroup');
+      const authorGroup = document.getElementById('authorGroup');
       const type = typeSelect.value;
 
       // Show streaming platform for movies and TV shows
       streamingGroup.style.display = (type === 'movie' || type === 'tv') ? 'block' : 'none';
       // Show episode field for podcasts only
       episodeGroup.style.display = (type === 'podcast') ? 'block' : 'none';
+      // Hide the premiere/air date field for restaurants
+      const premiereGroup = document.getElementById('premiereDateGroup');
+      if (premiereGroup) premiereGroup.style.display = (type === 'restaurant') ? 'none' : 'block';
+      // Date Logged wording per type
+      const dateHelper = document.getElementById('dateLoggedHelper');
+      if (dateHelper) dateHelper.textContent = (type === 'restaurant') ? 'When did you go?' : 'When did you watch/read/listen to this?';
+      // Premiere/publication label per type
+      const premiereLabel = document.querySelector('label[for="itemPremiereDate"]');
+      if (premiereLabel) premiereLabel.textContent = premiereDateLabelFor(type);
+      // Show author field for books and podcasts; reuse it as Location for restaurants
+      if (authorGroup) {
+        authorGroup.style.display = (type === 'book' || type === 'podcast' || type === 'restaurant') ? 'block' : 'none';
+        const authorLabel = authorGroup.querySelector('label');
+        const authorInput = document.getElementById('itemAuthor');
+        if (authorLabel) authorLabel.textContent = type === 'restaurant' ? 'Location' : 'Author';
+        if (authorInput) authorInput.placeholder = type === 'restaurant' ? 'Neighborhood, city, or address' : 'Author name';
+      }
+    }
+
+    // Label for the premiere/publication date field per type
+    function premiereDateLabelFor(type) {
+      if (type === 'book') return 'Publication Date';
+      if (type === 'tv') return 'Premieres / Airs On';
+      return 'Release Date'; // movies, podcasts
+    }
+
+    // Clear everything the user may have entered in the add form
+    function clearAddFormFields() {
+      document.getElementById('itemTitle').value = '';
+      document.getElementById('itemImage').value = '';
+      document.getElementById('itemIsbn').value = '';
+      document.getElementById('itemAuthor').value = '';
+      document.getElementById('itemPremiereDate').value = '';
+      document.getElementById('itemDateLogged').value = '';
+      document.getElementById('itemEpisode').value = '';
+      document.getElementById('itemStreamingPlatform').value = '';
+      document.getElementById('itemGenre').value = '';
+      document.getElementById('itemGenreOther').value = '';
+      document.getElementById('itemGenreOther').style.display = 'none';
+      document.getElementById('itemReferral').value = '';
+      document.getElementById('itemNotes').value = '';
+      setStarRating(null);
+      currentTags = [];
+      renderTagChips();
+      _lastSearchQuery = '';
+      document.getElementById('autocompleteResults').classList.remove('active');
+      const dupWarning = document.getElementById('dupWarning');
+      if (dupWarning) dupWarning.style.display = 'none';
     }
 
     // Update status labels based on media type
     // Select media type
     function selectType(type) {
+      const prevType = document.getElementById('itemType').value;
+      const isAddMode = !document.getElementById('editId').value;
+
       // Update hidden input
       document.getElementById('itemType').value = type;
 
@@ -6137,10 +6430,24 @@
       // Update genre options for this type
       updateGenreOptions(type);
 
+      // Switching type while adding invalidates everything already entered.
+      // (Edit mode deliberately keeps fields so miscategorized items can be fixed.)
+      if (isAddMode && prevType && prevType !== type) {
+        clearAddFormFields();
+        selectStatus('want');
+      }
+
       // Clear autocomplete if search is active
       const titleInput = document.getElementById('itemTitle');
       if (titleInput.value) {
         document.getElementById('autocompleteResults').classList.remove('active');
+      }
+
+      // If editing an existing item, keep the static preview badge (e.g. "📺 TV Show") in sync
+      const previewType = document.getElementById('previewType');
+      if (previewType && document.getElementById('editId').value) {
+        const typeEmojis = { movie: '🎥', tv: '📺', podcast: '🎙️', book: '📚', restaurant: '🍽️' };
+        previewType.textContent = (typeEmojis[type] || '') + ' ' + (type === 'tv' ? 'TV Show' : type.charAt(0).toUpperCase() + type.slice(1));
       }
     }
 
@@ -6149,7 +6456,8 @@
       movie: ['Action', 'Adventure', 'Animation', 'Comedy', 'Crime', 'Documentary', 'Drama', 'Fantasy', 'Horror', 'Musical', 'Mystery', 'Romance', 'Sci-Fi', 'Thriller', 'Western'],
       tv: ['Action', 'Animation', 'Comedy', 'Crime', 'Documentary', 'Drama', 'Fantasy', 'Horror', 'Mystery', 'Reality', 'Romance', 'Sci-Fi', 'Thriller'],
       book: ['Biography', 'Classic', 'Fantasy', 'Fiction', 'History', 'Horror', 'Mystery', 'Non-Fiction', 'Poetry', 'Romance', 'Sci-Fi', 'Self-Help', 'Thriller', 'Young Adult'],
-      podcast: ['Business', 'Comedy', 'Crime', 'Education', 'Health', 'History', 'News', 'Politics', 'Science', 'Society & Culture', 'Sports', 'Technology', 'True Crime']
+      podcast: ['Business', 'Comedy', 'Crime', 'Education', 'Health', 'History', 'News', 'Politics', 'Science', 'Society & Culture', 'Sports', 'Technology', 'True Crime'],
+      restaurant: ['American', 'BBQ', 'Breakfast & Brunch', 'Burgers', 'Chinese', 'Dessert', 'French', 'Indian', 'Italian', 'Japanese', 'Korean', 'Mediterranean', 'Mexican', 'Pizza', 'Seafood', 'Steakhouse', 'Sushi', 'Thai', 'Vegetarian', 'Vietnamese']
     };
 
     function updateGenreOptions(type) {
@@ -6177,6 +6485,8 @@
 
       const labels = type === 'thing'
         ? { want: 'Need to Try', current: 'Trying', done: 'Tried' }
+        : type === 'restaurant'
+        ? { want: 'Want to Try', current: 'Reserved', done: 'Been There' }
         : { want: 'Queued', current: 'In Progress', done: 'Finished' };
 
       statusSelect.innerHTML = Object.entries(labels)
@@ -6196,36 +6506,60 @@
     }
 
     // Search media based on type
+    async function searchByType(query, type) {
+      if (type === 'movie' || type === 'tv') return searchTMDB(query, type);
+      if (type === 'book') return searchBooks(query);
+      if (type === 'podcast') return searchPodcasts(query);
+      if (type === 'restaurant') return searchRestaurants(query);
+      return [];
+    }
+
+    // Google-style typo forgiveness: when a search finds nothing, ask
+    // Wikipedia (very typo-tolerant, knows every title) for the intended
+    // spelling and re-run the search with it.
+    async function fuzzySpellingSuggestion(query, type) {
+      try {
+        const res = await fetch(`https://en.wikipedia.org/w/api.php?action=query&list=search&srsearch=${encodeURIComponent(query)}&srlimit=1&format=json&origin=*`)
+          .then(r => r.ok ? r.json() : null).catch(() => null);
+        if (!res || !res.query) return null;
+        let guess = (res.query.searchinfo && res.query.searchinfo.suggestion)
+          || (res.query.search && res.query.search[0] && res.query.search[0].title) || '';
+        // Strip Wikipedia disambiguation suffixes like "(film)" or "(TV series)"
+        guess = guess.replace(/\s*\([^)]*\)\s*$/, '').trim();
+        return guess && guess.toLowerCase() !== query.trim().toLowerCase() ? guess : null;
+      } catch (e) {
+        return null;
+      }
+    }
+
     async function searchMedia(query, type) {
       const resultsDiv = document.getElementById('autocompleteResults');
 
       try {
-        let results = [];
+        let results = await searchByType(query, type);
 
-        if (type === 'movie' || type === 'tv') {
-          // Try OMDB first, then fall back to a simpler search
-          results = await searchTMDB(query, type);
-          
-          // If OMDB fails or returns nothing, show message
-          if (results.length === 0) {
-            resultsDiv.innerHTML = '<div class="loading-indicator" style="color:var(--text-tertiary);">No matches found — type the title manually to add it.</div>';
-            return;
-          }
-        } else if (type === 'book') {
-          results = await searchBooks(query);
-          if (results.length === 0) {
-            resultsDiv.innerHTML = '<div class="loading-indicator" style="color:var(--text-tertiary);">No books found — type the title manually to add it.</div>';
-            return;
-          }
-        } else if (type === 'podcast') {
-          results = await searchPodcasts(query);
-          if (results.length === 0) {
-            resultsDiv.innerHTML = '<div class="loading-indicator" style="color:var(--text-tertiary);">No podcasts found — type the title manually to add it.</div>';
-            return;
+        // Nothing found — retry with a spell-corrected query, like Google
+        let correctedQuery = null;
+        if (results.length === 0) {
+          const corrected = await fuzzySpellingSuggestion(query, type);
+          if (corrected) {
+            const retry = await searchByType(corrected, type);
+            if (retry.length > 0) {
+              results = retry;
+              correctedQuery = corrected;
+            }
           }
         }
 
-        displayAutocompleteResults(results, type);
+        if (results.length === 0) {
+          const noneMsg = type === 'restaurant'
+            ? 'No restaurants found — add the city (e.g. "Lilia Brooklyn"), or type the name manually.'
+            : `No ${type === 'book' ? 'books' : type === 'podcast' ? 'podcasts' : 'matches'} found — type the title manually to add it.`;
+          resultsDiv.innerHTML = `<div class="loading-indicator" style="color:var(--text-tertiary);">${noneMsg}</div>`;
+          return;
+        }
+
+        displayAutocompleteResults(results, type, correctedQuery);
       } catch (error) {
         console.error('Search error:', error);
         resultsDiv.innerHTML = '<div class="loading-indicator" style="color:var(--text-tertiary);">Search unavailable — type the title manually to add it.</div>';
@@ -6261,46 +6595,242 @@
       }
     }
 
-    // Search Google Books API
+    // Search books via Open Library
     async function searchBooks(query) {
       try {
-        // Use CORS proxy to avoid CORS issues
-        const searchUrl = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(query)}&maxResults=20&printType=books&orderBy=relevance&langRestrict=en`;
-        
-        const response = await fetch(searchUrl, {
-          method: 'GET',
-          headers: {
-            'Accept': 'application/json'
-          }
-        });
-        
-        if (!response.ok) {
-          console.error('Books API response not OK:', response.status);
-          return [];
-        }
-        
-        const data = await response.json();
-        
-        if (!data.items || data.items.length === 0) {
-          console.log('No book results found');
-          return [];
-        }
-        
-        return data.items.map(item => {
-          const volumeInfo = item.volumeInfo || {};
+        // Open Library — keyless and quota-free. (Google Books rejects requests from
+        // newer cloud projects even with the API enabled, and its anonymous quota is
+        // shared globally and usually exhausted.)
+        // Run title, author, and general searches in parallel and merge, so typing
+        // either a book title or an author name both work.
+        const fields = 'title,author_name,first_publish_year,cover_i,subject,isbn';
+        const urls = [
+          `https://openlibrary.org/search.json?author=${encodeURIComponent(query)}&limit=10&fields=${fields}&lang=en&sort=readinglog`,
+          `https://openlibrary.org/search.json?title=${encodeURIComponent(query)}&limit=10&fields=${fields}&lang=en`,
+          `https://openlibrary.org/search.json?q=${encodeURIComponent(query)}&limit=10&fields=${fields}&lang=en`
+        ];
+
+        // Apple Books runs alongside: its search forgives typos (Google-style)
+        // and covers new releases Open Library hasn't indexed yet
+        const applePromise = fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(query)}&media=ebook&limit=8`)
+          .then(r => r.ok ? r.json() : null).catch(() => null);
+
+        const responses = await Promise.allSettled(urls.map(u =>
+          fetch(u, { method: 'GET', headers: { 'Accept': 'application/json' } })
+            .then(r => r.ok ? r.json() : null)
+        ));
+        const [authorDocs, titleDocs, generalDocs] = responses.map(r =>
+          (r.status === 'fulfilled' && r.value && r.value.docs) ? r.value.docs : []
+        );
+        const appleData = await applePromise;
+        const appleBooks = (appleData && appleData.results ? appleData.results : []).map(b => ({
+          title: b.trackName || '',
+          year: b.releaseDate ? b.releaseDate.substring(0, 4) : '',
+          premiereDate: '',
+          image: b.artworkUrl100 ? b.artworkUrl100.replace('100x100', '400x400') : null,
+          author: b.artistName || '',
+          type: 'book',
+          genre: b.primaryGenreName === 'Fiction & Literature' ? 'Fiction' : (b.primaryGenreName || ''),
+          isbn: ''
+        })).filter(b => b.title);
+
+        // Rank results: if the query looks like an author's name (some result's author
+        // starts with it), that author's books come first, sorted by popularity.
+        // Otherwise exact title matches lead, and author results whose name merely
+        // *contains* the query (e.g. "One of the passengers") sink to the bottom.
+        const norm = s => (s || '').toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim();
+        const q = norm(query);
+        const isStrongAuthor = d => (d.author_name || []).some(a => norm(a) === q || norm(a).startsWith(q));
+        const strongAuthor = authorDocs.filter(isStrongAuthor);
+        const looseAuthor = authorDocs.filter(d => !isStrongAuthor(d));
+        const exactTitle = titleDocs.filter(d => norm(d.title) === q);
+        const otherTitle = titleDocs.filter(d => norm(d.title) !== q);
+        const ordered = strongAuthor.length > 0
+          ? [...strongAuthor, ...exactTitle, ...otherTitle, ...generalDocs, ...looseAuthor]
+          : [...exactTitle, ...otherTitle, ...generalDocs, ...looseAuthor];
+
+        const bookGenres = genresByType.book;
+        const olMapped = ordered.map(doc => {
+          const title = doc.title || 'Unknown Title';
+          const author = doc.author_name ? doc.author_name.join(', ') : '';
+          // Pick the first subject that resembles one of the app's book genres
+          const subjects = doc.subject || [];
+          const genre = subjects.find(s =>
+            bookGenres.some(g => s.toLowerCase().includes(g.toLowerCase()))
+          ) || '';
           return {
-            title: volumeInfo.title || 'Unknown Title',
-            year: volumeInfo.publishedDate ? volumeInfo.publishedDate.substring(0, 4) : '',
-            premiereDate: volumeInfo.publishedDate && volumeInfo.publishedDate.length >= 10 ? volumeInfo.publishedDate.substring(0, 10) : '',
-            image: volumeInfo.imageLinks?.thumbnail || volumeInfo.imageLinks?.smallThumbnail || null,
-            author: volumeInfo.authors ? volumeInfo.authors.join(', ') : '',
+            title: title,
+            year: doc.first_publish_year ? String(doc.first_publish_year) : '',
+            premiereDate: '',
+            image: doc.cover_i ? `https://covers.openlibrary.org/b/id/${doc.cover_i}-M.jpg` : null,
+            author: author,
             type: 'book',
-            genre: volumeInfo.categories?.[0] || ''
+            genre: genre,
+            isbn: (doc.isbn || []).find(n => /^97[89]\d{10}$/.test(n)) || ''
           };
         });
+
+        // Apple's typo-tolerant results slot in after the strong Open Library
+        // matches; when Open Library has nothing good (misspelling, brand-new
+        // release), Apple leads.
+        const splitIndex = strongAuthor.length + exactTitle.length;
+        const combined = [...olMapped.slice(0, splitIndex), ...appleBooks, ...olMapped.slice(splitIndex)];
+
+        const seen = new Set();
+        const merged = [];
+        for (const b of combined) {
+          const key = norm(b.title) + '|' + norm(b.author);
+          if (seen.has(key)) continue;
+          seen.add(key);
+          merged.push(b);
+        }
+
+        if (merged.length === 0) {
+          console.log('No book results found');
+        }
+        return merged.slice(0, 20);
       } catch (error) {
         console.error('Books search error:', error);
         // Return empty array instead of throwing to allow manual entry
+        return [];
+      }
+    }
+
+    // Google Places (New) — key is browser-safe: restricted to this site's
+    // referrers and the Places API only, with quota caps in the console.
+    const PLACES_API_KEY = 'AIzaSyAyQOEtvEqL8wy-lFBY0w1CoOjC2RfD8M0';
+
+    // Affiliate IDs for the Buy buttons on books. Empty IDs keep the
+    // buttons working as plain store links (no commission attribution).
+    const AFFILIATE = {
+      bookshopId: '',   // Bookshop.org affiliate profile ID
+      amazonTag: ''     // Amazon Associates tracking tag (e.g. mycued-20)
+    };
+
+    // ===== PRICING TIERS =====
+    // Master switch for the paid tier. While false, EVERY user gets full
+    // access: no group-creation limit, no upgrade modal, and all paid
+    // features (Wrapped/stat cards, tags & advanced filters, large imports)
+    // stay unlocked. Flip to true to activate gating once Stripe is wired up.
+    let ENABLE_PAID_TIER = false;
+
+    const PRICING = {
+      monthlyLabel: '$3.99',
+      annualLabel: '$29.99',
+      freeGroupCreateLimit: 2,   // free users can JOIN unlimited groups but CREATE only this many
+      freeImportRowLimit: 100    // rows per CSV import for free users
+    };
+
+    // True when this user has full access — either they're on the paid
+    // tier, or the paid tier isn't enabled yet.
+    function isPaidUser() {
+      if (!ENABLE_PAID_TIER) return true;
+      return !!(currentUser && currentUser.tier === 'paid');
+    }
+
+    function createdGroupCount() {
+      if (!currentUser) return 0;
+      return (groups || []).filter(g => g.createdBy === currentUser.id).length;
+    }
+
+    // Gate a paid feature: returns true if allowed, otherwise shows the
+    // upgrade modal with the given reason and returns false.
+    function requirePaid(reason) {
+      if (isPaidUser()) return true;
+      showUpgradeModal(reason);
+      return false;
+    }
+
+    function showUpgradeModal(reason) {
+      const el = document.getElementById('upgradeReason');
+      if (el) el.textContent = reason || 'This is a Cued Plus feature.';
+      document.getElementById('upgradeModal').classList.add('active');
+    }
+
+    function startUpgrade(plan) {
+      // Stripe checkout will land here later; plan is 'monthly' or 'annual'
+      showToast('Upgrades are coming soon — thanks for your interest!');
+      closeModal('upgradeModal');
+    }
+
+    async function searchRestaurants(query) {
+      const places = await searchRestaurantsGoogle(query);
+      if (places.length > 0) return places;
+      // Fall back to keyless OpenStreetMap if Places fails or hits its quota
+      return searchRestaurantsOSM(query);
+    }
+
+    async function searchRestaurantsGoogle(query) {
+      try {
+        const response = await fetch('https://places.googleapis.com/v1/places:searchText', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Goog-Api-Key': PLACES_API_KEY,
+            'X-Goog-FieldMask': 'places.displayName,places.formattedAddress,places.primaryTypeDisplayName,places.photos'
+          },
+          body: JSON.stringify({ textQuery: query, pageSize: 8, languageCode: 'en' })
+        });
+        if (!response.ok) {
+          console.error('Places API response not OK:', response.status);
+          return [];
+        }
+        const data = await response.json();
+        return (data.places || []).map(p => {
+          const photo = p.photos && p.photos[0]
+            ? `https://places.googleapis.com/v1/${p.photos[0].name}/media?maxWidthPx=400&key=${PLACES_API_KEY}`
+            : null;
+          // "Italian Restaurant" → "Italian" so it matches the cuisine list
+          const cuisine = (p.primaryTypeDisplayName && p.primaryTypeDisplayName.text || '').replace(/ Restaurant$/i, '');
+          return {
+            title: p.displayName && p.displayName.text || '',
+            year: '',
+            premiereDate: '',
+            image: photo,
+            author: (p.formattedAddress || '').replace(/, (USA|United States)$/, ''),
+            type: 'restaurant',
+            genre: cuisine
+          };
+        }).filter(p => p.title);
+      } catch (error) {
+        console.error('Places search error:', error);
+        return [];
+      }
+    }
+
+    // OpenStreetMap Nominatim fallback (keyless; no photos and name-only
+    // searches work best with a city included).
+    async function searchRestaurantsOSM(query) {
+      try {
+        const url = `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(query)}&limit=10&addressdetails=1&extratags=1`;
+        const response = await fetch(url, { headers: { 'Accept': 'application/json' } });
+        if (!response.ok) return [];
+        const data = await response.json();
+
+        const foodTypes = ['restaurant', 'cafe', 'bar', 'pub', 'fast_food', 'food_court', 'ice_cream', 'biergarten'];
+        const places = data.filter(p => foodTypes.includes(p.type) || (p.category === 'amenity' && foodTypes.includes(p.type)));
+        const docs = places.length > 0 ? places : data;
+
+        return docs.map(p => {
+          const a = p.address || {};
+          const name = p.name || (p.display_name || '').split(',')[0];
+          const locality = [a.neighbourhood || a.suburb, a.city || a.town || a.village, a.state]
+            .filter(Boolean).slice(0, 2).join(', ');
+          // OSM tags cuisines like "italian;pizza" — surface the first one
+          const rawCuisine = (p.extratags && p.extratags.cuisine ? p.extratags.cuisine : '').split(';')[0].replace(/_/g, ' ');
+          const cuisine = rawCuisine ? rawCuisine.charAt(0).toUpperCase() + rawCuisine.slice(1) : '';
+          return {
+            title: name,
+            year: '',
+            premiereDate: '',
+            image: null,
+            author: locality,
+            type: 'restaurant',
+            genre: cuisine
+          };
+        });
+      } catch (error) {
+        console.error('Restaurant search error:', error);
         return [];
       }
     }
@@ -6328,7 +6858,7 @@
     }
 
     // Display autocomplete results
-    function displayAutocompleteResults(results, type) {
+    function displayAutocompleteResults(results, type, correctedQuery) {
       const resultsDiv = document.getElementById('autocompleteResults');
 
       if (results.length === 0) {
@@ -6339,8 +6869,11 @@
       const typeEmoji = getTypeEmoji(type);
       searchResults = results;
 
+      const headerText = correctedQuery
+        ? `Showing results for &ldquo;${correctedQuery}&rdquo; — tap to select`
+        : `${results.length} result${results.length !== 1 ? 's' : ''} — tap to select`;
       resultsDiv.innerHTML =
-        `<div style="padding:0.4rem 0.75rem; font-size:0.7rem; color:var(--text-tertiary); border-bottom:1px solid var(--border-light);">${results.length} result${results.length !== 1 ? 's' : ''} — tap to select</div>` +
+        `<div style="padding:0.4rem 0.75rem; font-size:0.7rem; color:var(--text-tertiary); border-bottom:1px solid var(--border-light);">${headerText}</div>` +
         results.map((result, index) => `
         <div class="autocomplete-item" onclick="selectSearchResult(${index})">
           ${result.image
@@ -6354,11 +6887,6 @@
               ${result.author ? ` • ${result.author}` : ''}
             </div>
           </div>
-        </div>
-        <div class="quick-add-buttons">
-          <button class="quick-add-btn" onclick="event.stopPropagation(); quickAddItem(${index}, 'want')">📌 Queued</button>
-          <button class="quick-add-btn" onclick="event.stopPropagation(); quickAddItem(${index}, 'current')">🔥 In Progress</button>
-          <button class="quick-add-btn" onclick="event.stopPropagation(); quickAddItem(${index}, 'done')">✅ Done</button>
         </div>
       `).join('');
 
@@ -6390,7 +6918,11 @@
 
         document.getElementById('itemTitle').value = result.title;
         document.getElementById('itemImage').value = result.image || '';
+        document.getElementById('itemIsbn').value = result.isbn || '';
         document.getElementById('itemPremiereDate').value = result.premiereDate || '';
+        if (document.getElementById('itemAuthor')) {
+          document.getElementById('itemAuthor').value = result.author || '';
+        }
         document.getElementById('autocompleteResults').classList.remove('active');
 
         // Warn if already on shelf
@@ -6404,9 +6936,9 @@
           dupWarning.style.display = 'none';
         }
 
-        // Reset premiere label
+        // Reset premiere label (a TV search may later override it with season info)
         const premiereLabel = document.querySelector('label[for="itemPremiereDate"]');
-        if (premiereLabel) premiereLabel.textContent = 'Premieres / Airs On';
+        if (premiereLabel) premiereLabel.textContent = premiereDateLabelFor(document.getElementById('itemType').value);
 
         // Auto-populate genre + streaming + season dates
         if (result.type === 'movie' || result.type === 'tv') {
@@ -6613,9 +7145,15 @@
         movie: '🎥',
         tv: '📺',
         podcast: '🎙️',
-        book: '📚'
+        book: '📚',
+        restaurant: '🍽️'
       };
       return emojis[type];
+    }
+
+    function cardTitleOverlay(item) {
+      if (item.type !== 'restaurant' || !item.image) return '';
+      return `<div class="card-title-overlay">${item.title}</div>`;
     }
 
     function cardRatingOverlay(item) {
@@ -6657,7 +7195,7 @@
     }
 
     function updateStarPicker(value) {
-      document.querySelectorAll('#starPicker .star-btn').forEach(btn => {
+      document.querySelectorAll('#starPicker .star-btn, #addStarPicker .star-btn').forEach(btn => {
         const star = parseInt(btn.getAttribute('data-star'));
         btn.classList.remove('full', 'half');
         if (value !== null && value !== undefined) {
@@ -6911,6 +7449,7 @@
     }
 
     function openTagSheet() {
+      if (!requirePaid('Advanced filters and tags are a Cued Plus feature.')) return;
       const allTags = getAllUserTags();
       if (allTags.length === 0) return;
       renderTagSheetPills();
@@ -6966,7 +7505,7 @@
       const yearlyGoal = parseInt(localStorage.getItem('backlogue-yearly-goal') || '0') || 0;
 
       // Estimated hours consumed
-      const hoursMap = { movie: 2, tv: 0.75, podcast: 1, book: 8 };
+      const hoursMap = { movie: 2, tv: 0.75, podcast: 1, book: 8, restaurant: 2 };
       const totalHours = items.filter(i => i.status === 'done')
         .reduce((sum, i) => sum + (hoursMap[i.type] || 1), 0);
       const hoursDisplay = totalHours >= 1000
@@ -7009,8 +7548,8 @@
         .slice(0, 5);
 
       // Type display names and colors
-      const typeLabels = { movie: 'Movies', tv: 'TV Shows', podcast: 'Podcasts', book: 'Books' };
-      const typeColors = { movie: '#14b8a6', tv: '#818cf8', podcast: '#f59e0b', book: '#34d399' };
+      const typeLabels = { movie: 'Movies', tv: 'TV Shows', podcast: 'Podcasts', book: 'Books', restaurant: 'Restaurants' };
+      const typeColors = { movie: '#14b8a6', tv: '#818cf8', podcast: '#f59e0b', book: '#34d399', restaurant: '#fb7185' };
 
       let html = '';
 
@@ -7033,8 +7572,8 @@
       // ── By Type cards ──
       html += `<div style="margin-bottom:1.5rem;">
         <div style="font-family:'Bricolage Grotesque',sans-serif; font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--text-tertiary); margin-bottom:0.75rem;">By Type</div>
-        <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:0.5rem;">
-          ${['movie','tv','podcast','book'].map(t => {
+        <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:0.5rem;">
+          ${['movie','tv','podcast','book','restaurant'].map(t => {
             const c = typeCounts[t] || 0;
             const pct = total > 0 ? Math.round(c/total*100) : 0;
             return `<div style="background:var(--bg-accent); border-radius:12px; padding:0.75rem 0.5rem; text-align:center; border:1px solid var(--border-light);">
@@ -7131,7 +7670,7 @@
 
       // ── Top Rated ──
       if (topRated.length > 0) {
-        const typeEmojis2 = { movie: '🎥', tv: '📺', podcast: '🎙️', book: '📚' };
+        const typeEmojis2 = { movie: '🎥', tv: '📺', podcast: '🎙️', book: '📚', restaurant: '🍽️' };
         html += `<div style="margin-bottom:1rem;">
           <div style="font-family:'Bricolage Grotesque',sans-serif; font-size:0.8rem; font-weight:700; text-transform:uppercase; letter-spacing:0.07em; color:var(--text-tertiary); margin-bottom:0.75rem;">Your Top Rated</div>
           ${topRated.map((item, idx) => `
@@ -7198,8 +7737,8 @@
 
       if (filteredItems.length === 0) {
         grid.style.display = 'none';
-        const emptyIcons = { 'movie': '🎥', 'tv': '📺', 'podcast': '🎙️', 'book': '📚', 'all': '📚' };
-        const emptyLabels = { 'movie': 'No movies yet', 'tv': 'No TV shows yet', 'podcast': 'No podcasts yet', 'book': 'No books yet', 'all': 'Your shelf is empty' };
+        const emptyIcons = { 'movie': '🎥', 'tv': '📺', 'podcast': '🎙️', 'book': '📚', 'restaurant': '🍽️', 'all': '📚' };
+        const emptyLabels = { 'movie': 'No movies yet', 'tv': 'No TV shows yet', 'podcast': 'No podcasts yet', 'book': 'No books yet', 'restaurant': 'No restaurants yet', 'all': 'Your shelf is empty' };
         emptyState.querySelector('.empty-state-icon').textContent = emptyIcons[currentMediaFilter] || '📚';
         emptyState.querySelector('.empty-state-text').textContent = emptyLabels[currentMediaFilter] || 'Your shelf is empty';
         // Show Add button in empty state
@@ -7218,9 +7757,9 @@
       grid.style.display = '';
       emptyState.style.display = 'none';
 
-      const typeOrder    = ['movie', 'tv', 'podcast', 'book'];
-      const typeIconMap  = { movie: '🎥', tv: '📺', podcast: '🎙', book: '📚' };
-      const typeLabelMap = { movie: 'Movies', tv: 'TV Shows', podcast: 'Podcasts', book: 'Books' };
+      const typeOrder    = ['movie', 'tv', 'podcast', 'book', 'restaurant'];
+      const typeIconMap  = { movie: '🎥', tv: '📺', podcast: '🎙', book: '📚', restaurant: '🍽️' };
+      const typeLabelMap = { movie: 'Movies', tv: 'TV Shows', podcast: 'Podcasts', book: 'Books', restaurant: 'Restaurants' };
       const statusLabels = { current: 'In Progress', want: 'Queued', done: 'Finished' };
       let cardIndex = 0;
 
@@ -7306,7 +7845,7 @@
           <div class="card" data-id="${item.id}" data-type="${item.type}" style="animation-delay: ${Math.min(index * 0.05, 0.5)}s">
             <div class="card-image">
               ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : `<div class="card-placeholder">${getTypeEmoji(item.type)}<div class="card-placeholder-title">${item.title}</div></div>`}
-              ${cardRatingOverlay(item)}
+              ${cardRatingOverlay(item)}${cardTitleOverlay(item)}
             </div>
           </div>
         `;
@@ -7374,8 +7913,8 @@
 
     // Render shared items as a card grid grouped by media type
     function renderFeedGrid(containerEl, filteredItems) {
-      const typeOrderArr = ['movie', 'tv', 'podcast', 'book'];
-      const typeLabels = { movie: 'Movies', tv: 'TV Shows', podcast: 'Podcasts', book: 'Books' };
+      const typeOrderArr = ['movie', 'tv', 'podcast', 'book', 'restaurant'];
+      const typeLabels = { movie: 'Movies', tv: 'TV Shows', podcast: 'Podcasts', book: 'Books', restaurant: 'Restaurants' };
 
       filteredItems.sort((a, b) => b.timestamp - a.timestamp);
       feedItemsCache = [];
@@ -7388,6 +7927,7 @@
           <div class="card feed-card" data-feed-idx="${feedIdx}" data-type="${item.type}" style="animation-delay:${Math.min(cardIndex * 0.05, 0.5)}s;position:relative;">
             <div class="card-image">
               ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : `<div class="card-placeholder">${getTypeEmoji(item.type)}<div class="card-placeholder-title">${item.title}</div></div>`}
+              ${cardTitleOverlay(item)}
             </div>
             ${alreadyHave
               ? `<div style="position:absolute;bottom:0;left:0;right:0;background:#0d9488;text-align:center;font-size:0.58rem;font-weight:700;color:#fff;padding:0.25rem 0;pointer-events:none;letter-spacing:0.06em;">✓ ON SHELF</div>`
@@ -7596,7 +8136,7 @@
     // Filter items
     function filterItems(value) {
       // Determine which filter was changed based on the value
-      if (['movie', 'tv', 'podcast', 'book', 'thing'].includes(value)) {
+      if (['movie', 'tv', 'podcast', 'book', 'restaurant', 'thing'].includes(value)) {
         // Media type filter
         currentMediaFilter = value;
       } else if (['want', 'current', 'done'].includes(value)) {
@@ -7627,24 +8167,18 @@
       document.getElementById('editId').value = '';
       document.getElementById('itemRating').value = '';
       document.getElementById('itemStreamingPlatform').value = '';
-      document.getElementById('itemType').value = 'movie';
-
-      // Reset type icons to movie
-      document.querySelectorAll('.type-icon-btn').forEach(btn => {
-        btn.classList.remove('active');
-      });
-      document.querySelector('[data-type="movie"]')?.classList.add('active');
+      // Default the type to the active media filter (e.g. TV), or movie when viewing all
+      const defaultType = ['movie', 'tv', 'podcast', 'book', 'restaurant'].includes(currentMediaFilter) ? currentMediaFilter : 'movie';
+      selectType(defaultType);
 
       setStarRating(null); // Reset stars
       document.getElementById('itemPremiereDate').value = '';
       const premiereLabel = document.querySelector('label[for="itemPremiereDate"]');
-      if (premiereLabel) premiereLabel.textContent = 'Premieres / Airs On';
+      if (premiereLabel) premiereLabel.textContent = premiereDateLabelFor(document.getElementById('itemType').value);
       document.getElementById('itemDateLogged').value = '';
       currentTags = [];
       renderTagChips();
       document.getElementById('autocompleteResults').classList.remove('active');
-      toggleStreamingPlatform(); // Show/hide streaming platform
-      updateGenreOptions('movie'); // Reset genre options for default type
       document.getElementById('itemGenre').value = '';
       document.getElementById('itemGenreOther').value = '';
       document.getElementById('itemGenreOther').style.display = 'none';
@@ -7654,6 +8188,8 @@
       document.getElementById('modalItemPreview').classList.remove('visible');
       document.getElementById('editModeTypeTitle').style.display = 'none';
       document.querySelector('.modal-content').classList.remove('quick-edit-mode');
+      document.getElementById('reserveRow').style.display = 'none';
+      document.getElementById('buyRow').style.display = 'none';
       selectStatus('want');
 
       // Add mode: show Save + Cancel
@@ -7661,6 +8197,8 @@
       document.getElementById('modalCloseBtn').textContent = 'Cancel';
 
       document.getElementById('itemModal').classList.add('active');
+      // Always open scrolled to the top (the element keeps its old scroll position)
+      document.querySelector('#itemModal .modal-content').scrollTop = 0;
     }
 
     // Open group modal
@@ -7760,6 +8298,9 @@
         document.getElementById('itemStreamingPlatform').value = item.streamingPlatform || '';
         document.getElementById('itemReferral').value = item.referral || '';
         document.getElementById('itemEpisode').value = item.episode || '';
+        if (document.getElementById('itemAuthor')) {
+          document.getElementById('itemAuthor').value = item.author || '';
+        }
         // Update genre options for the item's type, then set value
         updateGenreOptions(item.type);
         const genreSelect = document.getElementById('itemGenre');
@@ -7792,7 +8333,7 @@
         const previewImg = document.getElementById('previewImage');
         const previewTitle = document.getElementById('previewTitle');
         const previewType = document.getElementById('previewType');
-        const typeEmojis = { movie: '🎥', tv: '📺', podcast: '🎙️', book: '📚' };
+        const typeEmojis = { movie: '🎥', tv: '📺', podcast: '🎙️', book: '📚', restaurant: '🍽️' };
 
         previewTitle.textContent = item.title;
         previewType.textContent = (typeEmojis[item.type] || '') + ' ' + (item.type === 'tv' ? 'TV Show' : item.type.charAt(0).toUpperCase() + item.type.slice(1));
@@ -7809,13 +8350,40 @@
         document.getElementById('editModeTypeTitle').style.display = 'block';
         document.querySelector('.modal-content').classList.add('quick-edit-mode');
 
+        // Reserve links for restaurants
+        const reserveRow = document.getElementById('reserveRow');
+        if (item.type === 'restaurant') {
+          const q = encodeURIComponent(item.title + (item.author ? ' ' + item.author : ''));
+          document.getElementById('reserveOpenTable').href = 'https://www.opentable.com/s?term=' + q;
+          document.getElementById('reserveResy').href = 'https://resy.com/search?query=' + encodeURIComponent(item.title);
+          document.getElementById('reserveMaps').href = 'https://www.google.com/maps/search/?api=1&query=' + q;
+          reserveRow.style.display = 'flex';
+        } else {
+          reserveRow.style.display = 'none';
+        }
+
+        // Buy links for books (direct product page when we know the ISBN)
+        document.getElementById('itemIsbn').value = item.isbn || '';
+        const buyRow = document.getElementById('buyRow');
+        if (item.type === 'book') {
+          const bq = encodeURIComponent(item.title + (item.author ? ' ' + item.author : ''));
+          document.getElementById('buyBookshop').href = (AFFILIATE.bookshopId && item.isbn)
+            ? `https://bookshop.org/a/${AFFILIATE.bookshopId}/${item.isbn}`
+            : `https://bookshop.org/search?keywords=${bq}` + (AFFILIATE.bookshopId ? `&affiliate=${AFFILIATE.bookshopId}` : '');
+          document.getElementById('buyAmazon').href = `https://www.amazon.com/s?k=${bq}` + (AFFILIATE.amazonTag ? `&tag=${AFFILIATE.amazonTag}` : '');
+          buyRow.style.display = 'flex';
+        } else {
+          buyRow.style.display = 'none';
+        }
+
         // Update type icon buttons
         document.querySelectorAll('.type-icon-btn').forEach(btn => {
           btn.classList.remove('active');
         });
         document.querySelector(`[data-type="${item.type}"]`)?.classList.add('active');
 
-        // Update status pills
+        // Update status pill labels for the item's type, then select
+        updateStatusOptions(item.type);
         selectStatus(item.status);
 
         // Update star rating display (backward compat: legacy values converted)
@@ -7831,6 +8399,8 @@
         document.getElementById('modalCloseBtn').textContent = 'Done';
 
         document.getElementById('itemModal').classList.add('active');
+        // Always open scrolled to the top (the element keeps its old scroll position)
+        document.querySelector('#itemModal .modal-content').scrollTop = 0;
       } catch (error) {
         console.error('Error editing item:', error);
         alert('Failed to open item for editing.');
@@ -7845,6 +8415,12 @@
       document.querySelectorAll('.status-pill-btn').forEach(btn => {
         btn.classList.toggle('active', btn.dataset.status === status);
       });
+      // In add mode, offer star rating only for Finished items (edit mode rates via the preview header)
+      const ratingGroup = document.getElementById('addRatingGroup');
+      if (ratingGroup) {
+        const isAddMode = !document.getElementById('editId').value;
+        ratingGroup.style.display = (isAddMode && status === 'done') ? 'block' : 'none';
+      }
       // Auto-fill date when marking as done
       if (status === 'done') {
         const dateInput = document.getElementById('itemDateLogged');
@@ -7885,6 +8461,12 @@
       try {
         const name = document.getElementById('newGroupName').value.trim();
         if (!name) return;
+
+        // Free tier: joining groups is unlimited, creating is capped
+        if (!isPaidUser() && createdGroupCount() >= PRICING.freeGroupCreateLimit) {
+          showUpgradeModal(`Free accounts can create up to ${PRICING.freeGroupCreateLimit} groups (joining is always unlimited). Create as many as you like with Cued Plus.`);
+          return null;
+        }
 
         const newGroup = {
           id: Date.now().toString(),
@@ -8310,6 +8892,7 @@
             <div class="submenu-item" onclick="handleGroupFeedChange('${group.id}', 'tv', event)">TV Shows</div>
             <div class="submenu-item" onclick="handleGroupFeedChange('${group.id}', 'podcast', event)">Podcasts</div>
             <div class="submenu-item" onclick="handleGroupFeedChange('${group.id}', 'book', event)">Books</div>
+            <div class="submenu-item" onclick="handleGroupFeedChange('${group.id}', 'restaurant', event)">Restaurants</div>
           </div>
         </div>
       `).join('');
@@ -8363,7 +8946,7 @@
           if (mediaType === 'all') {
             label.textContent = group.name;
           } else {
-            const typeEmoji = {movie: '🎥', tv: '📺', podcast: '🎙️', book: '📚'}[mediaType];
+            const typeEmoji = {movie: '🎥', tv: '📺', podcast: '🎙️', book: '📚', restaurant: '🍽️'}[mediaType];
             label.textContent = `${group.name} - ${typeEmoji}`;
           }
         }
@@ -8566,7 +9149,7 @@
           const previews = items.slice(0, 3).map(it =>
             it.image
               ? `<img src="${it.image}" style="width:36px;height:54px;object-fit:cover;border-radius:5px;flex-shrink:0;">`
-              : `<div style="width:36px;height:54px;border-radius:5px;background:var(--bg-accent);display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;">${{movie:'🎬',tv:'📺',book:'📚',podcast:'🎙️'}[it.type]||'🎬'}</div>`
+              : `<div style="width:36px;height:54px;border-radius:5px;background:var(--bg-accent);display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;">${{movie:'🎬',tv:'📺',book:'📚',podcast:'🎙️',restaurant:'🍽️'}[it.type]||'🎬'}</div>`
           ).join('');
           const extra = items.length > 3 ? `<div style="font-size:0.65rem;color:var(--text-tertiary);align-self:center;">+${items.length-3}</div>` : '';
           const byHandle = list.createdByHandle ? `@${list.createdByHandle}` : 'someone';
@@ -8646,7 +9229,7 @@
         const canRemove = it.addedBy === currentUser.id || isCreator;
         const img = it.image
           ? `<img src="${it.image}" style="width:64px;height:96px;object-fit:cover;border-radius:8px;display:block;">`
-          : `<div style="width:64px;height:96px;border-radius:8px;background:var(--bg-accent);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">${{movie:'🎬',tv:'📺',book:'📚',podcast:'🎙️'}[it.type]||'🎬'}</div>`;
+          : `<div style="width:64px;height:96px;border-radius:8px;background:var(--bg-accent);display:flex;align-items:center;justify-content:center;font-size:1.5rem;">${{movie:'🎬',tv:'📺',book:'📚',podcast:'🎙️',restaurant:'🍽️'}[it.type]||'🎬'}</div>`;
         return `<div style="display:flex;gap:0.75rem;align-items:flex-start;padding:0.65rem 0;border-bottom:1px solid var(--border-light);">
           ${img}
           <div style="flex:1;min-width:0;">
@@ -8707,7 +9290,7 @@
     function glResultRow(it, groupId, listId) {
       const img = it.image
         ? `<img src="${it.image}" style="width:36px;height:54px;object-fit:cover;border-radius:5px;flex-shrink:0;">`
-        : `<div style="width:36px;height:54px;border-radius:5px;background:var(--bg-accent);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;">${{movie:'🎬',tv:'📺',book:'📚',podcast:'🎙️'}[it.type]||'🎬'}</div>`;
+        : `<div style="width:36px;height:54px;border-radius:5px;background:var(--bg-accent);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;">${{movie:'🎬',tv:'📺',book:'📚',podcast:'🎙️',restaurant:'🍽️'}[it.type]||'🎬'}</div>`;
       const safeTitle = (it.title||'').replace(/'/g,"&#39;");
       const safeType = (it.type||'movie');
       const safeImg = (it.image||'').replace(/'/g,"&#39;");
@@ -9040,7 +9623,7 @@
               const previews = its.slice(0,3).map(it =>
                 it.image
                   ? `<img src="${it.image}" style="width:36px;height:54px;object-fit:cover;border-radius:5px;flex-shrink:0;">`
-                  : `<div style="width:36px;height:54px;border-radius:5px;background:var(--bg-primary);display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;">${{movie:'🎬',tv:'📺',book:'📚',podcast:'🎙️'}[it.type]||'🎬'}</div>`
+                  : `<div style="width:36px;height:54px;border-radius:5px;background:var(--bg-primary);display:flex;align-items:center;justify-content:center;font-size:0.9rem;flex-shrink:0;">${{movie:'🎬',tv:'📺',book:'📚',podcast:'🎙️',restaurant:'🍽️'}[it.type]||'🎬'}</div>`
               ).join('');
               const extra = its.length > 3 ? `<div style="font-size:0.65rem;color:var(--text-tertiary);align-self:center;">+${its.length-3}</div>` : '';
               const byHandle = list.createdByHandle ? `@${list.createdByHandle}` : 'someone';
@@ -9093,7 +9676,7 @@
         }
 
         // Gather all public items from all profiles, sorted by dateLogged desc
-        const typeEmojis = { movie: '🎥', tv: '📺', podcast: '🎙️', book: '📚' };
+        const typeEmojis = { movie: '🎥', tv: '📺', podcast: '🎙️', book: '📚', restaurant: '🍽️' };
         const statusLabels = { done: 'finished', current: 'is watching', want: 'queued' };
         const statusLabelsPodcast = { done: 'finished', current: 'is listening to', want: 'queued' };
         const statusLabelsBook = { done: 'finished', current: 'is reading', want: 'queued' };
@@ -9348,7 +9931,7 @@
             <div class="card" data-id="${item.id}" data-type="${item.type}" style="animation-delay: ${Math.min(i * 0.05, 0.5)}s">
               <div class="card-image">
                 ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : `<div class="card-placeholder">${getTypeEmoji(item.type)}<div class="card-placeholder-title">${item.title}</div></div>`}
-                ${cardRatingOverlay(item)}
+                ${cardRatingOverlay(item)}${cardTitleOverlay(item)}
               </div>
             </div>
           `).join('');
@@ -9439,7 +10022,7 @@
           <div class="card" data-id="${item.id}" data-type="${item.type}" style="animation-delay: ${Math.min(i * 0.05, 0.5)}s">
             <div class="card-image">
               ${item.image ? `<img loading="lazy" src="${item.image}" alt="${item.title}">` : `<div class="card-placeholder">${getTypeEmoji(item.type)}<div class="card-placeholder-title">${item.title}</div></div>`}
-              ${cardRatingOverlay(item)}
+              ${cardRatingOverlay(item)}${cardTitleOverlay(item)}
             </div>
           </div>
         `).join('');
@@ -9832,6 +10415,7 @@
     }
 
     function openShareCardForProfile() {
+      if (!requirePaid('Wrapped and shareable stat cards are a Cued Plus feature.')) return;
       renderProfileShareCard();
       document.getElementById('shareCardTypes').style.display = 'none';
       document.getElementById('shareCardModal').classList.add('active');
@@ -9869,15 +10453,11 @@
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="28" height="28">
             <defs>
               <radialGradient id="scbg" cx="50%" cy="55%" r="65%"><stop offset="0%" stop-color="#0e2530"/><stop offset="100%" stop-color="#050c0f"/></radialGradient>
-              <linearGradient id="schp" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#4fd8c4"/><stop offset="100%" stop-color="#0d7a70"/></linearGradient>
               <linearGradient id="scbkm" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#99f5e8"/><stop offset="100%" stop-color="#0d9488"/></linearGradient>
             </defs>
             <rect width="96" height="96" rx="22" fill="url(#scbg)"/>
-            <path d="M 20 52 C 20 10 76 10 76 52" fill="none" stroke="url(#schp)" stroke-width="7" stroke-linecap="round"/>
-            <rect x="11" y="46" width="14" height="26" rx="7" fill="url(#schp)"/>
-            <rect x="71" y="46" width="14" height="26" rx="7" fill="url(#schp)"/>
-            <path d="M 37 44 L 59 44 L 59 90 L 48 79 L 37 90 Z" fill="url(#scbkm)"/>
-            <polygon points="43,54 43,73 58,63.5" fill="#060e12" opacity="0.6"/>
+            <path d="M 32 16 L 64 16 L 64 80 L 48 66.5 L 32 80 Z" fill="url(#scbkm)"/>
+            <polyline points="42,32 53,43 42,54" fill="none" stroke="#060e12" stroke-width="6" stroke-linecap="round" stroke-linejoin="round" opacity="0.65"/>
           </svg>
           <span style="font-family:'Bricolage Grotesque',sans-serif;font-size:1rem;font-weight:800;background:linear-gradient(135deg,#fff 0%,#5eead4 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;">Cued</span>
         </div>
@@ -9901,6 +10481,7 @@
     }
 
     function openShareCardForStats() {
+      if (!requirePaid('Wrapped and shareable stat cards are a Cued Plus feature.')) return;
       currentShareItem = null;
       renderStatsShareCard();
       document.getElementById('shareCardTypes').style.display = 'none';
@@ -9926,8 +10507,8 @@
 
       // Top type
       const topType = Object.entries(typeCounts).sort((a,b) => b[1]-a[1])[0];
-      const typeLabels = { movie: 'Movies', tv: 'TV Shows', book: 'Books', podcast: 'Podcasts' };
-      const typeColors = { movie: '#14b8a6', tv: '#818cf8', podcast: '#f59e0b', book: '#34d399' };
+      const typeLabels = { movie: 'Movies', tv: 'TV Shows', book: 'Books', podcast: 'Podcasts', restaurant: 'Restaurants' };
+      const typeColors = { movie: '#14b8a6', tv: '#818cf8', podcast: '#f59e0b', book: '#34d399', restaurant: '#fb7185' };
 
       // Top genre this year
       const genreCounts = {};
@@ -9946,7 +10527,7 @@
         ? (ratedYear.reduce((s,i) => s + legacyToStars(i.rating), 0) / ratedYear.length).toFixed(1) : null;
 
       // Estimated hours
-      const hoursMap = { movie: 2, tv: 0.75, podcast: 1, book: 8 };
+      const hoursMap = { movie: 2, tv: 0.75, podcast: 1, book: 8, restaurant: 2 };
       const totalHours = yearItems.reduce((sum,i) => sum + (hoursMap[i.type] || 1), 0);
       const hoursDisplay = totalHours >= 1000 ? (totalHours/1000).toFixed(1)+'k' : Math.round(totalHours).toString();
 
@@ -10061,7 +10642,7 @@
 
     function renderWatchlistShareCard() {
       const watchlist = items.filter(i => i.status === 'want');
-      const typeEmojis = { movie: '🎥', tv: '📺', podcast: '🎙️', book: '📚' };
+      const typeEmojis = { movie: '🎥', tv: '📺', podcast: '🎙️', book: '📚', restaurant: '🍽️' };
       const container = document.getElementById('shareCardRender');
 
       const listHtml = watchlist.slice(0, 10).map(item => `
@@ -10140,6 +10721,7 @@
           : `<div style="width:140px;height:210px;margin:0 auto 1rem;border-radius:10px;background:linear-gradient(135deg,#282828,#333);display:flex;align-items:center;justify-content:center;font-size:3rem;">${getTypeEmoji(item.type)}</div>`
         }
         <div class="detail-card-title">${item.title}</div>
+        ${item.author ? `<div class="detail-card-author" style="text-align:center; font-size:0.85rem; color:var(--text-secondary); margin-top:-0.25rem;">by ${item.author}</div>` : ''}
         <div class="detail-card-meta">
           ${getTypeEmoji(item.type)} ${item.type.charAt(0).toUpperCase() + item.type.slice(1)}
           ${item.genre ? ' &middot; ' + item.genre : ''}
@@ -10252,11 +10834,46 @@
             description = data.results[0].overview || '';
           }
         } else if (item.type === 'book') {
-          const url = `https://www.googleapis.com/books/v1/volumes?q=${encodeURIComponent(item.title)}&maxResults=1&langRestrict=en`;
-          const res = await fetch(url);
-          const data = await res.json();
-          if (data.items && data.items.length > 0) {
-            description = data.items[0].volumeInfo?.description || '';
+          // Open Library: try the stored ISBN's work, then a title/author search.
+          // Some records carry junk like "Hardcover", so require a real synopsis.
+          const fetchWorkDesc = async (workKey) => {
+            if (!workKey) return '';
+            const work = await fetch(`https://openlibrary.org${workKey}.json`).then(r => r.ok ? r.json() : null).catch(() => null);
+            if (!work || !work.description) return '';
+            return typeof work.description === 'string' ? work.description : (work.description.value || '');
+          };
+          const candidates = [];
+          if (item.isbn) {
+            const ed = await fetch(`https://openlibrary.org/isbn/${item.isbn}.json`).then(r => r.ok ? r.json() : null).catch(() => null);
+            candidates.push(await fetchWorkDesc(ed && ed.works && ed.works[0] ? ed.works[0].key : null));
+          }
+          if (!candidates.some(d => d.length >= 40)) {
+            const q = `https://openlibrary.org/search.json?title=${encodeURIComponent(item.title)}${item.author ? '&author=' + encodeURIComponent(item.author) : ''}&limit=1&fields=key`;
+            const s = await fetch(q).then(r => r.ok ? r.json() : null).catch(() => null);
+            candidates.push(await fetchWorkDesc(s && s.docs && s.docs[0] ? s.docs[0].key : null));
+          }
+          if (!candidates.some(d => d.length >= 40)) {
+            // Apple Books publisher blurb as a final fallback
+            const it = await fetch(`https://itunes.apple.com/search?term=${encodeURIComponent(item.title + ' ' + (item.author || ''))}&media=ebook&limit=1`).then(r => r.ok ? r.json() : null).catch(() => null);
+            const blurb = it && it.results && it.results[0] && it.results[0].description ? it.results[0].description : '';
+            candidates.push(blurb.replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim());
+          }
+          description = candidates.find(d => d.length >= 40) || '';
+        } else if (item.type === 'restaurant') {
+          // Google Places editorial summary
+          const res = await fetch('https://places.googleapis.com/v1/places:searchText', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'X-Goog-Api-Key': PLACES_API_KEY,
+              'X-Goog-FieldMask': 'places.editorialSummary'
+            },
+            body: JSON.stringify({ textQuery: item.title + (item.author ? ' ' + item.author : ''), pageSize: 1, languageCode: 'en' })
+          });
+          if (res.ok) {
+            const data = await res.json();
+            description = data.places && data.places[0] && data.places[0].editorialSummary
+              ? data.places[0].editorialSummary.text : '';
           }
         }
 
@@ -10474,9 +11091,9 @@
       const typeCounts = {};
       items.forEach(i => { typeCounts[i.type] = (typeCounts[i.type] || 0) + 1; });
 
-      const typeEmojis = { movie: '\uD83C\uDFAC', tv: '\uD83D\uDCFA', podcast: '\uD83C\uDF99\uFE0F', book: '\uD83D\uDCDA' };
+      const typeEmojis = { movie: '\uD83C\uDFAC', tv: '\uD83D\uDCFA', podcast: '\uD83C\uDF99\uFE0F', book: '\uD83D\uDCDA', restaurant: '\uD83C\uDF7D\uFE0F' };
       let typeHtml = '';
-      ['movie', 'tv', 'podcast', 'book'].forEach(t => {
+      ['movie', 'tv', 'podcast', 'book', 'restaurant'].forEach(t => {
         const c = typeCounts[t] || 0;
         if (c > 0) {
           typeHtml += `<div style="display:flex;justify-content:space-between;padding:0.3rem 0;font-size:0.8rem;color:rgba(255,255,255,0.7);">
@@ -10492,7 +11109,7 @@
         <div style="height:4px;background:linear-gradient(90deg,#5B9BD5,#7CB8E8,#f59e0b);"></div>
         <div style="padding:1.75rem 1.75rem 1.5rem;height:calc(100% - 4px);box-sizing:border-box;display:flex;flex-direction:column;justify-content:space-between;">
         <div style="text-align:center;margin-bottom:1.25rem;">
-          <div style="font-family:'Bricolage Grotesque', sans-serif;font-size:1.4rem;font-weight:700;margin-bottom:0.25rem;">My Media Journey</div>
+          <div style="font-family:'Bricolage Grotesque', sans-serif;font-size:1.4rem;font-weight:700;margin-bottom:0.25rem;">My Cue</div>
           <div style="font-size:0.75rem;color:rgba(255,255,255,0.45);">${currentUser && currentUser.handle ? '@' + currentUser.handle : 'A Cued User'}</div>
         </div>
         <div class="share-card-stats-grid">
@@ -10744,7 +11361,7 @@
       if (visibleItems.length > 0) {
         // Build type pills — only for types that have items
         const presentTypes = [...new Set(visibleItems.map(i => i.type))];
-        const typeLabels = { movie: 'Movies', tv: 'TV', book: 'Books', podcast: 'Podcasts' };
+        const typeLabels = { movie: 'Movies', tv: 'TV', book: 'Books', podcast: 'Podcasts', restaurant: 'Dining' };
         const pills = document.getElementById('publicProfilePills');
         pills.innerHTML =
           `<button class="status-pill active" onclick="filterPublicProfileType('all', this)">All</button>` +
@@ -10797,7 +11414,7 @@
       });
 
       const groupOrder = ['both_done','both_current','they_done','i_done'];
-      const typeIcons = { movie: '🎬', tv: '📺', book: '📚', podcast: '🎙️' };
+      const typeIcons = { movie: '🎬', tv: '📺', book: '📚', podcast: '🎙️', restaurant: '🍽️' };
 
       const theirHandle = document.getElementById('publicProfileName') ? document.getElementById('publicProfileName').textContent : 'them';
       const totalCount = matched.length;
@@ -10877,8 +11494,8 @@
 
     function renderPublicProfileSections(profileItems, showRatings, showReviews, singleType) {
       const grid = document.getElementById('publicProfileGrid');
-      const typeEmojis = { movie: '🎥', tv: '📺', podcast: '🎙️', book: '📚' };
-      const typeHeadings = { movie: 'Movies', tv: 'TV Shows', book: 'Books', podcast: 'Podcasts' };
+      const typeEmojis = { movie: '🎥', tv: '📺', podcast: '🎙️', book: '📚', restaurant: '🍽️' };
+      const typeHeadings = { movie: 'Movies', tv: 'TV Shows', book: 'Books', podcast: 'Podcasts', restaurant: 'Restaurants' };
       const statusOrder = ['current','want','done'];
       const statusLabels = { current: 'In Progress', want: 'Queued', done: 'Finished' };
       const typeOrder = ['movie','tv','book','podcast'];
@@ -10934,8 +11551,8 @@
       localStorage.setItem('backlogue-light-mode', enabled ? '1' : '0');
     }
 
-    // Apply saved theme on load
-    if (localStorage.getItem('backlogue-light-mode') === '1') {
+    // Apply saved theme on load — light is the default; dark only when explicitly chosen
+    if (localStorage.getItem('backlogue-light-mode') !== '0') {
       document.body.classList.add('light-mode');
     }
 
@@ -11001,6 +11618,12 @@
       const text = await file.text();
       const rows = parseCSV(text);
       if (rows.length === 0) { alert('No data found in file.'); return; }
+
+      // Free tier: cap import size; paid gets priority/large imports
+      if (!isPaidUser() && rows.length > PRICING.freeImportRowLimit) {
+        showUpgradeModal(`That file has ${rows.length} rows — free imports are capped at ${PRICING.freeImportRowLimit}. Import your full history with Cued Plus.`);
+        return;
+      }
 
       // Detect source by headers
       const headers = Object.keys(rows[0]);
@@ -11296,7 +11919,7 @@
 
     function openSpotlightPicker(type) {
       _spotlightPickerType = type;
-      const labels = { movie: 'Film', tv: 'Show', book: 'Book', podcast: 'Podcast' };
+      const labels = { movie: 'Film', tv: 'Show', book: 'Book', podcast: 'Podcast', restaurant: 'Restaurant' };
       document.getElementById('spotlightPickerTitle').textContent = 'Pick a ' + labels[type];
       document.getElementById('spotlightPickerSearch').value = '';
       renderSpotlightPickerList();
@@ -11348,7 +11971,7 @@
           slot.innerHTML = `<img src="${item.image}" alt="${item.title}" style="width:100%;height:100%;object-fit:cover;">`;
         } else {
           slot.className = 'spotlight-pick-empty';
-          const typeEmojis = { movie: '🎥', tv: '📺', book: '📚', podcast: '🎙️' };
+          const typeEmojis = { movie: '🎥', tv: '📺', book: '📚', podcast: '🎙️', restaurant: '🍽️' };
           slot.innerHTML = `<span style="font-size:0.7rem;color:var(--text-primary);text-align:center;padding:0.2rem;">${item.title.slice(0,15)}</span>`;
         }
       }
@@ -11359,8 +11982,8 @@
       _spotlightSelections[type] = null;
       const slot = document.getElementById('spotlightSlot_' + type);
       if (slot) {
-        const typeEmojis = { movie: '🎥', tv: '📺', book: '📚', podcast: '🎙️' };
-        const typeLabels = { movie: 'Film', tv: 'Show', book: 'Book', podcast: 'Podcast' };
+        const typeEmojis = { movie: '🎥', tv: '📺', book: '📚', podcast: '🎙️', restaurant: '🍽️' };
+        const typeLabels = { movie: 'Film', tv: 'Show', book: 'Book', podcast: 'Podcast', restaurant: 'Restaurant' };
         slot.className = 'spotlight-pick-empty';
         slot.innerHTML = `<span style="font-size:1.1rem;">${typeEmojis[type]}</span><span style="font-size:0.6rem;color:var(--text-tertiary);">${typeLabels[type]}</span>`;
       }
@@ -11486,6 +12109,12 @@
 
       containers.forEach(grid => {
         if (!grid) return;
+        // renderItems() calls initLongPress() on every render, but these containers
+        // persist across renders (only their innerHTML changes) — without this guard,
+        // every render stacked another full set of listeners on the same element,
+        // so a single tap could be misread as a double-tap by a leftover listener.
+        if (grid.dataset.longPressBound === '1') return;
+        grid.dataset.longPressBound = '1';
 
         let touchStartX = 0, touchStartY = 0;
         let touchMoved = false;
@@ -11510,9 +12139,9 @@
           const now = Date.now();
           const lastTap = parseInt(card.dataset.lastTap || '0');
           if (now - lastTap < 200) {
-            // Double-tap: cycle status
+            // Double-tap: ask for confirmation before cycling status
             card.dataset.lastTap = '0';
-            swipeUpStatus(card.dataset.id);
+            requestStatusChange(card.dataset.id);
           } else {
             card.dataset.lastTap = now;
             openDetailCard(card.dataset.id);
@@ -11534,9 +12163,50 @@
         grid.addEventListener('dblclick', (e) => {
           const card = e.target.closest('.card[data-id]');
           if (!card) return;
-          swipeUpStatus(card.dataset.id);
+          requestStatusChange(card.dataset.id);
         });
       });
+    }
+
+    // Double-tap/double-click no longer changes status immediately — it asks for
+    // confirmation first, since two quick taps are too easy to trigger by accident.
+    let _pendingStatusChangeId = null;
+    let _statusConfirmTimeout = null;
+
+    function statusLabelsFor(type) {
+      return type === 'restaurant'
+        ? { want: 'Want to Try', current: 'Reserved', done: 'Been There' }
+        : { want: 'Queued', current: 'In Progress', done: 'Finished' };
+    }
+
+    function requestStatusChange(itemId) {
+      const item = items.find(i => i.id === itemId);
+      if (!item) return;
+      const cycle = { want: 'current', current: 'done', done: 'want' };
+      const newStatus = cycle[item.status] || 'want';
+      const labels = statusLabelsFor(item.type);
+
+      _pendingStatusChangeId = itemId;
+      document.getElementById('statusConfirmText').textContent = `Mark as ${labels[newStatus]}?`;
+      document.getElementById('statusConfirmBar').classList.add('visible');
+
+      clearTimeout(_statusConfirmTimeout);
+      _statusConfirmTimeout = setTimeout(cancelStatusChange, 4000);
+    }
+
+    function cancelStatusChange() {
+      _pendingStatusChangeId = null;
+      clearTimeout(_statusConfirmTimeout);
+      document.getElementById('statusConfirmBar').classList.remove('visible');
+    }
+
+    async function confirmStatusChange() {
+      const itemId = _pendingStatusChangeId;
+      document.getElementById('statusConfirmBar').classList.remove('visible');
+      clearTimeout(_statusConfirmTimeout);
+      _pendingStatusChangeId = null;
+      if (!itemId) return;
+      await swipeUpStatus(itemId);
     }
 
     async function swipeUpStatus(itemId) {
@@ -11544,8 +12214,9 @@
       if (!item) return;
       const cycle = { want: 'current', current: 'done', done: 'want' };
       const newStatus = cycle[item.status] || 'want';
-      const labels = { want: 'Queued', current: 'In Progress', done: 'Finished' };
+      const labels = statusLabelsFor(item.type);
       item.status = newStatus;
+      item.statusChangedAt = Date.now();
       if (newStatus === 'done' && !item.dateLogged) item.dateLogged = getTodayDate();
       if (newStatus !== 'done') item.dateLogged = '';
       renderItems();
@@ -11597,6 +12268,61 @@
         placeholder.style.display = 'flex';
         placeholder.textContent = getTypeEmoji(item.type);
       }
+    }
+
+    // === STATUS NUDGE — at most ONE gentle question per app open ===
+    // Restaurants: Reserved >1 day (reservations resolve fast, snooze 3d).
+    // Movies: In Progress >7 days (a movie is two hours, snooze 14d).
+    // Books: In Progress >60 days (books are slow, snooze 14d).
+    // TV and podcasts are never nudged: In Progress is their natural state.
+    let _diningNudgeItemId = null;
+
+    const NUDGE_RULES = [
+      { type: 'restaurant', ageDays: 1,  snoozeDays: 3,  question: t => `Did you make it to ${t}?`, yes: '⭐ Been There' },
+      { type: 'movie',      ageDays: 7,  snoozeDays: 14, question: t => `Did you finish ${t}?`,     yes: '⭐ Finished' },
+      { type: 'book',       ageDays: 60, snoozeDays: 14, question: t => `Did you finish ${t}?`,     yes: '⭐ Finished' }
+    ];
+
+    function checkStatusNudge() {
+      const DAY = 86400000;
+      const now = Date.now();
+      for (const rule of NUDGE_RULES) {
+        const candidate = items.find(i =>
+          i.type === rule.type &&
+          i.status === 'current' &&
+          now - (i.statusChangedAt || parseInt(i.id) || now) > rule.ageDays * DAY &&
+          (!i.nudgeSnoozedAt || now - i.nudgeSnoozedAt > rule.snoozeDays * DAY)
+        );
+        if (candidate) {
+          _diningNudgeItemId = candidate.id;
+          document.getElementById('diningNudgeText').textContent = rule.question(candidate.title);
+          document.getElementById('diningNudgeYes').textContent = rule.yes;
+          document.getElementById('diningNudgeBar').classList.add('visible');
+          return;
+        }
+      }
+    }
+
+    async function diningNudgeBeenThere() {
+      const item = items.find(i => i.id === _diningNudgeItemId);
+      document.getElementById('diningNudgeBar').classList.remove('visible');
+      _diningNudgeItemId = null;
+      if (!item) return;
+      item.status = 'done';
+      item.statusChangedAt = Date.now();
+      if (!item.dateLogged) item.dateLogged = getTodayDate();
+      renderItems();
+      await saveItemToFirestore(item);
+      showRatingPrompt(item.id);
+    }
+
+    async function diningNudgeSnooze() {
+      const item = items.find(i => i.id === _diningNudgeItemId);
+      document.getElementById('diningNudgeBar').classList.remove('visible');
+      _diningNudgeItemId = null;
+      if (!item) return;
+      item.nudgeSnoozedAt = Date.now();
+      await saveItemToFirestore(item);
     }
 
     let ratingPromptItemId = null;
@@ -11708,6 +12434,7 @@
           : `<div style="width:140px;height:210px;margin:0 auto 1rem;border-radius:10px;background:linear-gradient(135deg,#282828,#333);display:flex;align-items:center;justify-content:center;font-size:3rem;">${getTypeEmoji(item.type)}</div>`
         }
         <div class="detail-card-title">${item.title}</div>
+        ${item.author ? `<div class="detail-card-author" style="text-align:center; font-size:0.85rem; color:var(--text-secondary); margin-top:-0.25rem;">by ${item.author}</div>` : ''}
         <div class="detail-card-meta">
           ${getTypeEmoji(item.type)} ${item.type.charAt(0).toUpperCase() + item.type.slice(1)}
           ${item.genre ? ' &middot; ' + item.genre : ''}
@@ -11729,49 +12456,6 @@
       document.getElementById('detailCardOverlay').classList.add('visible');
     }
 
-    // === QUICK-ADD FROM SEARCH (Feature 6) ===
-    async function quickAddItem(index, status) {
-      if (!searchResults || !searchResults[index]) return;
-      const result = searchResults[index];
-
-      // Check if already in list
-      if (items.some(i => i.title === result.title && i.type === result.type)) {
-        showToast('Already in your list!');
-        return;
-      }
-
-      const type = document.getElementById('itemType').value || 'movie';
-      const newItem = {
-        id: Date.now().toString(),
-        title: result.title,
-        type: type,
-        status: status,
-        watchSoon: false,
-        rating: null,
-        image: result.image || '',
-        streamingPlatform: '',
-        genre: result.genre || '',
-        referral: '',
-        notes: '',
-        premiereDate: result.premiereDate || '',
-        dateLogged: '',
-        tags: [],
-        group: '',
-        userId: currentUser.id
-      };
-
-      items.push(newItem);
-      await saveItemToFirestore(newItem);
-
-      // Close autocomplete and clear input
-      document.getElementById('autocompleteResults').classList.remove('active');
-      document.getElementById('itemTitle').value = '';
-
-      renderItems();
-      const labels = { want: 'Queued', current: 'In Progress', done: 'Finished' };
-      showToast(`Added "${result.title}" as ${labels[status] || status}`);
-    }
-
     // === PULL-TO-REFRESH (Feature 7) ===
 
     // Firebase Auth state listener - main entry point
@@ -11788,8 +12472,8 @@
           alert('Error loading your data. Please try refreshing.');
         }
       } else {
-        // User is signed out - show login
-        showLogin();
+        // User is signed out - show the landing page
+        showLanding();
       }
     });
 
@@ -12165,6 +12849,19 @@
 
   <!-- Toast Notification -->
   <div id="toast" class="toast"></div>
+
+  <!-- Status Change Confirm Bar -->
+  <div id="diningNudgeBar" class="status-confirm-bar">
+    <span id="diningNudgeText"></span>
+    <button type="button" class="status-confirm-btn status-confirm-yes" id="diningNudgeYes" onclick="diningNudgeBeenThere()">⭐ Been There</button>
+    <button type="button" class="status-confirm-btn status-confirm-no" onclick="diningNudgeSnooze()">Not yet</button>
+  </div>
+
+  <div id="statusConfirmBar" class="status-confirm-bar">
+    <span id="statusConfirmText"></span>
+    <button type="button" class="status-confirm-btn status-confirm-yes" onclick="confirmStatusChange()">Confirm</button>
+    <button type="button" class="status-confirm-btn status-confirm-no" onclick="cancelStatusChange()">Cancel</button>
+  </div>
 
   <!-- Spotlight Picker Modal -->
   <div id="spotlightPickerModal" class="modal" style="display:none;" onclick="if(event.target===this)closeSpotlightPicker()">

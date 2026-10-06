@@ -1,0 +1,102 @@
+# Codemagic CI configuration for the "Cued" Capacitor iOS app.
+#
+# What this file does, in plain terms: every time it runs, Codemagic spins up
+# a temporary Mac in the cloud, checks out this repo onto it, and runs the
+# steps below in order. This first workflow only proves the iOS app compiles
+# -- it does NOT sign the app or publish it anywhere. Signing/App Store setup
+# is intentionally left out until you have an Apple Developer account.
+#
+# Docs: https://docs.codemagic.io/yaml/yaml-getting-started/
+
+workflows:
+  # "ios-unsigned-build" is just an internal ID for this workflow -- you'll
+  # see it in the Codemagic dashboard and use it if you ever trigger builds
+  # via their API. You can define multiple workflows in one file; we only
+  # need one for now.
+  ios-unsigned-build:
+    name: iOS - build only (no signing)
+
+    # Safety net: if something hangs, Codemagic kills the build after this
+    # many minutes instead of burning build credits indefinitely.
+    max_build_duration: 60
+
+    # The cloud machine to build on. mac_mini_m2 is an Apple Silicon (M2)
+    # Mac -- the machine type you asked for.
+    instance_type: mac_mini_m2
+
+    environment:
+      # "latest" tells Codemagic to use whatever Xcode version it currently
+      # has installed as default on its macOS image -- i.e. a current,
+      # supported Xcode, without you having to track version numbers.
+      xcode: latest
+
+    scripts:
+      - name: Install npm dependencies
+        script: |
+          npm install
+
+      - name: Build the www/ folder from index.html
+        script: |
+          # This is scripts/sync-web.js -- it copies your root index.html
+          # into www/index.html, which is the folder Capacitor is configured
+          # (via capacitor.config.ts's webDir) to package into the native app.
+          node scripts/sync-web.js
+
+      - name: Sync web assets and plugins into the native iOS project
+        script: |
+          # Copies the freshly-built www/ folder into ios/App, and makes sure
+          # the native project knows about any Capacitor plugins listed in
+          # package.json. This is the step that bridges your web code and
+          # the native iOS project.
+          npx cap sync ios
+
+      - name: Install CocoaPods dependencies (if this project uses CocoaPods)
+        script: |
+          # As of right now this project uses Swift Package Manager (see
+          # ios/App/CapApp-SPM) instead of CocoaPods, so there's no Podfile
+          # and this step just skips itself. It's kept here so that if a
+          # future Capacitor plugin adds a Podfile, this step starts working
+          # automatically without you having to edit this file.
+          if [ -f "ios/App/Podfile" ]; then
+            cd ios/App && pod install
+          else
+            echo "No Podfile found -- nothing to install (project uses Swift Package Manager)."
+          fi
+
+      - name: Compile the iOS app (no code signing)
+        script: |
+          # This is the actual "does it build" check.
+          #
+          # A few deliberate choices here:
+          #   -target App        builds the app target directly. Codemagic
+          #                       can't use "-scheme App" because this repo
+          #                       (never opened in Xcode, since you're on
+          #                       Windows) has no shared Xcode scheme saved
+          #                       yet -- that's normal, not a mistake.
+          #   -sdk iphonesimulator  targets the iOS Simulator rather than a
+          #                       real device. Simulator builds don't need
+          #                       any Apple Developer certificates or
+          #                       provisioning profiles, which is exactly
+          #                       what we want before you have an account.
+          #   CODE_SIGNING_ALLOWED=NO  belt-and-suspenders: explicitly turns
+          #                       signing off so the build can't fail over
+          #                       missing certificates.
+          xcodebuild build \
+            -project ios/App/App.xcodeproj \
+            -target App \
+            -sdk iphonesimulator \
+            -configuration Debug \
+            -derivedDataPath "$CM_BUILD_DIR/build" \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO
+
+    artifacts:
+      # If the build succeeds, grab the compiled .app bundle so you can see
+      # it in the Codemagic dashboard as proof the build worked. (It's a
+      # simulator build, so this isn't something you install on a real
+      # iPhone -- it's just evidence of a successful compile.)
+      - $CM_BUILD_DIR/build/Build/Products/**/*.app
+
+    # No "publishing:" section on purpose -- we're not sending this anywhere
+    # (not TestFlight, not App Store Connect, not email). That's a later step
+    # once you have an Apple Developer account and code signing set up.

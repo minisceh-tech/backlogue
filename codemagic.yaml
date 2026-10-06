@@ -68,11 +68,16 @@ workflows:
           # This is the actual "does it build" check.
           #
           # A few deliberate choices here:
-          #   -target App        builds the app target directly. Codemagic
-          #                       can't use "-scheme App" because this repo
-          #                       (never opened in Xcode, since you're on
-          #                       Windows) has no shared Xcode scheme saved
-          #                       yet -- that's normal, not a mistake.
+          #   -scheme App        this repo (never opened in Xcode, since
+          #                       you're on Windows) has no scheme file
+          #                       checked in -- that's normal. Xcode
+          #                       auto-generates an implicit scheme matching
+          #                       a target's name on the fly, so "App" still
+          #                       works without anything extra being saved
+          #                       to the repo. (We originally tried
+          #                       "-target App" instead to dodge this, but
+          #                       xcodebuild requires -scheme whenever
+          #                       -derivedDataPath is also used.)
           #   -sdk iphonesimulator  targets the iOS Simulator rather than a
           #                       real device. Simulator builds don't need
           #                       any Apple Developer certificates or
@@ -83,7 +88,7 @@ workflows:
           #                       missing certificates.
           xcodebuild build \
             -project ios/App/App.xcodeproj \
-            -target App \
+            -scheme App \
             -sdk iphonesimulator \
             -configuration Debug \
             -derivedDataPath "$CM_BUILD_DIR/build" \
